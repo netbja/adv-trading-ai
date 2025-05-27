@@ -1,0 +1,48 @@
+# ===== TRADING AI GITIGNORE =====
+
+# Données sensibles
+data/
+logs/
+backup/
+*.log
+
+# Variables d'environnement
+.env
+.env.local
+.env.production
+
+# Docker
+.docker/
+
+# Backups
+*.backup.*
+*.dump
+*.sql.gz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node modules (si API custom)
+node_modules/
+npm-debug.log*
+
+# Python (si scripts Python)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Temporary files
+*.tmp
+*.temp
+*~
