@@ -70,7 +70,7 @@ services:
       - ./backup/postgres:/backup
       - ./logs/postgres:/var/log/postgresql
       - ./configs/postgres/init:/docker-entrypoint-initdb.d:ro
-      - ./configs/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    #  - ./configs/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     networks:
       - trading_network
     restart: unless-stopped
