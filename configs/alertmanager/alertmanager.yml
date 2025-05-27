@@ -1,6 +1,6 @@
 global:
   smtp_smarthost: 'localhost:587'
-  smtp_from: 'alertmanager@trading-ai.local'
+  smtp_from: 'alertmanager@adv-trading-ai.local'
 
 route:
   group_by: ['alertname']
