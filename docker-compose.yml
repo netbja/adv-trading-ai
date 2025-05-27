@@ -194,25 +194,19 @@ services:
     image: postgres:15-alpine
     container_name: trading_ai_backup
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
-      POSTGRES_USER: ${POSTGRES_USER:-trader}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
-      PGPASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
-      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION:-7}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION}
     volumes:
       - ./backup/postgres:/backup
       - ./scripts/backup:/scripts:ro
     networks:
       - trading_network
     restart: "no"
-    entrypoint: >
-      sh -c "
-        while true; do 
-          sleep 86400; 
-          pg_dump -h postgres -U ${POSTGRES_USER:-trader} ${POSTGRES_DB:-trading_ai} > /backup/trading_ai_$$(date +%Y%m%d_%H%M%S).sql && 
-          find /backup -name '*.sql' -mtime +${BACKUP_RETENTION:-7} -delete; 
-        done
-      "
+    entrypoint: ["/bin/sh", "/scripts/backup.sh"]
+
 
 # 🌐 RÉSEAUX
 networks:
