@@ -1,0 +1,110 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+ruler:
+  alertmanager_url: http://localhost:9093
+
+limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+chunk_store_config:
+  max_look_back_period: 0s
+
+table_manager:
+  retention_deletes_enabled: false
+  retention_period: 0s
+
+compactor:
+  working_directory: /loki/boltdb-shipper-compactor
+  shared_store: filesystem
+EOF
+
+# ===== PROMTAIL CONFIG =====
+mkdir -p configs/promtail
+cat > configs/promtail/promtail.yml << 'EOF'
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+
+  - job_name: containers
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: containers
+          __path__: /var/log/containers/*.log
+
+  - job_name: trading-ai-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: trading-ai
+          __path__: /var/log/grafana/*.log
+
+      - targets:
+          - localhost
+        labels:
+          job: trading-ai
+          __path__: /var/log/postgresql/*.log
+
+      - targets:
+          - localhost
+        labels:
+          job: trading-ai
+          __path__: /var/log/n8n/*.log
+
+      - targets:
+          - localhost
+        labels:
+          job: trading-ai
+          __path__: /var/log/nginx/*.log
+          
