@@ -3,15 +3,77 @@
 ## 📋 Vue d'ensemble
 
 Système de trading automatisé multi-niveaux avec:
-- **Meme Scalping** (5min-1h) 
+
+- **Meme Scalping** (5min-1h)
 - **Technical Trading** (1h-4h)
 - **Shared AI Brain** pour optimisation
 - **Monitoring Grafana** temps réel
 - **Multi-chain support**
 
-## 🏗️ Architecture
+## structure du projet
 
-```
+### Structure détaillée
+
+/opt/trading-ai/
+├── README.md                   # Documentation principale
+├── docker-compose.yml          # Stack complète
+├── .env                        # Variables d'environnement
+├── .gitignore                  # Fichiers à ignorer
+├── configs/                    # Configurations
+│   ├── nginx/
+│   │   └── nginx.conf          # Reverse proxy
+│   │   └── frontend/
+│   │   │   └── index.html      # Page web
+│   ├── grafana/
+│   │   ├── dashboards/         # Dashboards JSON
+│   │   │   └── trading-master-dashboard.json
+│   │   │   └── n8n-workflows.json
+│   │   │   └── system-metrics.json
+│   │   ├── provisioning/       # Auto-provisioning
+│   │   │   └── dashboards/     # Dashboards YAML
+│   │   │       └── dashboards.yml
+│   │   │   └── datasources/    # Datasources YAML
+│   │   │       └── datasources.yml
+│   │   └── grafana.ini         # Config Grafana
+│   ├── prometheus/
+│   │   └── prometheus.yml      # Config monitoring
+│   └── postgres/
+│       └── init.sql           # Schema initial
+│
+├── scripts/                    # Scripts utilitaires
+│   ├── backup.sh              # Backup automatique
+│   ├── restore.sh             # Restauration
+│   ├── deploy.sh              # Déploiement
+│   └── monitoring.sh          # Healthcheck
+│
+├── n8n-workflows/             # Workflows N8N
+│   ├── 01-meme-scalping.json     # Workflow principal
+│   ├── 02-technical-trading.json # Workflow technique (futur)
+│   └── 03-shared-brain.json      # AI partagé (futur)
+│
+├── src/                       # Code source custom
+│   ├── api/                   # API custom si besoin
+│   ├── utils/                 # Utilitaires
+│   └── monitoring/            # Scripts monitoring
+│
+├── data/                      # Données (gitignore)
+│   ├── postgres/              # Base de données
+│   ├── grafana/               # Dashboards + config
+│   ├── n8n/                   # Workflows sauvés
+│   └── prometheus/            # Métriques historiques
+│
+├── logs/                      # Logs centralisés (gitignore)
+│   ├── postgres/
+│   ├── grafana/
+│   ├── n8n/
+│   └── nginx/
+│
+└── backup/                    # Backups (gitignore)
+    └── postgres/              # Dumps quotidiens
+
+### 🏗️ Architecture
+
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   N8N Workflows │    │   PostgreSQL    │    │     Grafana     │
 │   - Meme Scalp  │◄──►│   - Trades      │◄──►│   - Dashboard   │

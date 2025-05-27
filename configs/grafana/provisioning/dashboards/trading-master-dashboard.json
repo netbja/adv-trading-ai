@@ -1,0 +1,462 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "🤖 Dual AI Trading System - Master Dashboard",
+    "tags": ["trading", "ai", "crypto", "n8n"],
+    "timezone": "UTC",
+    "refresh": "30s",
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "🎯 System Overview",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "SELECT \n  CASE WHEN COUNT(*) > 0 THEN 'ACTIVE' ELSE 'INACTIVE' END as status,\n  COUNT(*) as total_trades,\n  AVG(CASE WHEN actual_roi > 0 THEN 1 ELSE 0 END) * 100 as win_rate,\n  AVG(actual_roi) as avg_roi\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '24 hours'",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {"displayMode": "basic"},
+            "unit": "short"
+          }
+        }
+      },
+      
+      {
+        "id": 2,
+        "title": "⚖️ Strategy Allocation",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "targets": [
+          {
+            "expr": "SELECT \n  strategy,\n  COUNT(*) as trades,\n  SUM(amount_usd) as volume\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '24 hours'\nGROUP BY strategy",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "options": {
+          "pieType": "donut",
+          "tooltip": {"mode": "single"},
+          "legend": {"displayMode": "list", "placement": "right"}
+        }
+      },
+      
+      {
+        "id": 3,
+        "title": "📊 Performance Comparison",
+        "type": "bargauge",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "targets": [
+          {
+            "expr": "SELECT \n  strategy,\n  AVG(CASE WHEN actual_roi > 0 THEN 1 ELSE 0 END) * 100 as win_rate,\n  AVG(actual_roi) as avg_roi,\n  COUNT(*) as total_trades\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '7 days'\nGROUP BY strategy",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "continuous-GrYlRd"},
+            "custom": {"orientation": "horizontal"},
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        }
+      },
+      
+      {
+        "id": 4,
+        "title": "💰 Portfolio Balance Evolution",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12},
+        "targets": [
+          {
+            "expr": "SELECT \n  timestamp,\n  total_balance,\n  available_balance,\n  total_pnl,\n  strategy\nFROM portfolio_snapshots \nWHERE timestamp >= NOW() - INTERVAL '24 hours'\nORDER BY timestamp",
+            "format": "time_series",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "barAlignment": 0,
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "gradientMode": "hue",
+              "spanNulls": false,
+              "insertNulls": false,
+              "showPoints": "never",
+              "pointSize": 5
+            },
+            "unit": "currencyUSD"
+          }
+        }
+      },
+      
+      {
+        "id": 5,
+        "title": "🔥 Recent Trades",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 20},
+        "targets": [
+          {
+            "expr": "SELECT \n  timestamp,\n  symbol,\n  action,\n  price,\n  amount_usd,\n  strategy,\n  actual_roi,\n  status,\n  platform\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '4 hours'\nORDER BY timestamp DESC\nLIMIT 20",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto"
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "actual_roi"},
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "continuous-GrYlRd"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      
+      {
+        "id": 6,
+        "title": "📈 Market Conditions",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 0, "y": 28},
+        "targets": [
+          {
+            "expr": "SELECT \n  condition,\n  volatility_level,\n  confidence_score\nFROM market_conditions \nORDER BY timestamp DESC \nLIMIT 1",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "custom": {"displayMode": "lcd"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 40},
+                {"color": "green", "value": 70}
+              ]
+            }
+          }
+        }
+      },
+      
+      {
+        "id": 7,
+        "title": "🧠 AI Learning Progress",
+        "type": "gauge",
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 28},
+        "targets": [
+          {
+            "expr": "SELECT \n  AVG(confidence) as avg_confidence,\n  COUNT(*) as pattern_count\nFROM ai_learning \nWHERE timestamp >= NOW() - INTERVAL '24 hours'",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "continuous-GrYlRd"},
+            "custom": {"orientation": "auto"},
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        }
+      },
+      
+      {
+        "id": 8,
+        "title": "⚡ System Health",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 28},
+        "targets": [
+          {
+            "expr": "up{job=\"trading-ai\"}",
+            "datasource": "Prometheus"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "unit": "short",
+            "custom": {"displayMode": "basic"}
+          }
+        }
+      },
+      
+      {
+        "id": 9,
+        "title": "📊 Hourly Performance Heatmap",
+        "type": "heatmap",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "SELECT \n  EXTRACT(HOUR FROM timestamp) as hour,\n  EXTRACT(DOW FROM timestamp) as day_of_week,\n  AVG(actual_roi) as avg_roi,\n  COUNT(*) as trade_count\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '7 days'\nGROUP BY EXTRACT(HOUR FROM timestamp), EXTRACT(DOW FROM timestamp)\nORDER BY hour, day_of_week",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "hideFrom": {"legend": false, "tooltip": false, "vis": false}
+            },
+            "color": {"mode": "continuous-RdYlGr"}
+          }
+        }
+      },
+      
+      {
+        "id": 10,
+        "title": "🎯 Top Performing Tokens",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+        "targets": [
+          {
+            "expr": "SELECT \n  symbol,\n  COUNT(*) as trades,\n  AVG(actual_roi) as avg_roi,\n  SUM(amount_usd) as total_volume,\n  AVG(holding_time_minutes) as avg_holding_time\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '7 days'\n  AND actual_roi IS NOT NULL\nGROUP BY symbol\nHAVING COUNT(*) >= 2\nORDER BY AVG(actual_roi) DESC\nLIMIT 10",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {"align": "auto", "displayMode": "auto"}
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "avg_roi"},
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {"mode": "continuous-GrYlRd"}
+                },
+                {
+                  "id": "unit",
+                  "value": "percent"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      
+      {
+        "id": 11,
+        "title": "🔄 Strategy Rebalancing History",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 40},
+        "targets": [
+          {
+            "expr": "SELECT \n  timestamp,\n  strategy_allocation->>'meme' as meme_allocation,\n  strategy_allocation->>'technical' as technical_allocation\nFROM market_conditions \nWHERE timestamp >= NOW() - INTERVAL '7 days'\nORDER BY timestamp",
+            "format": "time_series",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "stepAfter",
+              "lineWidth": 2,
+              "fillOpacity": 20,
+              "gradientMode": "none",
+              "spanNulls": false,
+              "insertNulls": false,
+              "showPoints": "always",
+              "pointSize": 8
+            },
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1
+          }
+        },
+        "options": {
+          "tooltip": {"mode": "multi", "sort": "none"},
+          "legend": {"calcs": [], "displayMode": "list", "placement": "bottom"}
+        }
+      },
+      
+      {
+        "id": 12,
+        "title": "⚠️ Risk Metrics",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 46},
+        "targets": [
+          {
+            "expr": "SELECT \n  (COUNT(CASE WHEN actual_roi < -10 THEN 1 END) * 100.0 / COUNT(*)) as large_loss_rate,\n  MIN(actual_roi) as max_loss,\n  STDDEV(actual_roi) as volatility\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '7 days'\n  AND actual_roi IS NOT NULL",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 15},
+                {"color": "red", "value": 25}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+      },
+      
+      {
+        "id": 13,
+        "title": "💎 Best Chains Performance",
+        "type": "bargauge",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 46},
+        "targets": [
+          {
+            "expr": "SELECT \n  chain,\n  COUNT(*) as trades,\n  AVG(actual_roi) as avg_roi,\n  SUM(amount_usd) as volume\nFROM trades \nWHERE timestamp >= NOW() - INTERVAL '7 days'\nGROUP BY chain\nORDER BY AVG(actual_roi) DESC",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "continuous-GrYlRd"},
+            "custom": {"orientation": "vertical"},
+            "unit": "percent"
+          }
+        }
+      },
+      
+      {
+        "id": 14,
+        "title": "🚀 Volume Distribution",
+        "type": "histogram",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 46},
+        "targets": [
+          {
+            "expr": "SELECT amount_usd FROM trades WHERE timestamp >= NOW() - INTERVAL '24 hours'",
+            "format": "table",
+            "datasource": "PostgreSQL"
+          }
+        ],
+        "options": {
+          "bucketSize": 100,
+          "bucketOffset": 0
+        }
+      },
+      
+      {
+        "id": 15,
+        "title": "🔥 Live Trading Activity",
+        "type": "logs",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 46},
+        "targets": [
+          {
+            "expr": "{job=\"trading-ai\"} |= \"Trade executed\" or \"Trade failed\"",
+            "datasource": "Prometheus"
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "showCommonLabels": false,
+          "wrapLogMessage": false,
+          "prettifyLogMessage": false,
+          "enableLogDetails": true,
+          "dedupStrategy": "none",
+          "sortOrder": "Descending"
+        }
+      }
+    ],
+    
+    "templating": {
+      "list": [
+        {
+          "name": "strategy",
+          "type": "custom",
+          "options": [
+            {"text": "All", "value": "$__all", "selected": true},
+            {"text": "Meme", "value": "MEME"},
+            {"text": "Technical", "value": "TECHNICAL"}
+          ],
+          "current": {"text": "All", "value": "$__all"},
+          "multi": true,
+          "includeAll": true
+        },
+        {
+          "name": "timerange",
+          "type": "interval",
+          "options": [
+            {"text": "1h", "value": "1h"},
+            {"text": "6h", "value": "6h"},
+            {"text": "24h", "value": "24h", "selected": true},
+            {"text": "7d", "value": "7d"},
+            {"text": "30d", "value": "30d"}
+          ],
+          "current": {"text": "24h", "value": "24h"}
+        }
+      ]
+    },
+    
+    "annotations": {
+      "list": [
+        {
+          "name": "Strategy Rebalance",
+          "datasource": "PostgreSQL",
+          "target": {
+            "expr": "SELECT timestamp, 'Strategy Rebalanced' as text FROM market_conditions WHERE strategy_allocation IS NOT NULL"
+          },
+          "iconColor": "rgba(255, 96, 96, 1)",
+          "enable": true
+        },
+        {
+          "name": "Large Losses",
+          "datasource": "PostgreSQL", 
+          "target": {
+            "expr": "SELECT timestamp, CONCAT(symbol, ': ', actual_roi, '%') as text FROM trades WHERE actual_roi < -15"
+          },
+          "iconColor": "rgba(255, 0, 0, 1)",
+          "enable": true
+        }
+      ]
+    }
+  }
+}

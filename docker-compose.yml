@@ -1,0 +1,224 @@
+# 🐳 DOCKER SETUP COMPLET - VOLUMES AVEC VARIABLES + NGINX CORRIGÉ
+version: '3.8'
+
+services:
+  # 🌐 NGINX REVERSE PROXY + FRONTEND
+  nginx:
+    image: nginx:alpine
+    container_name: trading_ai_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs/nginx/frontend:/usr/share/nginx/html:ro
+      - ./configs/nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+      # Ajouter htpasswd depuis le container
+      - ./configs/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+    depends_on:
+      - grafana
+      - n8n
+    networks:
+      - trading_network
+    restart: unless-stopped
+    # Créer htpasswd dans le container nginx
+    command: >
+      sh -c "
+        apk add --no-cache apache2-utils &&
+        if [ ! -f /etc/nginx/.htpasswd ]; then
+          echo 'admin:' > /etc/nginx/.htpasswd &&
+          echo 'PrometheusAdmin2025!' | htpasswd -i /etc/nginx/.htpasswd admin
+        fi &&
+        nginx -g 'daemon off;'
+      "
+
+  # 📊 GRAFANA - MONITORING DASHBOARDS
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trading_ai_grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-TradingAI2025!}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_USERS_ALLOW_ORG_CREATE=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_SECURITY_SECRET_KEY=${GF_SECRET_KEY:-your-secret-key-here}
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./logs/grafana:/var/log/grafana
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - trading_network
+    restart: unless-stopped
+    user: "472:472"  # Grafana user
+    depends_on:
+      - postgres
+
+  # 🗃️ POSTGRESQL - BASE DE DONNÉES PRINCIPALE
+  postgres:
+    image: postgres:15-alpine
+    container_name: trading_ai_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-trader}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./backup/postgres:/backup
+      - ./logs/postgres:/var/log/postgresql
+      - ./configs/postgres/init:/docker-entrypoint-initdb.d:ro
+      - ./configs/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    networks:
+      - trading_network
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c log_destination=stderr
+      -c logging_collector=on
+      -c log_directory=/var/log/postgresql
+      -c log_filename=postgresql-%Y-%m-%d.log
+
+  # 🔧 N8N - WORKFLOW AUTOMATION
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: trading_ai_n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-TradingN8N2025!}
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${N8N_DB:-n8n}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-trader}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-TradingDB2025!}
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+    volumes:
+      - ./data/n8n:/home/node/.n8n
+      - ./logs/n8n:/var/log/n8n
+      - ./configs/n8n/custom-nodes:/home/node/.n8n/custom:ro
+    networks:
+      - trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  # 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trading_ai_prometheus
+    volumes:
+      - ./data/prometheus:/prometheus
+      - ./configs/prometheus:/etc/prometheus
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./configs/prometheus/rules:/etc/prometheus/rules:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  # 📊 NODE EXPORTER - MÉTRIQUES SYSTÈME
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: trading_ai_node_exporter
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  # 🚨 ALERTMANAGER - GESTION ALERTES
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: trading_ai_alertmanager
+    volumes:
+      - ./data/alertmanager:/alertmanager
+      - ./configs/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  # 📋 LOKI - CENTRALISATION LOGS
+  loki:
+    image: grafana/loki:latest
+    container_name: trading_ai_loki
+    volumes:
+      - ./data/loki:/loki
+      - ./configs/loki/loki.yml:/etc/loki/local-config.yaml:ro
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  # 📦 PROMTAIL - COLLECTEUR LOGS
+  promtail:
+    image: grafana/promtail:latest
+    container_name: trading_ai_promtail
+    volumes:
+      - ./configs/promtail/promtail.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - ./logs/grafana:/var/log/grafana:ro
+      - ./logs/postgres:/var/log/postgresql:ro
+      - ./logs/n8n:/var/log/n8n:ro
+      - ./logs/nginx:/var/log/nginx:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  # 🔄 BACKUP SERVICE
+  backup:
+    image: postgres:15-alpine
+    container_name: trading_ai_backup
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-trader}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION:-7}
+    volumes:
+      - ./backup/postgres:/backup
+      - ./scripts/backup:/scripts:ro
+    networks:
+      - trading_network
+    restart: "no"
+    entrypoint: >
+      sh -c "
+        while true; do 
+          sleep 86400; 
+          pg_dump -h postgres -U ${POSTGRES_USER:-trader} ${POSTGRES_DB:-trading_ai} > /backup/trading_ai_$$(date +%Y%m%d_%H%M%S).sql && 
+          find /backup -name '*.sql' -mtime +${BACKUP_RETENTION:-7} -delete; 
+        done
+      "
+
+# 🌐 RÉSEAUX
+networks:
+  trading_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET:-172.20.0.0/16}
