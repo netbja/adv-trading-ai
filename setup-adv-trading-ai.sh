@@ -137,7 +137,7 @@ create_project_structure() {
     create_dir_safe "$TRADING_AI_DIR/backup/postgres"
     
     # Structure de configuration
-    create_dir_safe "$TRADING_AI_DIR/configs/nginx"
+    create_dir_safe "$TRADING_AI_DIR/configs/nginx/frontend"
     create_dir_safe "$TRADING_AI_DIR/configs/grafana/dashboards"
     create_dir_safe "$TRADING_AI_DIR/configs/grafana/provisioning/dashboards"
     create_dir_safe "$TRADING_AI_DIR/configs/grafana/provisioning/datasources"
@@ -147,9 +147,7 @@ create_project_structure() {
     # Structure de développement
     create_dir_safe "$TRADING_AI_DIR/scripts"
     create_dir_safe "$TRADING_AI_DIR/n8n-workflows"
-    create_dir_safe "$TRADING_AI_DIR/src/api"
-    create_dir_safe "$TRADING_AI_DIR/src/utils"
-    create_dir_safe "$TRADING_AI_DIR/src/monitoring"
+    create_dir_safe "$TRADING_AI_DIR/docs"
     
     log_success "Structure créée avec succès"
 }
@@ -266,25 +264,13 @@ services:
     volumes:
       - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/nginx/frontend:/usr/share/nginx/html:ro
-      - ./configs/nginx/ssl:/etc/nginx/ssl:ro
       - ./logs/nginx:/var/log/nginx
-      - ./configs/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
     depends_on:
       - grafana
       - n8n
     networks:
       - trading_network
     restart: unless-stopped
-    # Créer htpasswd dans le container
-    command: >
-      sh -c "
-        apk add --no-cache apache2-utils &&
-        if [ ! -f /etc/nginx/.htpasswd ]; then
-          echo '"'"'admin:'"'"' > /etc/nginx/.htpasswd &&
-          echo '"'"'PrometheusAdmin2025!'"'"' | htpasswd -i /etc/nginx/.htpasswd admin
-        fi &&
-        nginx -g '"'"'daemon off;'"'"'
-      "
 
   # 📊 GRAFANA
   grafana:
@@ -297,6 +283,8 @@ services:
     volumes:
       - ./data/grafana:/var/lib/grafana
       - ./logs/grafana:/var/log/grafana
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards:ro
     networks:
       - trading_network
     restart: unless-stopped
@@ -316,6 +304,7 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
       - ./backup/postgres:/backup
       - ./logs/postgres:/var/log/postgresql
+      - ./configs/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - trading_network
     restart: unless-stopped
@@ -332,6 +321,7 @@ services:
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-TradingN8N2025!}
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=${N8N_DB:-n8n}
       - DB_POSTGRESDB_USER=${POSTGRES_USER:-trader}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-TradingDB2025!}
@@ -343,6 +333,8 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+    ports:
+      - "5678:5678"
 
 networks:
   trading_network:
@@ -350,6 +342,90 @@ networks:
 
     create_file_safe "$TRADING_AI_DIR/docker-compose.yml" "$compose_content" "$(date +%Y%m%d_%H%M%S)"
 }
+
+create_nginx_frontend() {
+    local index_html_content='<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Trading AI Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: '"'"'Segoe UI'"'"', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .card {
+            background: rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2); transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .btn {
+            display: inline-block; padding: 12px 24px; margin: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white; text-decoration: none; border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover { background: linear-gradient(45deg, #ee5a24, #ff6b6b); }
+        .status { display: flex; justify-content: space-around; margin-bottom: 30px; }
+        .status-item { text-align: center; }
+        .status-value { font-size: 2rem; font-weight: bold; }
+        .status-online { color: #00d4aa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Advanced Trading AI System</h1>
+            <p>Dual AI Architecture - Health Monitoring - Auto Learning</p>
+        </div>
+
+        <div class="status">
+            <div class="status-item">
+                <div class="status-value status-online">●</div>
+                <div>System</div>
+            </div>
+            <div class="status-item">
+                <div class="status-value">3</div>
+                <div>Active Trades</div>
+            </div>
+            <div class="status-item">
+                <div class="status-value">+12.5%</div>
+                <div>Daily P&L</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>📊 Grafana Monitoring</h3>
+                <p>Analytics, dashboards, performance metrics</p>
+                <a href="http://localhost:3000" class="btn" target="_blank">Open Grafana</a>
+            </div>
+            <div class="card">
+                <h3>🔧 N8N Workflows</h3>
+                <p>Trading workflows, AI orchestration</p>
+                <a href="http://localhost:5678" class="btn" target="_blank">Open N8N</a>
+            </div>
+            <div class="card">
+                <h3>🗃️ PostgreSQL</h3>
+                <p>Database management and queries</p>
+                <a href="#" class="btn">Database Info</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>'
+
+    create_file_safe "$TRADING_AI_DIR/configs/nginx/frontend/index.html" "$index_html_content" "$(date +%Y%m%d_%H%M%S)"
+}
+
+create_readme() {
     local readme_content="# 🚀 Advanced Trading AI System
 
 ## 📋 Vue d'ensemble
@@ -357,7 +433,7 @@ networks:
 Système de trading automatisé multi-niveaux avec:
 - **Meme Scalping** (5min-1h) 
 - **Technical Trading** (1h-4h)
-- **Shared AI Brain** pour optimisation
+- **Health Monitor IA** (30s)
 - **Monitoring Grafana** temps réel
 - **Multi-chain support**
 
@@ -368,15 +444,7 @@ Système de trading automatisé multi-niveaux avec:
 │   N8N Workflows │    │   PostgreSQL    │    │     Grafana     │
 │   - Meme Scalp  │◄──►│   - Trades      │◄──►│   - Dashboard   │
 │   - Technical   │    │   - Portfolio   │    │   - Alerts      │
-│   - Shared AI   │    │   - Metrics     │    │   - Reports     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         ▲                       ▲                       ▲
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     Nginx       │    │   Prometheus    │    │    Telegram     │
-│   - Reverse     │    │   - Metrics     │    │   - Alerts      │
-│   - SSL/TLS     │    │   - Monitoring  │    │   - Reports     │
+│   - Health AI   │    │   - Metrics     │    │   - Reports     │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 \`\`\`
 
@@ -397,7 +465,7 @@ docker-compose up -d
 # 4. Accès aux services
 # N8N: http://localhost:5678
 # Grafana: http://localhost:3000
-# PostgreSQL: localhost:5432
+# Frontend: http://localhost
 \`\`\`
 
 ## 📊 Services
@@ -407,48 +475,100 @@ docker-compose up -d
 | N8N | 5678 | Workflows automation |
 | Grafana | 3000 | Monitoring dashboards |
 | PostgreSQL | 5432 | Base de données |
-| Prometheus | 9090 | Métriques |
-| Nginx | 80/443 | Reverse proxy |
-
-## 🛠️ Gestion
-
-\`\`\`bash
-# Backup
-./scripts/backup.sh
-
-# Restauration
-./scripts/restore.sh backup_20241127.sql
-
-# Monitoring
-./scripts/monitoring.sh
-
-# Logs
-docker-compose logs -f [service]
-\`\`\`
+| Nginx | 80 | Frontend & reverse proxy |
 
 ## 📈 Workflows
 
-1. **Meme Scalping**: Scanner Pump.fun + AI Analysis
-2. **Technical Trading**: Multi-timeframe analysis  
-3. **Shared Brain**: Optimisation cross-strategy
+1. **Meme Scalping**: Scanner Pump.fun + AI Analysis (5-15min)
+2. **Technical Trading**: Multi-timeframe analysis (1-4h)
+3. **Health Monitor**: API/RPC monitoring + auto-adjustment (30s)
 
 ## 🔒 Sécurité
 
 - Authentification sur tous les services
-- SSL/TLS avec Nginx
-- Sauvegarde automatique
+- Sauvegarde automatique PostgreSQL
 - Logs centralisés
-
-## 📞 Support
-
-- Documentation: \`./docs/\`
-- Logs: \`./logs/\`
-- Issues: GitHub Issues
+- Monitoring proactif
 
 ---
-Créé le $(date +%Y-%m-%d) | Version 1.0"
+Créé le $(date +%Y-%m-%d) | Version 2.0"
 
     create_file_safe "$TRADING_AI_DIR/README.md" "$readme_content" "$(date +%Y%m%d_%H%M%S)"
+}
+
+# ===== CRÉATION DE FICHIERS SUPPLÉMENTAIRES =====
+create_additional_configs() {
+    # PostgreSQL init.sql
+    local postgres_init="-- 🗃️ POSTGRESQL INITIALIZATION
+-- Schema pour Trading AI System
+
+-- Extension pour UUID
+CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";
+
+-- Table des trades
+CREATE TABLE IF NOT EXISTS trades (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workflow_type VARCHAR(50) NOT NULL,
+    symbol VARCHAR(20) NOT NULL,
+    side VARCHAR(10) NOT NULL,
+    amount DECIMAL(18,8) NOT NULL,
+    price DECIMAL(18,8) NOT NULL,
+    status VARCHAR(20) DEFAULT 'OPEN',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Table des métriques de santé
+CREATE TABLE IF NOT EXISTS health_metrics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    service_name VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    latency_ms INTEGER,
+    error_message TEXT,
+    checked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Index pour performance
+CREATE INDEX IF NOT EXISTS idx_trades_symbol ON trades(symbol);
+CREATE INDEX IF NOT EXISTS idx_trades_created_at ON trades(created_at);
+CREATE INDEX IF NOT EXISTS idx_health_checked_at ON health_metrics(checked_at);"
+
+    create_file_safe "$TRADING_AI_DIR/configs/postgres/init.sql" "$postgres_init" "$(date +%Y%m%d_%H%M%S)"
+
+    # Grafana datasources
+    local grafana_datasources="apiVersion: 1
+
+datasources:
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    database: \${POSTGRES_DB:-trading_ai}
+    user: \${POSTGRES_USER:-trader}
+    secureJsonData:
+      password: \${POSTGRES_PASSWORD:-TradingDB2025!}
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false"
+
+    create_file_safe "$TRADING_AI_DIR/configs/grafana/provisioning/datasources/datasources.yml" "$grafana_datasources" "$(date +%Y%m%d_%H%M%S)"
+
+    # Grafana dashboards provisioning
+    local grafana_dashboards="apiVersion: 1
+
+providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards"
+
+    create_file_safe "$TRADING_AI_DIR/configs/grafana/provisioning/dashboards/dashboards.yml" "$grafana_dashboards" "$(date +%Y%m%d_%H%M%S)"
 }
 
 # ===== INITIALISATION GIT =====
@@ -465,12 +585,12 @@ init_git_repo() {
     fi
     
     # Ajouter les fichiers de base
-    if [[ -n "$(git status --porcelain)" ]]; then
-        git add .gitignore README.md .env 2>/dev/null || true
-        if git diff --staged --quiet; then
+    if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+        git add .gitignore README.md docker-compose.yml configs/ n8n-workflows/ scripts/ 2>/dev/null || true
+        if git diff --staged --quiet 2>/dev/null; then
             log_info "Aucun changement à commiter"
         else
-            git commit -m "Initial commit: Project structure and configuration" 2>/dev/null || log_info "Commit initial déjà présent"
+            git commit -m "Initial commit: Project structure and configuration" 2>/dev/null || log_info "Commit initial"
             log_success "Commit initial créé"
         fi
     else
@@ -482,14 +602,10 @@ init_git_repo() {
 final_checks() {
     log_info "Vérifications finales..."
     
-    # Permissions
-    chmod +x "$TRADING_AI_DIR/scripts/"*.sh 2>/dev/null || true
-    
-    # Structure
+    # Vérifier les répertoires critiques
     local critical_dirs=(
-        "$TRADING_AI_DIR/data"
-        "$TRADING_AI_DIR/logs" 
         "$TRADING_AI_DIR/configs"
+        "$TRADING_AI_DIR/n8n-workflows"
         "$TRADING_AI_DIR/scripts"
     )
     
@@ -514,7 +630,7 @@ show_summary() {
     if [[ "${GIT_ONLY:-false}" == "true" ]]; then
         echo -e "${BLUE}🔧 LAPTOP/DÉVELOPPEMENT - Prochaines étapes:${NC}"
         echo "1. cd $TRADING_AI_DIR"
-        echo "2. git add . && git commit -m 'Initial project structure'"
+        echo "2. git add . && git commit -m 'Complete project structure'"
         echo "3. git remote add origin <your-github-repo>"
         echo "4. git push -u origin main"
         echo ""
@@ -531,7 +647,7 @@ show_summary() {
         echo -e "${BLUE}🌐 Services après démarrage:${NC}"
         echo "• N8N: http://localhost:5678"
         echo "• Grafana: http://localhost:3000" 
-        echo "• PostgreSQL: localhost:5432"
+        echo "• Frontend: http://localhost"
     fi
     
     echo ""
@@ -542,7 +658,7 @@ show_summary() {
 # ===== FONCTION PRINCIPALE =====
 main() {
     echo ""
-    log_info "===== SETUP TRADING-AI v1.0 ====="
+    log_info "===== SETUP TRADING-AI v2.0 ====="
     log_info "Installation idempotente dans: $TRADING_AI_DIR"
     echo ""
     
@@ -553,6 +669,7 @@ main() {
     create_docker_compose
     create_nginx_frontend
     create_readme
+    create_additional_configs
     init_git_repo
     final_checks
     show_summary
