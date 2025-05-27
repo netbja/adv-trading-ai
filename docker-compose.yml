@@ -180,7 +180,6 @@ services:
     container_name: trading_ai_promtail
     volumes:
       - ./configs/promtail/promtail.yml:/etc/promtail/config.yml:ro
-      - /var/log:/var/log:ro
       - ./logs/grafana:/var/log/grafana:ro
       - ./logs/postgres:/var/log/postgresql:ro
       - ./logs/n8n:/var/log/n8n:ro
