@@ -56,16 +56,16 @@ services:
     depends_on:
       - postgres
 
-postgres:
-  image: postgres:15-alpine
-  container_name: trading_ai_postgres
-  environment:
-    POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
-    POSTGRES_USER: ${POSTGRES_USER:-trader}
+# 🗃️ POSTGRESQL - BASE DE DONNÉES PRINCIPALE
+  postgres:
+    image: postgres:15-alpine
+    container_name: trading_ai_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-trader}
     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
     POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
   volumes:
-    # ✅ VOLUME DOCKER (au lieu de bind mount)
     - postgres_data:/var/lib/postgresql/data
     - ./backup/postgres:/backup
     - ./logs/postgres:/var/log/postgresql
@@ -98,7 +98,7 @@ postgres:
     -c log_directory=/var/log/postgresql
     -c log_filename=postgresql-%Y-%m-%d.log
 
-  # 🔧 N8N - WORKFLOW AUTOMATION
+# 🔧 N8N - WORKFLOW AUTOMATION
   n8n:
     image: n8nio/n8n:latest
     container_name: trading_ai_n8n
@@ -129,7 +129,7 @@ postgres:
     depends_on:
       - postgres
 
-  # 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
+# 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
   prometheus:
     image: prom/prometheus:latest
     container_name: trading_ai_prometheus
@@ -150,7 +150,7 @@ postgres:
       - trading_network
     restart: unless-stopped
 
-  # 📊 NODE EXPORTER - MÉTRIQUES SYSTÈME
+# 📊 NODE EXPORTER - MÉTRIQUES SYSTÈME
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: trading_ai_node_exporter
@@ -162,7 +162,7 @@ postgres:
       - trading_network
     restart: unless-stopped
 
-  # 🚨 ALERTMANAGER - GESTION ALERTES
+# 🚨 ALERTMANAGER - GESTION ALERTES
   alertmanager:
     image: prom/alertmanager:latest
     container_name: trading_ai_alertmanager
@@ -177,53 +177,52 @@ postgres:
       - trading_network
     restart: unless-stopped
 
-  # 📋 LOKI - CENTRALISATION LOGS
-  loki:
-    image: grafana/loki:latest
-    container_name: trading_ai_loki
-    volumes:
-      - ./configs/loki/loki.yml:/etc/loki/local-config.yaml:ro
-      - ./data/loki/chunks:/loki/chunks
-      - ./data/loki/rules:/loki/rules
-      - ./data/loki/tsdb-compactor:/loki/tsdb-compactor
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - trading_network
-    restart: unless-stopped
+# 📋 LOKI - CENTRALISATION LOGS
+loki:
+  image: grafana/loki:latest
+  container_name: trading_ai_loki
+  volumes:
+    - ./configs/loki/loki.yml:/etc/loki/local-config.yaml:ro
+    - ./data/loki/chunks:/loki/chunks
+    - ./data/loki/rules:/loki/rules
+    - ./data/loki/tsdb-compactor:/loki/tsdb-compactor
+  command: -config.file=/etc/loki/local-config.yaml
+  networks:
+    - trading_network
+  restart: unless-stopped
 
+# 📦 PROMTAIL - COLLECTEUR LOGS
+promtail:
+  image: grafana/promtail:latest
+  container_name: trading_ai_promtail
+  volumes:
+    - ./configs/promtail/promtail.yml:/etc/promtail/config.yml:ro
+    - ./logs/grafana:/var/log/grafana:ro
+    - ./logs/postgres:/var/log/postgresql:ro
+    - ./logs/n8n:/var/log/n8n:ro
+    - ./logs/nginx:/var/log/nginx:ro
+  command: -config.file=/etc/promtail/config.yml
+  networks:
+    - trading_network
+  restart: unless-stopped
 
-  # 📦 PROMTAIL - COLLECTEUR LOGS
-  promtail:
-    image: grafana/promtail:latest
-    container_name: trading_ai_promtail
-    volumes:
-      - ./configs/promtail/promtail.yml:/etc/promtail/config.yml:ro
-      - ./logs/grafana:/var/log/grafana:ro
-      - ./logs/postgres:/var/log/postgresql:ro
-      - ./logs/n8n:/var/log/n8n:ro
-      - ./logs/nginx:/var/log/nginx:ro
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - trading_network
-    restart: unless-stopped
-
-  # 🔄 BACKUP SERVICE
-  backup:
-    image: postgres:15-alpine
-    container_name: trading_ai_backup
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGPASSWORD: ${POSTGRES_PASSWORD}
-      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION}
-    volumes:
-      - ./backup/postgres:/backup
-      - ./scripts/backup:/scripts:ro
-    networks:
-      - trading_network
-    restart: "no"
-    entrypoint: ["/bin/sh", "/scripts/backup.sh"]
+# 🔄 BACKUP SERVICE
+backup:
+  image: postgres:15-alpine
+  container_name: trading_ai_backup
+  environment:
+    POSTGRES_DB: ${POSTGRES_DB}
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    PGPASSWORD: ${POSTGRES_PASSWORD}
+    BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION}
+  volumes:
+    - ./backup/postgres:/backup
+    - ./scripts/backup:/scripts:ro
+  networks:
+    - trading_network
+  restart: "no"
+  entrypoint: ["/bin/sh", "/scripts/backup.sh"]
 
 
 # 🌐 RÉSEAUX
