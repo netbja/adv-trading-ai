@@ -56,49 +56,49 @@ services:
     depends_on:
       - postgres
 
-# 🗃️ POSTGRESQL - BASE DE DONNÉES PRINCIPALE
+  # 🗃️ POSTGRESQL - BASE DE DONNÉES PRINCIPALE (CORRIGÉ)
   postgres:
     image: postgres:15-alpine
     container_name: trading_ai_postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
       POSTGRES_USER: ${POSTGRES_USER:-trader}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
-    POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-  volumes:
-    - postgres_data:/var/lib/postgresql/data
-    - ./backup/postgres:/backup
-    - ./logs/postgres:/var/log/postgresql
-    - ./configs/postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
-    - ./configs/postgres/init:/docker-entrypoint-initdb.d:ro
-  networks:
-    - trading_network
-  restart: unless-stopped
-  ports:
-    - "${POSTGRES_PORT:-5432}:5432"
-  # CONFIGURATION VIA ARGUMENTS DE COMMANDE (méthode correcte pour Alpine)
-  command: >
-    postgres
-    -c max_connections=100
-    -c shared_buffers=128MB
-    -c effective_cache_size=512MB
-    -c work_mem=4MB
-    -c maintenance_work_mem=64MB
-    -c checkpoint_completion_target=0.7
-    -c wal_buffers=16MB
-    -c random_page_cost=1.1
-    -c effective_io_concurrency=200
-    -c default_statistics_target=100
-    -c min_wal_size=1GB
-    -c max_wal_size=4GB
-    -c log_statement=all
-    -c log_min_duration_statement=1000
-    -c logging_collector=on
-    -c log_destination=stderr
-    -c log_directory=/var/log/postgresql
-    -c log_filename=postgresql-%Y-%m-%d.log
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backup/postgres:/backup
+      - ./logs/postgres:/var/log/postgresql
+      - ./configs/postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+      - ./configs/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - trading_network
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    # CONFIGURATION VIA ARGUMENTS DE COMMANDE (méthode correcte pour Alpine)
+    command: >
+      postgres
+      -c max_connections=100
+      -c shared_buffers=128MB
+      -c effective_cache_size=512MB
+      -c work_mem=4MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.7
+      -c wal_buffers=16MB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c log_statement=all
+      -c log_min_duration_statement=1000
+      -c logging_collector=on
+      -c log_destination=stderr
+      -c log_directory=/var/log/postgresql
+      -c log_filename=postgresql-%Y-%m-%d.log
 
-# 🔧 N8N - WORKFLOW AUTOMATION
+  # 🔧 N8N - WORKFLOW AUTOMATION
   n8n:
     image: n8nio/n8n:latest
     container_name: trading_ai_n8n
@@ -129,7 +129,7 @@ services:
     depends_on:
       - postgres
 
-# 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
+  # 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
   prometheus:
     image: prom/prometheus:latest
     container_name: trading_ai_prometheus
@@ -150,7 +150,7 @@ services:
       - trading_network
     restart: unless-stopped
 
-# 📊 NODE EXPORTER - MÉTRIQUES SYSTÈME
+  # 📊 NODE EXPORTER - MÉTRIQUES SYSTÈME
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: trading_ai_node_exporter
@@ -162,7 +162,7 @@ services:
       - trading_network
     restart: unless-stopped
 
-# 🚨 ALERTMANAGER - GESTION ALERTES
+  # 🚨 ALERTMANAGER - GESTION ALERTES
   alertmanager:
     image: prom/alertmanager:latest
     container_name: trading_ai_alertmanager
@@ -177,53 +177,52 @@ services:
       - trading_network
     restart: unless-stopped
 
-# 📋 LOKI - CENTRALISATION LOGS
-loki:
-  image: grafana/loki:latest
-  container_name: trading_ai_loki
-  volumes:
-    - ./configs/loki/loki.yml:/etc/loki/local-config.yaml:ro
-    - ./data/loki/chunks:/loki/chunks
-    - ./data/loki/rules:/loki/rules
-    - ./data/loki/tsdb-compactor:/loki/tsdb-compactor
-  command: -config.file=/etc/loki/local-config.yaml
-  networks:
-    - trading_network
-  restart: unless-stopped
+  # 📋 LOKI - CENTRALISATION LOGS (CORRIGÉ INDENTATION)
+  loki:
+    image: grafana/loki:latest
+    container_name: trading_ai_loki
+    volumes:
+      - ./configs/loki/loki.yml:/etc/loki/local-config.yaml:ro
+      - ./data/loki/chunks:/loki/chunks
+      - ./data/loki/rules:/loki/rules
+      - ./data/loki/tsdb-compactor:/loki/tsdb-compactor
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - trading_network
+    restart: unless-stopped
 
-# 📦 PROMTAIL - COLLECTEUR LOGS
-promtail:
-  image: grafana/promtail:latest
-  container_name: trading_ai_promtail
-  volumes:
-    - ./configs/promtail/promtail.yml:/etc/promtail/config.yml:ro
-    - ./logs/grafana:/var/log/grafana:ro
-    - ./logs/postgres:/var/log/postgresql:ro
-    - ./logs/n8n:/var/log/n8n:ro
-    - ./logs/nginx:/var/log/nginx:ro
-  command: -config.file=/etc/promtail/config.yml
-  networks:
-    - trading_network
-  restart: unless-stopped
+  # 📦 PROMTAIL - COLLECTEUR LOGS (CORRIGÉ INDENTATION)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: trading_ai_promtail
+    volumes:
+      - ./configs/promtail/promtail.yml:/etc/promtail/config.yml:ro
+      - ./logs/grafana:/var/log/grafana:ro
+      - ./logs/postgres:/var/log/postgresql:ro
+      - ./logs/n8n:/var/log/n8n:ro
+      - ./logs/nginx:/var/log/nginx:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - trading_network
+    restart: unless-stopped
 
-# 🔄 BACKUP SERVICE
-backup:
-  image: postgres:15-alpine
-  container_name: trading_ai_backup
-  environment:
-    POSTGRES_DB: ${POSTGRES_DB}
-    POSTGRES_USER: ${POSTGRES_USER}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    PGPASSWORD: ${POSTGRES_PASSWORD}
-    BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION}
-  volumes:
-    - ./backup/postgres:/backup
-    - ./scripts/backup:/scripts:ro
-  networks:
-    - trading_network
-  restart: "no"
-  entrypoint: ["/bin/sh", "/scripts/backup.sh"]
-
+  # 🔄 BACKUP SERVICE (CORRIGÉ INDENTATION)
+  backup:
+    image: postgres:15-alpine
+    container_name: trading_ai_backup
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-trading_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-trader}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-TradingDB2025!}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION:-7}
+    volumes:
+      - ./backup/postgres:/backup
+      - ./scripts/backup:/scripts:ro
+    networks:
+      - trading_network
+    restart: "no"
+    entrypoint: ["/bin/sh", "/scripts/backup.sh"]
 
 # 🌐 RÉSEAUX
 networks:
@@ -233,6 +232,7 @@ networks:
       config:
         - subnet: ${NETWORK_SUBNET:-172.20.0.0/16}
 
+# 💾 VOLUMES
 volumes:
   postgres_data:
     driver: local
