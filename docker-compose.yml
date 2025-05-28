@@ -69,16 +69,34 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
       - ./backup/postgres:/backup
       - ./logs/postgres:/var/log/postgresql
+      # SEUL ce volume est nécessaire pour l'init SQL
       - ./configs/postgres/init:/docker-entrypoint-initdb.d:ro
-    #  - ./configs/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     networks:
       - trading_network
     restart: unless-stopped
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
+    # CONFIGURATION VIA ARGUMENTS DE COMMANDE (méthode correcte pour Alpine)
     command: >
       postgres
-      -c config_file=/etc/postgresql/postgresql.conf
+      -c max_connections=100
+      -c shared_buffers=128MB
+      -c effective_cache_size=512MB
+      -c work_mem=4MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.7
+      -c wal_buffers=16MB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c log_statement=all
+      -c log_min_duration_statement=1000
+      -c logging_collector=on
+      -c log_destination=stderr
+      -c log_directory=/var/log/postgresql
+      -c log_filename=postgresql-%Y-%m-%d.log
 
   # 🔧 N8N - WORKFLOW AUTOMATION
   n8n:
