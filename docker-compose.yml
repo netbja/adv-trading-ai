@@ -68,13 +68,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backup/postgres:/backup
       - ./logs/postgres:/var/log/postgresql
-      - ./configs/postgres/init:/docker-entrypoint-initdb.d:ro
     networks:
       - trading_network
     restart: unless-stopped
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
-    # Configuration optimisée pour Alpine
+    # ✅ HEALTHCHECK CRITIQUE pour que N8N attende
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER:-trader} -d ${POSTGRES_DB:-trading_ai}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Configuration optimisée
     command: >
       postgres
       -c max_connections=100
@@ -109,7 +114,8 @@ services:
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=${N8N_DB:-n8n}
+      # ✅ MÊME DB QUE POSTGRES (comme l'exemple officiel)
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-trading_ai}
       - DB_POSTGRESDB_USER=${POSTGRES_USER:-trader}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-TradingDB2025!}
       - EXECUTIONS_DATA_SAVE_ON_ERROR=all
@@ -122,8 +128,10 @@ services:
     networks:
       - trading_network
     restart: unless-stopped
+    # ✅ ATTENDRE QUE POSTGRES SOIT HEALTHY
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   # 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
   prometheus:
