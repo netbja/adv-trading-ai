@@ -133,8 +133,8 @@ create_project_structure() {
     create_dir_safe "$TRADING_AI_DIR/data/loki/tsdb-compactor"
     sudo chown -R 472:472 $TRADING_AI_DIR/data/grafana
     sudo chown -R 65534:65534 $TRADING_AI_DIR/data/prometheus 
-    sudo chown -R 65534:65534 $TRADING_AI_DIR/data/loki
     sudo chown -R 65534:65534 $TRADING_AI_DIR/data/alertmanager
+    sudo chown -R 10001:10001 $TRADING_AI_DIR/data/loki/
     
     # Structure de logs
     create_dir_safe "$TRADING_AI_DIR/logs/postgres"
