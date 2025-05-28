@@ -154,6 +154,7 @@ create_project_structure() {
     create_dir_safe "$TRADING_AI_DIR/configs/grafana/provisioning/datasources"
     create_dir_safe "$TRADING_AI_DIR/configs/prometheus"
     create_dir_safe "$TRADING_AI_DIR/configs/postgres"
+    create_dir_safe "$TRADING_AI_DIR/configs/postgres/init"
     
     # Structure de développement
     create_dir_safe "$TRADING_AI_DIR/scripts"
