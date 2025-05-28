@@ -163,12 +163,15 @@ services:
     image: grafana/loki:latest
     container_name: trading_ai_loki
     volumes:
-      - ./data/loki:/loki
       - ./configs/loki/loki.yml:/etc/loki/local-config.yaml:ro
+      - ./data/loki/chunks:/loki/chunks
+      - ./data/loki/rules:/loki/rules
+      - ./data/loki/tsdb-compactor:/loki/tsdb-compactor
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - trading_network
     restart: unless-stopped
+
 
   # 📦 PROMTAIL - COLLECTEUR LOGS
   promtail:
