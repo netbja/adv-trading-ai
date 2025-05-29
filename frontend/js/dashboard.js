@@ -91,10 +91,9 @@ function showPage(pageId) {
     const targetPage = document.getElementById(pageId + '-page');
     if (targetPage) {
         targetPage.classList.add('active');
+        console.log('Page rendue active:', targetPage.id);
     } else {
         console.warn(`Page avec ID ${pageId}-page non trouvée.`);
-        // Optionnel: rediriger vers une page d'erreur ou la page d'accueil
-        // document.getElementById('overview-page').classList.add('active'); 
     }
 
     const activeNavLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
@@ -161,12 +160,10 @@ async function loadPageData(pageId) {
     // Si c'est la page d'aperçu, son contenu statique est déjà là.
     // On appelle juste loadOverviewData pour rafraîchir les parties dynamiques.
     if (pageId === 'overview') { 
-        await loadOverviewData();
-        // S'assurer qu'un éventuel spinner précédent est retiré (si showPage l'avait mis)
-        // Normalement, pour overview, on ne devrait pas systématiquement mettre de spinner via innerHTML ici.
-        // Si la page "overview-page" contenait un spinner par défaut dans son HTML, il faudrait le gérer.
-        // Pour l'instant, on se contente de s'assurer que les données sont chargées.
-        return; // Ne pas exécuter la suite qui met un spinner générique.
+        console.log('Chargement des données pour overview...');
+        // await loadOverviewData(); // TEMPORAIREMENT COMMENTÉ
+        console.log('loadOverviewData serait appelé ici.');
+        return; 
     }
 
     // Pour toutes les autres pages, afficher un spinner de chargement générique
