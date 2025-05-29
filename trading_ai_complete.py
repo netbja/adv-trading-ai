@@ -1549,7 +1549,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                                     <div class="stat-label">Win Rate</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">${avgGain > 0 ? '+' : ''}$${avgGain.toFixed(2)}€</div>
+                                    <div class="stat-value">${{avgGain > 0 ? '+' : ''}}€${{avgGain.toFixed(2)}}</div>
                                     <div class="stat-label">Moy/Trade</div>
                                 </div>
                             </div>
