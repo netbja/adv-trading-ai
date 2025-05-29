@@ -41,44 +41,18 @@ async def startup_event():
     """Initialisation au démarrage"""
     global trading_master
     
-    logger.info("🚀 DÉMARRAGE DU SYSTÈME TRADING AI")
-    logger.info(f"🔍 auth_manager instance: {auth_manager}")
-    logger.info(f"🔍 DATABASE_URL: {DATABASE_URL}")
-    
     # Initialiser base de données
-    try:
-        logger.info("🔄 Initialisation de la base de données...")
-        await auth_manager.init_db()
-        logger.info("✅ Base de données initialisée")
-        
-        # Test de l'utilisateur admin après init
-        logger.info("🔄 Test de l'utilisateur admin après init...")
-        test_auth = await auth_manager.authenticate_user("admin", "TradingAI2025!", "127.0.0.1", "startup-test")
-        logger.info(f"🔍 Test auth admin result: {test_auth is not None}")
-        if test_auth:
-            logger.info(f"✅ Utilisateur admin trouvé: {test_auth.get('username')}")
-        else:
-            logger.error("❌ Utilisateur admin non trouvé après init!")
-            
-    except Exception as e:
-        logger.error(f"❌ Erreur init DB: {e}")
-        import traceback
-        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+    await auth_manager.init_db()
+    logger.info("✅ Base de données initialisée")
     
     # Initialiser système de trading
-    try:
-        trading_master = AutonomousTradingMaster(200.0)
-        await trading_master.initialize_autonomous_system()
-        logger.info("✅ Système de trading initialisé")
-    except Exception as e:
-        logger.error(f"❌ Erreur init trading master: {e}")
+    trading_master = AutonomousTradingMaster(200.0)
+    await trading_master.initialize_autonomous_system()
+    logger.info("✅ Système de trading initialisé")
     
     # Démarrer workflows live en arrière-plan
-    try:
-        asyncio.create_task(live_orchestrator.start_live_workflows())
-        logger.info("✅ Workflows live démarrés")
-    except Exception as e:
-        logger.error(f"❌ Erreur start workflows: {e}")
+    asyncio.create_task(live_orchestrator.start_live_workflows())
+    logger.info("✅ Workflows live démarrés")
 
 # Middleware d'authentification
 async def get_current_user(request: Request, session_token: str = Cookie(None)):
@@ -305,9 +279,9 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            /* Variables CSS professionnelles */
+            /* === INTERFACE MODERNE - TRADING AI === */
             :root {{
-                --primary: #2563eb;
+                --primary: #3b82f6;
                 --primary-dark: #1e40af;
                 --secondary: #64748b;
                 --success: #10b981;
@@ -315,21 +289,30 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 --danger: #ef4444;
                 --bg-main: #f8fafc;
                 --bg-card: #ffffff;
+                --bg-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 --border: #e2e8f0;
                 --text-primary: #1e293b;
                 --text-secondary: #64748b;
-                --shadow: 0 1px 3px rgba(0,0,0,0.1);
-                --sidebar-width: 320px;
+                --text-muted: #94a3b8;
+                --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+                --shadow: 0 4px 6px rgba(0,0,0,0.07);
+                --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+                --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+                --sidebar-width: 280px;
+                --border-radius: 12px;
+                --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             }}
             
             * {{ margin: 0; padding: 0; box-sizing: border-box; }}
             
             body {{
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
                 background: var(--bg-main);
                 color: var(--text-primary);
                 line-height: 1.6;
-                overflow-x: hidden;
+                font-size: 14px;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }}
             
             .app-layout {{
@@ -338,11 +321,10 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 min-height: 100vh;
             }}
             
-            /* Sidebar navigation */
+            /* === SIDEBAR MODERNE === */
             .sidebar {{
                 background: var(--bg-card);
                 border-right: 1px solid var(--border);
-                padding: 0;
                 position: fixed;
                 left: 0;
                 top: 0;
@@ -350,23 +332,22 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 height: 100vh;
                 overflow-y: auto;
                 z-index: 100;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                box-shadow: var(--shadow);
             }}
             
             .sidebar-header {{
                 padding: 2rem 1.5rem;
-                border-bottom: 1px solid var(--border);
-                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                background: var(--bg-hero);
                 color: white;
             }}
             
             .sidebar-header h1 {{
-                font-size: 1.4rem;
-                margin-bottom: 0.5rem;
+                font-size: 1.25rem;
                 font-weight: 700;
+                margin-bottom: 0.5rem;
             }}
             
-            .sidebar-header .user-info {{
+            .user-info {{
                 font-size: 0.875rem;
                 opacity: 0.9;
                 font-weight: 500;
@@ -377,16 +358,16 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             .nav-section {{
-                margin-bottom: 2.5rem;
+                margin-bottom: 2rem;
             }}
             
             .nav-section-title {{
-                padding: 0 1.5rem 1rem;
+                padding: 0 1.5rem 0.75rem;
                 font-size: 0.75rem;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
-                color: var(--text-secondary);
+                color: var(--text-muted);
             }}
             
             .nav-item {{
@@ -396,106 +377,98 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .nav-link {{
                 display: flex;
                 align-items: center;
-                gap: 1rem;
-                padding: 1rem 1.25rem;
-                border-radius: 0.75rem;
+                gap: 0.75rem;
+                padding: 0.875rem 1rem;
+                border-radius: 8px;
                 color: var(--text-secondary);
                 text-decoration: none;
-                transition: all 0.2s ease;
+                transition: var(--transition);
                 font-weight: 500;
                 cursor: pointer;
-                font-size: 0.95rem;
-                min-height: 48px;
+                font-size: 0.875rem;
             }}
             
             .nav-link:hover {{
                 background: #f1f5f9;
                 color: var(--primary);
-                transform: translateX(4px);
+                transform: translateX(2px);
             }}
             
             .nav-link.active {{
                 background: #dbeafe;
                 color: var(--primary);
                 font-weight: 600;
-                box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+                box-shadow: var(--shadow-sm);
             }}
             
             .nav-icon {{
-                font-size: 1.25rem;
-                width: 24px;
+                font-size: 1.125rem;
+                width: 20px;
                 text-align: center;
-                flex-shrink: 0;
             }}
             
             .status-indicator {{
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
                 border-radius: 50%;
                 margin-left: auto;
-                flex-shrink: 0;
             }}
             
-            .status-active {{ background: var(--success); animation: pulse 2s infinite; }}
+            .status-active {{ background: var(--success); }}
+            .status-scanning {{ background: var(--warning); animation: pulse 2s infinite; }}
             .status-idle {{ background: var(--secondary); }}
-            .status-error {{ background: var(--danger); }}
             
-            /* Main content */
+            /* === MAIN CONTENT === */
             .main-content {{
                 margin-left: var(--sidebar-width);
                 min-height: 100vh;
-                background: var(--bg-main);
             }}
             
             .topbar {{
                 background: var(--bg-card);
                 border-bottom: 1px solid var(--border);
-                padding: 1.5rem 2.5rem;
+                padding: 1.25rem 2rem;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 position: sticky;
                 top: 0;
                 z-index: 50;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                backdrop-filter: blur(10px);
+                background: rgba(255, 255, 255, 0.9);
             }}
             
             .topbar-title {{
-                font-size: 1.75rem;
+                font-size: 1.5rem;
                 font-weight: 700;
                 color: var(--text-primary);
             }}
             
             .topbar-actions {{
                 display: flex;
-                gap: 1.5rem;
+                gap: 1rem;
                 align-items: center;
             }}
             
             .btn {{
-                padding: 0.75rem 1.5rem;
+                padding: 0.625rem 1.25rem;
                 border: none;
-                border-radius: 0.5rem;
+                border-radius: 8px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                transition: var(--transition);
                 text-decoration: none;
                 display: inline-flex;
                 align-items: center;
                 gap: 0.5rem;
-                font-size: 0.9rem;
-                min-height: 44px;
+                font-size: 0.875rem;
+                white-space: nowrap;
             }}
             
             .btn-primary {{ 
                 background: var(--primary); 
                 color: white; 
-            }}
-            
-            .btn-secondary {{ 
-                background: var(--bg-card); 
-                color: var(--text-secondary); 
-                border: 1px solid var(--border); 
+                box-shadow: var(--shadow-sm);
             }}
             
             .btn-danger {{ 
@@ -505,11 +478,15 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             
             .btn:hover {{ 
                 transform: translateY(-1px); 
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                box-shadow: var(--shadow);
+            }}
+            
+            .btn-icon {{
+                font-size: 1rem;
             }}
             
             .content-area {{
-                padding: 2.5rem;
+                padding: 2rem;
                 max-width: 1400px;
                 margin: 0 auto;
             }}
@@ -523,89 +500,307 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 animation: fadeIn 0.3s ease;
             }}
             
-            .grid {{
-                display: grid;
+            /* === HERO SECTION === */
+            .overview-hero {{
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
+                padding: 2rem;
+                margin-bottom: 2rem;
+                box-shadow: var(--shadow);
+                border: 1px solid var(--border);
+            }}
+            
+            .hero-content {{
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
                 gap: 2rem;
             }}
             
-            .grid-2 {{ grid-template-columns: 1fr 1fr; }}
-            .grid-3 {{ grid-template-columns: repeat(3, 1fr); }}
-            .grid-4 {{ grid-template-columns: repeat(4, 1fr); }}
-            
-            .card {{
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 1rem;
-                padding: 2rem;
-                box-shadow: var(--shadow);
-                transition: all 0.2s ease;
+            .hero-main {{
+                flex: 1;
             }}
             
-            .card:hover {{
-                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-                transform: translateY(-2px);
+            .hero-title {{
+                font-size: 1.875rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 1.5rem;
+            }}
+            
+            .hero-metrics {{
+                display: flex;
+                gap: 3rem;
+                align-items: center;
+            }}
+            
+            .metric-primary {{
+                text-align: center;
+            }}
+            
+            .metric-label {{
+                display: block;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }}
+            
+            .metric-value {{
+                display: block;
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                line-height: 1;
+                margin-bottom: 0.25rem;
+            }}
+            
+            .metric-change {{
+                font-size: 1rem;
+                font-weight: 600;
+            }}
+            
+            .metric-change.positive {{ color: var(--success); }}
+            .metric-change.negative {{ color: var(--danger); }}
+            
+            .metric-grid {{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }}
+            
+            .metric-item {{
+                text-align: center;
+                padding: 1rem;
+                background: #f8fafc;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+            }}
+            
+            .metric-number {{
+                display: block;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 0.25rem;
+            }}
+            
+            .metric-text {{
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }}
+            
+            .hero-actions {{
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-end;
+            }}
+            
+            .status-info {{
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+            }}
+            
+            /* === WORKFLOWS CARDS === */
+            .workflows-section {{
+                margin-bottom: 2rem;
+            }}
+            
+            .section-header {{
+                margin-bottom: 1.5rem;
+            }}
+            
+            .section-header h3 {{
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 0.25rem;
+            }}
+            
+            .section-header p {{
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+            }}
+            
+            .workflow-cards-grid {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 1.5rem;
+            }}
+            
+            .workflow-card {{
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: var(--border-radius);
+                padding: 1.5rem;
+                cursor: pointer;
+                transition: var(--transition);
+                box-shadow: var(--shadow-sm);
+                position: relative;
+                overflow: hidden;
+            }}
+            
+            .workflow-card:hover {{
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-lg);
+                border-color: var(--primary);
+            }}
+            
+            .workflow-card.crypto {{
+                border-top: 3px solid #f59e0b;
+            }}
+            
+            .workflow-card.meme {{
+                border-top: 3px solid #8b5cf6;
+            }}
+            
+            .workflow-card.forex {{
+                border-top: 3px solid #3b82f6;
             }}
             
             .card-header {{
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 1.5rem;
-                padding-bottom: 1.5rem;
-                border-bottom: 1px solid var(--border);
+                align-items: center;
+                margin-bottom: 1rem;
             }}
             
-            .card-title {{
-                font-size: 1.25rem;
+            .card-icon {{
+                font-size: 2rem;
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            }}
+            
+            .card-status {{
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }}
+            
+            .status-dot {{
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+            }}
+            
+            .status-text {{
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }}
+            
+            .card-content h4 {{
+                font-size: 1.125rem;
                 font-weight: 700;
                 color: var(--text-primary);
                 margin-bottom: 0.5rem;
             }}
             
-            .card-subtitle {{
-                font-size: 0.9rem;
+            .card-content p {{
                 color: var(--text-secondary);
-                margin-top: 0.25rem;
+                font-size: 0.875rem;
+                margin-bottom: 1rem;
             }}
             
-            .metric {{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem 0;
-                border-bottom: 1px solid #f1f5f9;
+            .card-metrics {{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
             }}
             
-            .metric:last-child {{ border-bottom: none; }}
-            
-            .metric-label {{
-                color: var(--text-secondary);
-                font-weight: 600;
-                font-size: 0.95rem;
+            .card-metric {{
+                text-align: center;
             }}
             
-            .metric-value {{
+            .card-metric .value {{
+                display: block;
+                font-size: 1.125rem;
                 font-weight: 700;
                 color: var(--text-primary);
-                font-size: 1.1rem;
+                margin-bottom: 0.25rem;
             }}
             
-            .metric-value.positive {{ color: var(--success); }}
-            .metric-value.negative {{ color: var(--danger); }}
-            .metric-value.warning {{ color: var(--warning); }}
+            .card-metric .value.positive {{ color: var(--success); }}
+            .card-metric .value.warning {{ color: var(--warning); }}
             
-            /* Responsive design amélioré */
-            @media (max-width: 1200px) {{
+            .card-metric .label {{
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }}
+            
+            .card-footer {{
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border);
+                text-align: center;
+            }}
+            
+            .view-details {{
+                color: var(--primary);
+                font-weight: 600;
+                font-size: 0.875rem;
+            }}
+            
+            /* === ACTIVITY TIMELINE === */
+            .activity-section {{
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: var(--border-radius);
+                padding: 1.5rem;
+                box-shadow: var(--shadow-sm);
+            }}
+            
+            .activity-timeline {{
+                max-height: 300px;
+                overflow-y: auto;
+            }}
+            
+            /* === ANIMATIONS === */
+            @keyframes fadeIn {{
+                from {{ opacity: 0; transform: translateY(10px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            
+            @keyframes pulse {{
+                0%, 100% {{ opacity: 1; }}
+                50% {{ opacity: 0.5; }}
+            }}
+            
+            /* === RESPONSIVE === */
+            @media (max-width: 1024px) {{
                 :root {{
-                    --sidebar-width: 280px;
+                    --sidebar-width: 260px;
                 }}
                 
-                .grid-4 {{
-                    grid-template-columns: repeat(2, 1fr);
+                .hero-content {{
+                    flex-direction: column;
+                    gap: 1.5rem;
                 }}
                 
-                .content-area {{
-                    padding: 2rem;
+                .hero-metrics {{
+                    flex-direction: column;
+                    gap: 2rem;
+                    align-items: stretch;
+                }}
+                
+                .metric-grid {{
+                    grid-template-columns: repeat(3, 1fr);
                 }}
             }}
             
@@ -619,563 +814,38 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     transition: transform 0.3s ease;
                 }}
                 
-                .sidebar.mobile-open {{
-                    transform: translateX(0);
-                }}
-                
                 .main-content {{
                     margin-left: 0;
                 }}
                 
-                .grid-4, .grid-3, .grid-2 {{
+                .content-area {{
+                    padding: 1rem;
+                }}
+                
+                .workflow-cards-grid {{
                     grid-template-columns: 1fr;
                 }}
                 
-                .topbar {{
-                    padding: 1rem 1.5rem;
-                }}
-                
-                .content-area {{
-                    padding: 1.5rem;
-                }}
-                
-                .card {{
-                    padding: 1.5rem;
-                }}
-            }}
-            
-            /* Animations */
-            @keyframes fadeIn {{
-                from {{ opacity: 0; transform: translateY(20px); }}
-                to {{ opacity: 1; transform: translateY(0); }}
-            }}
-            
-            @keyframes pulse {{
-                0%, 100% {{ opacity: 1; }}
-                50% {{ opacity: 0.5; }}
-            }}
-            
-            /* Améliorations d'accessibilité */
-            .nav-link:focus,
-            .btn:focus {{
-                outline: 2px solid var(--primary);
-                outline-offset: 2px;
-            }}
-            
-            /* Scroll smooth */
-            html {{
-                scroll-behavior: smooth;
-            }}
-            
-            /* Loading states */
-            .loading {{
-                opacity: 0.6;
-                pointer-events: none;
-            }}
-            
-            .loading::after {{
-                content: "";
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 20px;
-                height: 20px;
-                margin: -10px 0 0 -10px;
-                border: 2px solid var(--primary);
-                border-radius: 50%;
-                border-top-color: transparent;
-                animation: spin 1s linear infinite;
-            }}
-            
-            @keyframes spin {{
-                to {{ transform: rotate(360deg); }}
-            }}
-            
-            /* Indicateurs de statut améliorés */
-            .workflow-grid {{
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                gap: 2rem;
-            }}
-            
-            /* === CARTES PERFORMANCE WORKFLOW === */
-            .workflow-performance-grid {{
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }}
-            
-            .performance-card {{
-                background: linear-gradient(135deg, #f8fafc, #ffffff);
-                border: 1px solid var(--border);
-                border-radius: 1rem;
-                padding: 1.5rem;
-                position: relative;
-                overflow: hidden;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            }}
-            
-            .performance-card:hover {{
-                transform: translateY(-4px);
-                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            }}
-            
-            .performance-header {{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1rem;
-            }}
-            
-            .performance-title {{
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: var(--text-primary);
-            }}
-            
-            .performance-icon {{
-                font-size: 1.5rem;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-                color: white;
-                box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
-            }}
-            
-            .performance-gain {{
-                text-align: right;
-            }}
-            
-            .gain-amount {{
-                font-size: 1.25rem;
-                font-weight: 700;
-                margin-bottom: 0.25rem;
-            }}
-            
-            .gain-amount.positive {{ color: var(--success); }}
-            .gain-amount.negative {{ color: var(--danger); }}
-            .gain-amount.neutral {{ color: var(--text-secondary); }}
-            
-            .gain-percentage {{
-                font-size: 0.875rem;
-                font-weight: 600;
-                padding: 0.25rem 0.75rem;
-                border-radius: 1rem;
-                display: inline-block;
-            }}
-            
-            .gain-percentage.positive {{
-                background: #d1fae5;
-                color: #065f46;
-            }}
-            
-            .gain-percentage.negative {{
-                background: #fee2e2;
-                color: #991b1b;
-            }}
-            
-            .gain-percentage.neutral {{
-                background: #f1f5f9;
-                color: var(--text-secondary);
-            }}
-            
-            .performance-chart {{
-                height: 60px;
-                margin: 1rem 0;
-                position: relative;
-                background: #f8fafc;
-                border-radius: 0.5rem;
-                overflow: hidden;
-            }}
-            
-            .mini-chart {{
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: end;
-                gap: 2px;
-                padding: 0.5rem;
-            }}
-            
-            .chart-bar {{
-                flex: 1;
-                background: linear-gradient(0deg, var(--primary), var(--success));
-                border-radius: 2px 2px 0 0;
-                min-height: 4px;
-                transition: all 0.3s ease;
-                opacity: 0.7;
-            }}
-            
-            .chart-bar.positive {{
-                background: linear-gradient(0deg, var(--success), #34d399);
-            }}
-            
-            .chart-bar.negative {{
-                background: linear-gradient(0deg, var(--danger), #f87171);
-            }}
-            
-            .chart-bar:hover {{
-                opacity: 1;
-                transform: scaleY(1.1);
-            }}
-            
-            .performance-stats {{
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1rem;
-                margin-top: 1rem;
-                padding-top: 1rem;
-                border-top: 1px solid var(--border);
-            }}
-            
-            .stat-item {{
-                text-align: center;
-            }}
-            
-            .stat-value {{
-                font-size: 1rem;
-                font-weight: 700;
-                color: var(--text-primary);
-                margin-bottom: 0.25rem;
-            }}
-            
-            .stat-label {{
-                font-size: 0.75rem;
-                color: var(--text-secondary);
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                font-weight: 600;
-            }}
-            
-            /* === ANIMATIONS SPÉCIALES === */
-            @keyframes chartGrow {{
-                from {{
-                    transform: scaleY(0);
-                }}
-                to {{
-                    transform: scaleY(1);
-                }}
-            }}
-            
-            .chart-bar {{
-                animation: chartGrow 0.8s ease-out;
-                transform-origin: bottom;
-            }}
-            
-            .performance-card {{
-                background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #f8fafc 100%);
-            }}
-            
-            .performance-card.crypto {{
-                border-left: 4px solid #f59e0b;
-            }}
-            
-            .performance-card.meme {{
-                border-left: 4px solid #8b5cf6;
-            }}
-            
-            .performance-card.forex {{
-                border-left: 4px solid #3b82f6;
-            }}
-            
-            .workflow-card {{
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 1rem;
-                padding: 2rem;
-                position: relative;
-                overflow: hidden;
-                transition: all 0.2s ease;
-            }}
-            
-            .workflow-card:hover {{
-                transform: translateY(-4px);
-                box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-            }}
-            
-            .workflow-status {{
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: var(--secondary);
-            }}
-            
-            .workflow-status.scanning {{ background: var(--warning); }}
-            .workflow-status.analyzing {{ background: var(--primary); }}
-            .workflow-status.executing {{ background: var(--success); }}
-            .workflow-status.completed {{ background: var(--success); }}
-            .workflow-status.error {{ background: var(--danger); }}
-            
-            .workflow-header {{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1.5rem;
-            }}
-            
-            .workflow-title {{
-                font-size: 1.25rem;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-            }}
-            
-            .status-badge {{
-                padding: 0.5rem 1rem;
-                border-radius: 2rem;
-                font-size: 0.75rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }}
-            
-            .status-idle {{ background: #f1f5f9; color: var(--text-secondary); }}
-            .status-scanning {{ background: #fef3c7; color: #92400e; }}
-            .status-analyzing {{ background: #dbeafe; color: #1e40af; }}
-            .status-executing {{ background: #d1fae5; color: #065f46; }}
-            .status-completed {{ background: #d1fae5; color: #065f46; }}
-            .status-error {{ background: #fee2e2; color: #991b1b; }}
-            
-            /* Activity feed */
-            .activity-feed {{
-                max-height: 400px;
-                overflow-y: auto;
-                padding-right: 0.5rem;
-            }}
-            
-            .activity-item {{
-                display: flex;
-                gap: 1.5rem;
-                padding: 1.5rem 0;
-                border-bottom: 1px solid var(--border);
-                transition: all 0.2s ease;
-            }}
-            
-            .activity-item:hover {{
-                background: #f8fafc;
-                border-radius: 0.5rem;
-                margin: 0 -1rem;
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }}
-            
-            .activity-item:last-child {{ border-bottom: none; }}
-            
-            .activity-icon {{
-                width: 48px;
-                height: 48px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.25rem;
-                flex-shrink: 0;
-            }}
-            
-            .activity-icon.crypto {{ background: #fef3c7; color: #92400e; }}
-            .activity-icon.forex {{ background: #dbeafe; color: #1e40af; }}
-            .activity-icon.meme {{ background: #f3e8ff; color: #7c3aed; }}
-            
-            .activity-content {{
-                flex: 1;
-            }}
-            
-            .activity-title {{
-                font-weight: 700;
-                margin-bottom: 0.5rem;
-                font-size: 1rem;
-            }}
-            
-            .activity-description {{
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-                line-height: 1.5;
-            }}
-            
-            .activity-time {{
-                color: var(--text-secondary);
-                font-size: 0.75rem;
-                margin-top: 0.5rem;
-                font-weight: 500;
-            }}
-            
-            {workflow_styles}
-            
-            /* === NOUVELLE LAYOUT OVERVIEW === */
-            .overview-header {{
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 1rem;
-                padding: 2rem;
-                margin-bottom: 2rem;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                gap: 2rem;
-                box-shadow: var(--shadow);
-            }}
-            
-            .header-metrics {{
-                display: flex;
-                gap: 3rem;
-                align-items: center;
-                flex: 1;
-            }}
-            
-            .primary-metric {{
-                text-align: center;
-            }}
-            
-            .metric-title {{
-                font-size: 1rem;
-                color: var(--text-secondary);
-                margin-bottom: 0.5rem;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }}
-            
-            .metric-main {{
-                font-size: 3rem;
-                font-weight: 700;
-                color: var(--text-primary);
-                margin-bottom: 0.5rem;
-                line-height: 1;
-            }}
-            
-            .metric-sub {{
-                font-size: 1.25rem;
-                font-weight: 600;
-            }}
-            
-            .metric-sub.positive {{ color: var(--success); }}
-            .metric-sub.negative {{ color: var(--danger); }}
-            
-            .quick-stats {{
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }}
-            
-            .quick-stat {{
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 1rem;
-                background: #f8fafc;
-                border-radius: 0.75rem;
-                min-width: 120px;
-            }}
-            
-            .stat-label {{
-                font-size: 0.875rem;
-                color: var(--text-secondary);
-                font-weight: 600;
-                text-align: center;
-            }}
-            
-            .stat-value {{
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: var(--text-primary);
-            }}
-            
-            .stat-value.positive {{ color: var(--success); }}
-            .stat-value.negative {{ color: var(--danger); }}
-            
-            .header-actions {{
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-end;
-            }}
-            
-            .last-update {{
-                font-size: 0.875rem;
-                color: var(--text-secondary);
-                font-weight: 500;
-            }}
-            
-            .section-header {{
-                font-size: 1.5rem;
-                font-weight: 700;
-                margin-bottom: 1.5rem;
-                color: var(--text-primary);
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-            }}
-            
-            .performance-section {{
-                margin-bottom: 3rem;
-            }}
-            
-            .activity-section {{
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 1rem;
-                padding: 2rem;
-                box-shadow: var(--shadow);
-            }}
-            
-            /* === RESPONSIVE POUR NOUVELLE LAYOUT === */
-            @media (max-width: 1024px) {{
-                .overview-header {{
-                    flex-direction: column;
-                    align-items: stretch;
-                }}
-                
-                .header-metrics {{
-                    flex-direction: column;
-                    gap: 2rem;
-                    align-items: center;
-                }}
-                
-                .quick-stats {{
-                    grid-template-columns: repeat(3, 1fr);
-                    width: 100%;
-                }}
-                
-                .header-actions {{
-                    align-items: center;
-                }}
-            }}
-            
-            @media (max-width: 768px) {{
-                .overview-header {{
-                    padding: 1.5rem;
-                }}
-                
-                .header-metrics {{
-                    gap: 1.5rem;
-                }}
-                
-                .metric-main {{
-                    font-size: 2.5rem;
-                }}
-                
-                .quick-stats {{
+                .metric-grid {{
                     grid-template-columns: 1fr;
                     gap: 1rem;
                 }}
                 
-                .quick-stat {{
-                    padding: 0.75rem;
-                    min-width: auto;
+                .hero-metrics {{
+                    gap: 1.5rem;
+                }}
+                
+                .card-metrics {{
+                    grid-template-columns: 1fr;
                 }}
             }}
+            
+            /* === UTILITIES === */
+            .positive {{ color: var(--success) !important; }}
+            .negative {{ color: var(--danger) !important; }}
+            .warning {{ color: var(--warning) !important; }}
+            
+            /* Suppression des anciens styles non utilisés */
         </style>
     </head>
     <body>
@@ -1266,51 +936,145 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 </header>
                 
                 <div class="content-area">
-                    <!-- Page Vue d'ensemble -->
+                    <!-- Page Vue d'ensemble - Interface moderne -->
                     <div id="overview-page" class="page-content active">
-                        <!-- Métriques principales simplifiées -->
-                        <div class="overview-header">
-                            <div class="header-metrics">
-                                <div class="primary-metric">
-                                    <div class="metric-title">Capital Total</div>
-                                    <div class="metric-main" id="current-capital">200.00€</div>
-                                    <div class="metric-sub positive" id="total-return">+0.00%</div>
+                        <!-- Header avec métriques principales -->
+                        <div class="overview-hero">
+                            <div class="hero-content">
+                                <div class="hero-main">
+                                    <h2 class="hero-title">Portfolio Trading AI</h2>
+                                    <div class="hero-metrics">
+                                        <div class="metric-primary">
+                                            <span class="metric-label">Capital Total</span>
+                                            <span class="metric-value" id="current-capital">200.00€</span>
+                                            <span class="metric-change positive" id="total-return">+0.00%</span>
+                                        </div>
+                                        <div class="metric-grid">
+                                            <div class="metric-item">
+                                                <span class="metric-number" id="system-efficiency">100%</span>
+                                                <span class="metric-text">Efficacité</span>
+                                            </div>
+                                            <div class="metric-item">
+                                                <span class="metric-number">3</span>
+                                                <span class="metric-text">Workflows Actifs</span>
+                                            </div>
+                                            <div class="metric-item">
+                                                <span class="metric-number" id="system-uptime">1</span>
+                                                <span class="metric-text">Jour(s) Uptime</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <div class="quick-stats">
-                                    <div class="quick-stat">
-                                        <span class="stat-label">Workflows Actifs</span>
-                                        <span class="stat-value">3</span>
-                                    </div>
-                                    <div class="quick-stat">
-                                        <span class="stat-label">Efficacité</span>
-                                        <span class="stat-value positive" id="system-efficiency">100%</span>
-                                    </div>
-                                    <div class="quick-stat">
-                                        <span class="stat-label">Uptime</span>
-                                        <span class="stat-value" id="system-uptime">1 jour</span>
+                                <div class="hero-actions">
+                                    <button class="btn btn-primary" onclick="refreshData()">
+                                        <span class="btn-icon">🔄</span>
+                                        Actualiser
+                                    </button>
+                                    <div class="status-info">
+                                        <div class="status-indicator status-active"></div>
+                                        <span id="last-update">Dernière MAJ: --:--</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cartes Workflows avec navigation -->
+                        <div class="workflows-section">
+                            <div class="section-header">
+                                <h3>🚀 Workflows de Trading</h3>
+                                <p>Cliquez sur un workflow pour voir les détails</p>
                             </div>
                             
-                            <div class="header-actions">
-                                <button class="btn btn-primary" onclick="refreshData()">🔄 Actualiser</button>
-                                <div class="last-update" id="last-update">Dernière MAJ: --:--</div>
+                            <div class="workflow-cards-grid">
+                                <div class="workflow-card crypto" onclick="showPage('crypto-workflow')">
+                                    <div class="card-header">
+                                        <div class="card-icon">₿</div>
+                                        <div class="card-status">
+                                            <span class="status-dot status-active"></span>
+                                            <span class="status-text">Actif</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4>Crypto Principal</h4>
+                                        <p>BTC, ETH, principales altcoins</p>
+                                        <div class="card-metrics">
+                                            <div class="card-metric">
+                                                <span class="value">0</span>
+                                                <span class="label">Signaux aujourd'hui</span>
+                                            </div>
+                                            <div class="card-metric">
+                                                <span class="value positive">+0.0%</span>
+                                                <span class="label">Performance 7j</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="view-details">Voir détails →</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="workflow-card meme" onclick="showPage('meme-workflow')">
+                                    <div class="card-header">
+                                        <div class="card-icon">🐸</div>
+                                        <div class="card-status">
+                                            <span class="status-dot status-scanning"></span>
+                                            <span class="status-text">Scan en cours</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4>Crypto Meme</h4>
+                                        <p>Tokens viraux, analyse sentiment</p>
+                                        <div class="card-metrics">
+                                            <div class="card-metric">
+                                                <span class="value">0</span>
+                                                <span class="label">Tokens scannés</span>
+                                            </div>
+                                            <div class="card-metric">
+                                                <span class="value warning">MEDIUM</span>
+                                                <span class="label">Niveau de risque</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="view-details">Voir détails →</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="workflow-card forex" onclick="showPage('forex-workflow')">
+                                    <div class="card-header">
+                                        <div class="card-icon">💱</div>
+                                        <div class="card-status">
+                                            <span class="status-dot status-active"></span>
+                                            <span class="status-text">Actif</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4>Forex Trading</h4>
+                                        <p>EUR/USD, GBP/USD, USD/JPY</p>
+                                        <div class="card-metrics">
+                                            <div class="card-metric">
+                                                <span class="value">102.5</span>
+                                                <span class="label">USD Strength Index</span>
+                                            </div>
+                                            <div class="card-metric">
+                                                <span class="value positive">+0.35%</span>
+                                                <span class="label">Performance 24h</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="view-details">Voir détails →</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Cartes de performance des workflows -->
-                        <div class="performance-section">
-                            <h2 class="section-header">📊 Performance par Workflow</h2>
-                            <div class="workflow-performance-grid" id="workflow-performance">
-                                <!-- Contenu chargé dynamiquement -->
-                            </div>
-                        </div>
-                        
-                        <!-- Activité récente -->
+                        <!-- Activité récente compacte -->
                         <div class="activity-section">
-                            <h2 class="section-header">⚡ Activité Récente</h2>
-                            <div class="activity-feed" id="recent-activity">
+                            <div class="section-header">
+                                <h3>⚡ Activité Récente</h3>
+                            </div>
+                            <div class="activity-timeline" id="recent-activity">
                                 <!-- Contenu chargé dynamiquement -->
                             </div>
                         </div>
@@ -1744,49 +1508,28 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
 async def login(request: Request):
     """Endpoint de connexion"""
     try:
-        logger.info(f"🔍 Login attempt - auth_manager: {auth_manager}")
-        logger.info(f"🔍 DATABASE_URL: {DATABASE_URL[:50]}...")
-        
         data = await request.json()
         username = data.get("username")
         password = data.get("password")
         
-        logger.info(f"🔍 Login data - username: {username}, password: {'*' * len(password) if password else 'None'}")
-        
         if not username or not password:
             raise HTTPException(status_code=400, detail="Username et password requis")
-        
-        # Vérifier que auth_manager est initialisé
-        if not auth_manager:
-            logger.error("❌ auth_manager est None!")
-            raise HTTPException(status_code=500, detail="Gestionnaire d'authentification non initialisé")
         
         # Obtenir IP et User-Agent
         client_ip = request.client.host
         user_agent = request.headers.get("user-agent", "")
         
-        logger.info(f"🔍 Client info - IP: {client_ip}, User-Agent: {user_agent[:50]}...")
-        
         # Authentifier
-        logger.info("🔍 Calling authenticate_user...")
         user_data = await auth_manager.authenticate_user(username, password, client_ip, user_agent)
-        logger.info(f"🔍 Auth result: {user_data is not None}")
         
         if not user_data:
             raise HTTPException(status_code=401, detail="Identifiants invalides")
         
-        logger.info("✅ Login successful")
         return user_data
         
-    except HTTPException:
-        # Re-raise HTTP exceptions
-        raise
     except Exception as e:
-        logger.error(f"❌ Erreur login: {e}")
-        logger.error(f"❌ Exception type: {type(e).__name__}")
-        import traceback
-        logger.error(f"❌ Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
+        logger.error(f"Erreur login: {e}")
+        raise HTTPException(status_code=500, detail="Erreur serveur")
 
 @app.get("/api/dashboard")
 async def get_dashboard_data(user_data: dict = Depends(require_auth)):
