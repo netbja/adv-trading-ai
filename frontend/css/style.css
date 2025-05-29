@@ -902,4 +902,136 @@ body {
 
 /* Fin des styles du dashboard principal. 
    Les styles spécifiques aux pages de workflow (anciennement get_workflow_styles()) 
-   seront ajoutés ultérieurement ou chargés dynamiquement. */ 
+   seront ajoutés ultérieurement ou chargés dynamiquement. */
+
+/* Styles pour les pages de détails des Workflows */
+
+/* Grille pour les métriques clés en haut de la page workflow */
+.workflow-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background-color: var(--card-bg-color, #fff);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-large, 12px);
+    box-shadow: var(--shadow-small, 0 2px 4px rgba(0,0,0,0.05));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.metric-card .metric-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color, #007bff);
+    margin-bottom: 0.5rem;
+}
+
+.metric-card .metric-label {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary, #6c757d);
+}
+
+/* Style pour les titres de section avec icône */
+.page-content h3 { /* Cible les h3 dans les contenus de page dynamiques */
+    font-size: 1.5rem;
+    color: var(--text-color-primary, #212529);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    padding-bottom: 0.5rem;
+}
+
+.section-icon {
+    margin-right: 0.75rem;
+    font-size: 1.3rem; /* Ajuster si besoin pour la taille des icônes emojis */
+}
+
+/* Détails de l'exécution en cours */
+.execution-details {
+    background-color: var(--background-color-light, #f8f9fa);
+    padding: 1rem;
+    border-radius: var(--border-radius-medium, 8px);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.execution-details p {
+    margin-bottom: 0.5rem;
+}
+
+.execution-details p strong {
+    color: var(--text-color-primary, #212529);
+}
+
+/* Conteneur pour les tableaux pour permettre le défilement horizontal si besoin */
+.table-container {
+    overflow-x: auto;
+    background-color: var(--card-bg-color, #fff);
+    border-radius: var(--border-radius-medium, 8px);
+    box-shadow: var(--shadow-small, 0 2px 4px rgba(0,0,0,0.05));
+    margin-bottom: 1.5rem;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.data-table th, .data-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+.data-table th {
+    background-color: var(--background-color-light, #f8f9fa);
+    color: var(--text-color-secondary, #6c757d);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--background-color-hover, #e9ecef);
+}
+
+/* Couleurs pour les valeurs positives/négatives dans les tableaux */
+.data-table .positive {
+    color: var(--success-color, #28a745);
+    font-weight: 500;
+}
+
+.data-table .negative {
+    color: var(--danger-color, #dc3545);
+    font-weight: 500;
+}
+
+/* Section des actions */
+.workflow-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+/* Styles pour le message de chargement (spinner) */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+    color: var(--text-color-secondary, #6c757d);
+} 
