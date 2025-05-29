@@ -229,34 +229,34 @@ def get_login_page() -> HTMLResponse:
         </div>
         
         <script>
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
+            document.getElementById('login-form').addEventListener('submit', async (e) => {{
                 e.preventDefault();
                 
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
                 const errorDiv = document.getElementById('error-message');
                 
-                try {
-                    const response = await fetch('/api/login', {
+                try {{
+                    const response = await fetch('/api/login', {{
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
+                        headers: {{ 'Content-Type': 'application/json' }},
+                        body: JSON.stringify({{ username, password }})
+                    }});
                     
                     const result = await response.json();
                     
-                    if (response.ok) {
+                    if (response.ok) {{
                         document.cookie = `session_token=${result.session_token}; path=/; max-age=86400`;
                         window.location.reload();
-                    } else {
+                    }} else {{
                         errorDiv.textContent = result.detail || 'Erreur de connexion';
                         errorDiv.style.display = 'block';
-                    }
-                } catch (error) {
+                    }}
+                }} catch (error) {{
                     errorDiv.textContent = 'Erreur de connexion au serveur';
                     errorDiv.style.display = 'block';
-                }
-            });
+                }}
+            }});
         </script>
     </body>
     </html>
@@ -1284,39 +1284,39 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
         <script>
             let currentPage = 'overview';
             
-            function showPage(pageId) {
-                // Nettoyer les anciens workflows
-                if (currentPage.includes('workflow')) {
+            function showPage(pageId) {{
+                /* Nettoyer les anciens workflows */
+                if (currentPage.includes('workflow')) {{
                     cleanupWorkflowPage(currentPage.replace('-page', ''));
-                }
+                }}
                 
-                // Cacher toutes les pages
-                document.querySelectorAll('.page-content').forEach(page => {
+                /* Cacher toutes les pages */
+                document.querySelectorAll('.page-content').forEach(page => {{
                     page.classList.remove('active');
-                });
+                }});
                 
-                // Désactiver tous les liens nav
-                document.querySelectorAll('.nav-link').forEach(link => {
+                /* Désactiver tous les liens nav */
+                document.querySelectorAll('.nav-link').forEach(link => {{
                     link.classList.remove('active');
-                });
+                }});
                 
-                // Afficher la page sélectionnée
+                /* Afficher la page sélectionnée */
                 const targetPage = document.getElementById(pageId + '-page');
-                if (targetPage) {
+                if (targetPage) {{
                     targetPage.classList.add('active');
-                }
+                }}
                 
-                // Activer le lien nav correspondant
+                /* Activer le lien nav correspondant */
                 const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {
+                navLinks.forEach(link => {{
+                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {{
                         link.classList.add('active');
-                    }
-                });
+                    }}
+                }});
                 
-                // Mettre à jour le titre
-                const titles = {
-                    'overview': 'Vue d\'ensemble',
+                /* Mettre à jour le titre */
+                const titles = {{
+                    'overview': 'Vue d\\'ensemble',
                     'capital': 'Capital & Performance',
                     'crypto-workflow': 'Workflow Crypto Principal',
                     'meme-workflow': 'Workflow Crypto Meme',
@@ -1324,28 +1324,28 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     'wallets': 'Wallets & Secrets',
                     'settings': 'Paramètres',
                     'logs': 'Logs Système'
-                };
+                }};
                 
                 const titleElement = document.getElementById('page-title');
-                if (titleElement) {
+                if (titleElement) {{
                     titleElement.textContent = titles[pageId] || pageId;
-                }
+                }}
                 
                 currentPage = pageId;
                 
-                // Charger les données de la page
+                /* Charger les données de la page */
                 loadPageData(pageId);
                 
-                // Scroll vers le haut
+                /* Scroll vers le haut */
                 window.scrollTo(0, 0);
-            }
+            }}
             
             // Améliorer la gestion des clics sur les liens de navigation
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {{
                 // Ajouter les event listeners pour tous les liens de navigation
                 const navLinks = document.querySelectorAll('.nav-link[onclick]');
-                navLinks.forEach(link => {
-                    link.addEventListener('click', function(e) {
+                navLinks.forEach(link => {{
+                    link.addEventListener('click', function(e) {{
                         e.preventDefault();
                         e.stopPropagation();
                         
@@ -1353,68 +1353,68 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                         const onclickAttr = this.getAttribute('onclick');
                         const match = onclickAttr.match(/showPage\('([^']+)'\)/);
                         
-                        if (match) {
+                        if (match) {{
                             const pageId = match[1];
                             showPage(pageId);
-                        }
-                    });
+                        }}
+                    }});
                     
                     // Améliorer l'accessibilité
                     link.setAttribute('role', 'button');
                     link.setAttribute('tabindex', '0');
                     
                     // Support du clavier
-                    link.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                    link.addEventListener('keydown', function(e) {{
+                        if (e.key === 'Enter' || e.key === ' ') {{
                             e.preventDefault();
                             this.click();
-                        }
-                    });
-                });
+                        }}
+                    }});
+                }});
                 
                 // Charger les données initiales
                 loadOverviewData();
                 
                 // Auto-refresh amélioré
                 startAutoRefresh();
-            });
+            }});
             
-            function startAutoRefresh() {
+            function startAutoRefresh() {{
                 // Refresh toutes les 30 secondes pour la vue d'ensemble
-                setInterval(() => {
-                    if (currentPage === 'overview') {
+                setInterval(() => {{
+                    if (currentPage === 'overview') {{
                         loadOverviewData();
-                    }
-                }, 30000);
-            }
+                    }}
+                }}, 30000);
+            }}
             
-            async function loadPageData(pageId) {
-                try {
-                    if (pageId === 'overview') {
+            async function loadPageData(pageId) {{
+                try {{
+                    if (pageId === 'overview') {{
                         await loadOverviewData();
-                    } else if (pageId.includes('workflow')) {
+                    }} else if (pageId.includes('workflow')) {{
                         const workflowType = pageId.replace('-workflow', '');
                         await loadWorkflowPage(workflowType);
-                    }
-                } catch (error) {
+                    }}
+                }} catch (error) {{
                     console.error('Erreur chargement page:', error);
                     showNotification('Erreur de chargement des données', 'error');
-                }
-            }
+                }}
+            }}
             
-            async function loadOverviewData() {
-                try {
+            async function loadOverviewData() {{
+                try {{
                     // Ajouter indicateur de chargement
                     const lastUpdateElement = document.getElementById('last-update');
-                    if (lastUpdateElement) {
+                    if (lastUpdateElement) {{
                         lastUpdateElement.textContent = 'Chargement...';
-                    }
+                    }}
                     
                     // Charger données dashboard
                     const dashResponse = await fetch('/api/dashboard');
-                    if (!dashResponse.ok) {
+                    if (!dashResponse.ok) {{
                         throw new Error('Erreur API dashboard');
-                    }
+                    }}
                     const dashData = await dashResponse.json();
                     
                     // Mettre à jour métriques avec animation
@@ -1429,68 +1429,68 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     
                     // Charger statut workflows
                     const workflowResponse = await fetch('/api/workflows/live-status');
-                    if (workflowResponse.ok) {
+                    if (workflowResponse.ok) {{
                         const workflowData = await workflowResponse.json();
                         updateWorkflowPerformance(workflowData);
                         updateRecentActivity(workflowData);
-                    }
+                    }}
                     
                     // Mettre à jour timestamp
-                    if (lastUpdateElement) {
+                    if (lastUpdateElement) {{
                         lastUpdateElement.textContent = 'Dernière MAJ: ' + new Date().toLocaleTimeString();
-                    }
+                    }}
                     
-                } catch (error) {
+                }} catch (error) {{
                     console.error('Erreur chargement données:', error);
                     showNotification('Erreur de connexion aux données', 'error');
                     
                     // Afficher état offline
                     const lastUpdateElement = document.getElementById('last-update');
-                    if (lastUpdateElement) {
+                    if (lastUpdateElement) {{
                         lastUpdateElement.textContent = 'Erreur de connexion';
-                    }
-                }
-            }
+                    }}
+                }}
+            }}
             
-            function updateMetricWithAnimation(elementId, value) {
+            function updateMetricWithAnimation(elementId, value) {{
                 const element = document.getElementById(elementId);
-                if (element && element.textContent !== value) {
+                if (element && element.textContent !== value) {{
                     element.style.transform = 'scale(1.1)';
                     element.style.transition = 'transform 0.2s ease';
                     
-                    setTimeout(() => {
+                    setTimeout(() => {{
                         element.textContent = value;
                         element.style.transform = 'scale(1)';
-                    }, 100);
-                }
-            }
+                    }}, 100);
+                }}
+            }}
             
-            function updateWorkflowPerformance(data) {
+            function updateWorkflowPerformance(data) {{
                 const performanceContainer = document.getElementById('workflow-performance');
                 if (!performanceContainer) return;
                 
                 const workflows = [
-                    { 
+                    {{ 
                         key: 'crypto', 
                         title: 'Crypto Principal', 
                         icon: '₿',
                         color: 'crypto'
-                    },
-                    { 
+                    }},
+                    {{ 
                         key: 'meme', 
                         title: 'Crypto Meme', 
                         icon: '🐸',
                         color: 'meme'
-                    },
-                    { 
+                    }},
+                    {{ 
                         key: 'forex', 
                         title: 'Forex Trading', 
                         icon: '💱',
                         color: 'forex'
-                    }
+                    }}
                 ];
                 
-                performanceContainer.innerHTML = workflows.map(workflow => {
+                performanceContainer.innerHTML = workflows.map(workflow => {{
                     const workflowData = data[workflow.key] || {};
                     const performance = workflowData.performance || {};
                     
@@ -1506,11 +1506,11 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     const avgGain = performance.avg_gain_per_trade || 0;
                     
                     // Créer les barres du graphique
-                    const chartBars = weekPerformance.map((gain, index) => {
+                    const chartBars = weekPerformance.map((gain, index) => {{
                         const height = Math.max(Math.abs(gain) * 30, 4); // Min 4px
                         const gainClass = gain >= 0 ? 'positive' : 'negative';
                         return `<div class="chart-bar ${gainClass}" style="height: ${height}px" title="Jour ${index + 1}: ${gain > 0 ? '+' : ''}${gain}%"></div>`;
-                    }).join('');
+                    }}).join('');
                     
                     const gainClass = totalGain >= 0 ? 'positive' : 'negative';
                     const gainSign = totalGain >= 0 ? '+' : '';
@@ -1555,17 +1555,17 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                             </div>
                         </div>
                     `;
-                }).join('');
+                }}).join('');
                 
                 // Animation des barres après insertion
-                setTimeout(() => {
-                    document.querySelectorAll('.chart-bar').forEach((bar, index) => {
+                setTimeout(() => {{
+                    document.querySelectorAll('.chart-bar').forEach((bar, index) => {{
                         bar.style.animationDelay = `${index * 0.1}s`;
-                    });
-                }, 100);
-            }
+                    }});
+                }}, 100);
+            }}
             
-            function updateRecentActivity(data) {
+            function updateRecentActivity(data) {{
                 const activityContainer = document.getElementById('recent-activity');
                 if (!activityContainer) return;
                 
@@ -1576,22 +1576,22 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                         <div class="no-activity-sub">Les workflows sont en cours d'exécution</div>
                     </div>
                 `;
-            }
+            }}
             
-            async function refreshData() {
+            async function refreshData() {{
                 await loadPageData(currentPage);
                 showNotification('Données actualisées', 'success');
-            }
+            }}
             
-            function logout() {
-                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            function logout() {{
+                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {{
                     document.cookie = 'session_token=; path=/; max-age=0';
                     window.location.reload();
-                }
-            }
+                }}
+            }}
             
             // Système de notifications
-            function showNotification(message, type = 'info') {
+            function showNotification(message, type = 'info') {{
                 const notification = document.createElement('div');
                 notification.className = `notification notification-${type}`;
                 notification.textContent = message;
@@ -1609,31 +1609,31 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     transition: transform 0.3s ease;
                 `;
                 
-                if (type === 'success') {
+                if (type === 'success') {{
                     notification.style.background = '#10b981';
-                } else if (type === 'error') {
+                }} else if (type === 'error') {{
                     notification.style.background = '#ef4444';
-                } else {
+                }} else {{
                     notification.style.background = '#3b82f6';
-                }
+                }}
                 
                 document.body.appendChild(notification);
                 
                 // Animation d'entrée
-                setTimeout(() => {
+                setTimeout(() => {{
                     notification.style.transform = 'translateX(0)';
-                }, 100);
+                }}, 100);
                 
                 // Suppression automatique
-                setTimeout(() => {
+                setTimeout(() => {{
                     notification.style.transform = 'translateX(100%)';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
+                    setTimeout(() => {{
+                        if (notification.parentNode) {{
                             notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }, 3000);
-            }
+                        }}
+                    }}, 300);
+                }}, 3000);
+            }}
             
             {workflow_js}
         </script>
