@@ -452,7 +452,7 @@ async function exportWorkflowData(workflowType) {
         const response = await fetch(`/api/workflows/${workflowType}/export`);
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.detail || 'Erreur lors de l'exportation');
+            throw new Error(errorData.detail || 'Erreur lors de l\'exportation');
         }
         const blob = await response.blob();
         const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${workflowType}_export.json`;
