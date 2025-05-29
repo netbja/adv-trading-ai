@@ -9,13 +9,14 @@ import os
 import logging
 from datetime import datetime
 from dataclasses import asdict
-from fastapi import FastAPI, HTTPException, Request, Depends, Cookie
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi import FastAPI, HTTPException, Request, Depends, Cookie, Form
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
 import random
+import secrets
 
 # Imports des modules
 from src.auth.secure_auth import SecureAuthManager
@@ -43,6 +44,12 @@ app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
 # Optionnel: Configuration de Jinja2Templates si on veut rendre des templates HTML depuis le serveur
 # templates = Jinja2Templates(directory="frontend")
+
+def get_login_page_from_file():
+    return FileResponse("frontend/login.html", media_type="text/html")
+
+def get_main_dashboard_from_file():
+    return FileResponse("frontend/index.html", media_type="text/html")
 
 @app.on_event("startup")
 async def startup_event():
