@@ -1,0 +1,49 @@
+# 🧠 DOCKERFILE POUR SYSTÈME AUTONOME
+FROM python:3.11-slim
+
+# Variables d'environnement
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Créer utilisateur non-root
+RUN useradd --create-home --shell /bin/bash trading_ai
+
+# Installer dépendances système
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Répertoire de travail
+WORKDIR /app
+
+# Copier fichiers de requirements
+COPY requirements.txt .
+
+# Installer dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier le code source
+COPY smart_capital_growth_system.py .
+COPY roi_10x_trading_system.py .
+COPY zero_mindset_trading_system.py .
+COPY src/ ./src/
+
+# Créer répertoires pour logs et data
+RUN mkdir -p /app/logs /app/data
+RUN chown -R trading_ai:trading_ai /app
+
+# Changer vers utilisateur non-root
+USER trading_ai
+
+# Port d'exposition
+EXPOSE 8000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Commande par défaut
+CMD ["python", "smart_capital_growth_system.py"] 

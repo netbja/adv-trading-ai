@@ -133,6 +133,61 @@ services:
       postgres:
         condition: service_healthy
 
+  # 🧠 AI ORCHESTRATOR - INTELLIGENT CRON REPLACEMENT
+  ai_orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    container_name: trading_ai_orchestrator
+    environment:
+      # AI Configuration
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      
+      # N8N Integration
+      - N8N_USER=${N8N_USER:-admin}
+      - N8N_PASSWORD=${N8N_PASSWORD:-TradingN8N2025!}
+      
+      # Database
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-trading_ai}
+      - POSTGRES_USER=${POSTGRES_USER:-trader}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-TradingDB2025!}
+      
+      # API Configuration
+      - ORCHESTRATOR_PORT=8080
+      
+      # Telegram (optional)
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      
+      # Trading APIs
+      - TRADERMADE_API_KEY=${TRADERMADE_API_KEY:-demo}
+      - BIRDEYE_API_KEY=${BIRDEYE_API_KEY:-}
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+    volumes:
+      - ./logs/orchestrator:/app/logs
+      - ./data/orchestrator:/app/data
+    ports:
+      - "${ORCHESTRATOR_PORT:-8080}:8080"
+    networks:
+      - trading_network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      n8n:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # 📈 PROMETHEUS - MÉTRIQUES SYSTÈME
   prometheus:
     image: prom/prometheus:latest
@@ -205,6 +260,7 @@ services:
       - ./logs/postgres:/var/log/postgresql:ro
       - ./logs/n8n:/var/log/n8n:ro
       - ./logs/nginx:/var/log/nginx:ro
+      - ./logs/orchestrator:/var/log/orchestrator:ro  # Logs orchestrateur
     command: -config.file=/etc/promtail/config.yml
     networks:
       - trading_network
