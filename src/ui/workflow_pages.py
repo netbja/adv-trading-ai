@@ -67,7 +67,7 @@ def get_crypto_workflow_page() -> str:
                         <div class="status-header">
                             <div class="status-info">
                                 <span>Statut actuel :</span>
-                                <span class="status-badge status-idle" id="crypto-current-status">Idle</span>
+                                <span class="status-badge status-idle" id="crypto-current-status">En attente</span>
                             </div>
                             
                             <div class="workflow-actions">
@@ -80,11 +80,40 @@ def get_crypto_workflow_page() -> str:
                             </div>
                         </div>
                         
+                        <div class="status-display">
+                            <div class="status-main">
+                                <div class="status-indicator-large" id="crypto-status-indicator">
+                                    <div class="status-pulse"></div>
+                                    <span class="status-emoji">⏸️</span>
+                                </div>
+                                <div class="status-text-content">
+                                    <div class="status-main-text" id="crypto-status-text">Workflow en pause</div>
+                                    <div class="status-sub-text" id="crypto-status-sub">Prochain scan dans 3 minutes</div>
+                                </div>
+                            </div>
+                            
+                            <div class="status-metrics">
+                                <div class="status-metric">
+                                    <span class="metric-label">Uptime</span>
+                                    <span class="metric-value" id="crypto-uptime">99.5%</span>
+                                </div>
+                                <div class="status-metric">
+                                    <span class="metric-label">Dernière exec.</span>
+                                    <span class="metric-value" id="crypto-last-exec">14:25</span>
+                                </div>
+                                <div class="status-metric">
+                                    <span class="metric-label">Efficacité</span>
+                                    <span class="metric-value" id="crypto-efficiency">87%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="progress-container">
                             <div class="progress-label" id="crypto-progress-label">En attente du prochain cycle...</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="crypto-progress" style="width: 0%"></div>
                             </div>
+                            <div class="progress-time" id="crypto-progress-time">00:00 / 03:00</div>
                         </div>
                         
                         <!-- Phases du workflow -->
@@ -244,7 +273,7 @@ def get_meme_workflow_page() -> str:
                         <div class="status-header">
                             <div class="status-info">
                                 <span>Statut actuel :</span>
-                                <span class="status-badge status-idle" id="meme-current-status">Idle</span>
+                                <span class="status-badge status-idle" id="meme-current-status">En attente</span>
                             </div>
                             
                             <div class="workflow-actions">
@@ -257,11 +286,40 @@ def get_meme_workflow_page() -> str:
                             </div>
                         </div>
                         
+                        <div class="status-display">
+                            <div class="status-main">
+                                <div class="status-indicator-large" id="meme-status-indicator">
+                                    <div class="status-pulse"></div>
+                                    <span class="status-emoji">🔍</span>
+                                </div>
+                                <div class="status-text-content">
+                                    <div class="status-main-text" id="meme-status-text">Recherche tokens viraux</div>
+                                    <div class="status-sub-text" id="meme-status-sub">Analyse de sentiment en cours</div>
+                                </div>
+                            </div>
+                            
+                            <div class="status-metrics">
+                                <div class="status-metric">
+                                    <span class="metric-label">Score viral</span>
+                                    <span class="metric-value" id="meme-viral-max">85</span>
+                                </div>
+                                <div class="status-metric">
+                                    <span class="metric-label">Tokens</span>
+                                    <span class="metric-value" id="meme-tokens-count">12</span>
+                                </div>
+                                <div class="status-metric">
+                                    <span class="metric-label">Risque</span>
+                                    <span class="metric-value warning" id="meme-risk-display">MEDIUM</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="progress-container">
                             <div class="progress-label" id="meme-progress-label">En attente du prochain cycle...</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="meme-progress" style="width: 0%"></div>
                             </div>
+                            <div class="progress-time" id="meme-progress-time">00:00 / 05:00</div>
                         </div>
                     </div>
                 </div>
@@ -361,7 +419,7 @@ def get_forex_workflow_page() -> str:
                         <div class="status-header">
                             <div class="status-info">
                                 <span>Statut actuel :</span>
-                                <span class="status-badge status-idle" id="forex-current-status">Idle</span>
+                                <span class="status-badge status-idle" id="forex-current-status">En attente</span>
                             </div>
                             
                             <div class="workflow-actions">
@@ -374,11 +432,40 @@ def get_forex_workflow_page() -> str:
                             </div>
                         </div>
                         
+                        <div class="status-display">
+                            <div class="status-main">
+                                <div class="status-indicator-large" id="forex-status-indicator">
+                                    <div class="status-pulse"></div>
+                                    <span class="status-emoji">💱</span>
+                                </div>
+                                <div class="status-text-content">
+                                    <div class="status-main-text" id="forex-status-text">Analyse devises</div>
+                                    <div class="status-sub-text" id="forex-status-sub">Surveillance EUR/USD, GBP/USD</div>
+                                </div>
+                            </div>
+                            
+                            <div class="status-metrics">
+                                <div class="status-metric">
+                                    <span class="metric-label">Force USD</span>
+                                    <span class="metric-value" id="forex-usd-index">102.3</span>
+                                </div>
+                                <div class="status-metric">
+                                    <span class="metric-label">Volatilité</span>
+                                    <span class="metric-value" id="forex-volatility">2.1%</span>
+                                </div>
+                                <div class="status-metric">
+                                    <span class="metric-label">Signaux</span>
+                                    <span class="metric-value positive" id="forex-signals">3</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="progress-container">
                             <div class="progress-label" id="forex-progress-label">En attente du prochain cycle...</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="forex-progress" style="width: 0%"></div>
                             </div>
+                            <div class="progress-time" id="forex-progress-time">00:00 / 02:00</div>
                         </div>
                     </div>
                 </div>
@@ -1274,5 +1361,109 @@ def get_workflow_styles() -> str:
         .config-grid {
             grid-template-columns: 1fr;
         }
+    }
+    
+    /* === STATUT TEMPS RÉEL AMÉLIORÉ === */
+    .status-display {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border);
+    }
+    
+    .status-main {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .status-indicator-large {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        border: 3px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+    
+    .status-pulse {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        border-radius: 50%;
+        border: 2px solid var(--primary);
+        opacity: 0.6;
+        animation: pulse-ring 2s infinite;
+    }
+    
+    @keyframes pulse-ring {
+        0% { transform: scale(1); opacity: 0.6; }
+        50% { transform: scale(1.1); opacity: 0.3; }
+        100% { transform: scale(1.2); opacity: 0; }
+    }
+    
+    .status-text-content {
+        flex: 1;
+    }
+    
+    .status-main-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .status-sub-text {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    
+    .status-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .status-metric {
+        text-align: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border);
+    }
+    
+    .status-metric .metric-label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .status-metric .metric-value {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .progress-time {
+        text-align: center;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+        font-weight: 500;
+        font-family: 'Courier New', monospace;
     }
     """ 

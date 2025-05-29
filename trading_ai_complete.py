@@ -797,6 +797,132 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 overflow-y: auto;
             }}
             
+            /* === ACTIVITÉ RÉCENTE AMÉLIORÉE === */
+            .activity-item {{
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+                border-radius: 10px;
+                transition: var(--transition);
+                margin-bottom: 0.75rem;
+                border: 1px solid transparent;
+            }}
+            
+            .activity-item:hover {{
+                background: #f8fafc;
+                border-color: var(--border);
+                transform: translateX(4px);
+            }}
+            
+            .activity-icon-wrapper {{
+                position: relative;
+                flex-shrink: 0;
+            }}
+            
+            .activity-icon {{
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
+                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+                border: 1px solid var(--border);
+            }}
+            
+            .activity-status-dot {{
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                border: 2px solid white;
+            }}
+            
+            .status-success {{ background: var(--success); }}
+            .status-info {{ background: var(--primary); }}
+            .status-warning {{ background: var(--warning); }}
+            .status-error {{ background: var(--danger); }}
+            
+            .activity-content {{
+                flex: 1;
+                min-width: 0;
+            }}
+            
+            .activity-header {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.25rem;
+                gap: 1rem;
+            }}
+            
+            .activity-title {{
+                font-weight: 600;
+                color: var(--text-primary);
+                font-size: 0.95rem;
+            }}
+            
+            .activity-time {{
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                white-space: nowrap;
+                font-weight: 500;
+            }}
+            
+            .activity-description {{
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                line-height: 1.4;
+            }}
+            
+            .no-activity {{
+                text-align: center;
+                padding: 3rem 2rem;
+                color: var(--text-secondary);
+            }}
+            
+            .no-activity-icon {{
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                opacity: 0.6;
+            }}
+            
+            .no-activity-text {{
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }}
+            
+            .no-activity-sub {{
+                font-size: 0.9rem;
+                opacity: 0.8;
+            }}
+            
+            /* Styles spécifiques par type d'activité */
+            .activity-success .activity-icon {{
+                background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+                color: var(--success);
+            }}
+            
+            .activity-info .activity-icon {{
+                background: linear-gradient(135deg, #dbeafe, #93c5fd);
+                color: var(--primary);
+            }}
+            
+            .activity-warning .activity-icon {{
+                background: linear-gradient(135deg, #fef3c7, #fde68a);
+                color: var(--warning);
+            }}
+            
+            .activity-error .activity-icon {{
+                background: linear-gradient(135deg, #fee2e2, #fecaca);
+                color: var(--danger);
+            }}
+            
             /* === ANIMATIONS === */
             @keyframes fadeIn {{
                 from {{ opacity: 0; transform: translateY(20px); }}
@@ -1158,39 +1284,39 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
         <script>
             let currentPage = 'overview';
             
-            function showPage(pageId) {{
+            function showPage(pageId) {
                 // Nettoyer les anciens workflows
-                if (currentPage.includes('workflow')) {{
+                if (currentPage.includes('workflow')) {
                     cleanupWorkflowPage(currentPage.replace('-page', ''));
-                }}
+                }
                 
                 // Cacher toutes les pages
-                document.querySelectorAll('.page-content').forEach(page => {{
+                document.querySelectorAll('.page-content').forEach(page => {
                     page.classList.remove('active');
-                }});
+                });
                 
                 // Désactiver tous les liens nav
-                document.querySelectorAll('.nav-link').forEach(link => {{
+                document.querySelectorAll('.nav-link').forEach(link => {
                     link.classList.remove('active');
-                }});
+                });
                 
                 // Afficher la page sélectionnée
                 const targetPage = document.getElementById(pageId + '-page');
-                if (targetPage) {{
+                if (targetPage) {
                     targetPage.classList.add('active');
-                }}
+                }
                 
                 // Activer le lien nav correspondant
                 const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => {{
-                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {{
+                navLinks.forEach(link => {
+                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {
                         link.classList.add('active');
-                    }}
-                }});
+                    }
+                });
                 
                 // Mettre à jour le titre
-                const titles = {{
-                    'overview': 'Vue d\\'ensemble',
+                const titles = {
+                    'overview': 'Vue d\'ensemble',
                     'capital': 'Capital & Performance',
                     'crypto-workflow': 'Workflow Crypto Principal',
                     'meme-workflow': 'Workflow Crypto Meme',
@@ -1198,12 +1324,12 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     'wallets': 'Wallets & Secrets',
                     'settings': 'Paramètres',
                     'logs': 'Logs Système'
-                }};
+                };
                 
                 const titleElement = document.getElementById('page-title');
-                if (titleElement) {{
+                if (titleElement) {
                     titleElement.textContent = titles[pageId] || pageId;
-                }}
+                }
                 
                 currentPage = pageId;
                 
@@ -1212,83 +1338,83 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 
                 // Scroll vers le haut
                 window.scrollTo(0, 0);
-            }}
+            }
             
             // Améliorer la gestion des clics sur les liens de navigation
-            document.addEventListener('DOMContentLoaded', function() {{
+            document.addEventListener('DOMContentLoaded', function() {
                 // Ajouter les event listeners pour tous les liens de navigation
                 const navLinks = document.querySelectorAll('.nav-link[onclick]');
-                navLinks.forEach(link => {{
-                    link.addEventListener('click', function(e) {{
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
                         // Extraire le pageId de l'attribut onclick
                         const onclickAttr = this.getAttribute('onclick');
-                        const match = onclickAttr.match(/showPage\\('([^']+)'\\)/);
+                        const match = onclickAttr.match(/showPage\('([^']+)'\)/);
                         
-                        if (match) {{
+                        if (match) {
                             const pageId = match[1];
                             showPage(pageId);
-                        }}
-                    }});
+                        }
+                    });
                     
                     // Améliorer l'accessibilité
                     link.setAttribute('role', 'button');
                     link.setAttribute('tabindex', '0');
                     
                     // Support du clavier
-                    link.addEventListener('keydown', function(e) {{
-                        if (e.key === 'Enter' || e.key === ' ') {{
+                    link.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
                             this.click();
-                        }}
-                    }});
-                }});
+                        }
+                    });
+                });
                 
                 // Charger les données initiales
                 loadOverviewData();
                 
                 // Auto-refresh amélioré
                 startAutoRefresh();
-            }});
+            });
             
-            function startAutoRefresh() {{
+            function startAutoRefresh() {
                 // Refresh toutes les 30 secondes pour la vue d'ensemble
-                setInterval(() => {{
-                    if (currentPage === 'overview') {{
+                setInterval(() => {
+                    if (currentPage === 'overview') {
                         loadOverviewData();
-                    }}
-                }}, 30000);
-            }}
+                    }
+                }, 30000);
+            }
             
-            async function loadPageData(pageId) {{
-                try {{
-                    if (pageId === 'overview') {{
+            async function loadPageData(pageId) {
+                try {
+                    if (pageId === 'overview') {
                         await loadOverviewData();
-                    }} else if (pageId.includes('workflow')) {{
+                    } else if (pageId.includes('workflow')) {
                         const workflowType = pageId.replace('-workflow', '');
                         await loadWorkflowPage(workflowType);
-                    }}
-                }} catch (error) {{
+                    }
+                } catch (error) {
                     console.error('Erreur chargement page:', error);
                     showNotification('Erreur de chargement des données', 'error');
-                }}
-            }}
+                }
+            }
             
-            async function loadOverviewData() {{
-                try {{
+            async function loadOverviewData() {
+                try {
                     // Ajouter indicateur de chargement
                     const lastUpdateElement = document.getElementById('last-update');
-                    if (lastUpdateElement) {{
+                    if (lastUpdateElement) {
                         lastUpdateElement.textContent = 'Chargement...';
-                    }}
+                    }
                     
                     // Charger données dashboard
                     const dashResponse = await fetch('/api/dashboard');
-                    if (!dashResponse.ok) {{
+                    if (!dashResponse.ok) {
                         throw new Error('Erreur API dashboard');
-                    }}
+                    }
                     const dashData = await dashResponse.json();
                     
                     // Mettre à jour métriques avec animation
@@ -1303,70 +1429,70 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     
                     // Charger statut workflows
                     const workflowResponse = await fetch('/api/workflows/live-status');
-                    if (workflowResponse.ok) {{
+                    if (workflowResponse.ok) {
                         const workflowData = await workflowResponse.json();
                         updateWorkflowPerformance(workflowData);
                         updateRecentActivity(workflowData);
-                    }}
+                    }
                     
                     // Mettre à jour timestamp
-                    if (lastUpdateElement) {{
+                    if (lastUpdateElement) {
                         lastUpdateElement.textContent = 'Dernière MAJ: ' + new Date().toLocaleTimeString();
-                    }}
+                    }
                     
-                }} catch (error) {{
+                } catch (error) {
                     console.error('Erreur chargement données:', error);
                     showNotification('Erreur de connexion aux données', 'error');
                     
                     // Afficher état offline
                     const lastUpdateElement = document.getElementById('last-update');
-                    if (lastUpdateElement) {{
+                    if (lastUpdateElement) {
                         lastUpdateElement.textContent = 'Erreur de connexion';
-                    }}
-                }}
-            }}
+                    }
+                }
+            }
             
-            function updateMetricWithAnimation(elementId, value) {{
+            function updateMetricWithAnimation(elementId, value) {
                 const element = document.getElementById(elementId);
-                if (element && element.textContent !== value) {{
+                if (element && element.textContent !== value) {
                     element.style.transform = 'scale(1.1)';
                     element.style.transition = 'transform 0.2s ease';
                     
-                    setTimeout(() => {{
+                    setTimeout(() => {
                         element.textContent = value;
                         element.style.transform = 'scale(1)';
-                    }}, 100);
-                }}
-            }}
+                    }, 100);
+                }
+            }
             
-            function updateWorkflowPerformance(data) {{
+            function updateWorkflowPerformance(data) {
                 const performanceContainer = document.getElementById('workflow-performance');
                 if (!performanceContainer) return;
                 
                 const workflows = [
-                    {{ 
+                    { 
                         key: 'crypto', 
                         title: 'Crypto Principal', 
                         icon: '₿',
                         color: 'crypto'
-                    }},
-                    {{ 
+                    },
+                    { 
                         key: 'meme', 
                         title: 'Crypto Meme', 
                         icon: '🐸',
                         color: 'meme'
-                    }},
-                    {{ 
+                    },
+                    { 
                         key: 'forex', 
                         title: 'Forex Trading', 
                         icon: '💱',
                         color: 'forex'
-                    }}
+                    }
                 ];
                 
-                performanceContainer.innerHTML = workflows.map(workflow => {{
-                    const workflowData = data[workflow.key] || {{}};
-                    const performance = workflowData.performance || {{}};
+                performanceContainer.innerHTML = workflows.map(workflow => {
+                    const workflowData = data[workflow.key] || {};
+                    const performance = workflowData.performance || {};
                     
                     // Simulation de données de performance sur 7 jours
                     const weekPerformance = performance.weekly_gains || [
@@ -1380,124 +1506,177 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     const avgGain = performance.avg_gain_per_trade || 0;
                     
                     // Créer les barres du graphique
-                    const chartBars = weekPerformance.map((gain, index) => {{
+                    const chartBars = weekPerformance.map((gain, index) => {
                         const height = Math.max(Math.abs(gain) * 30, 4); // Min 4px
                         const gainClass = gain >= 0 ? 'positive' : 'negative';
-                        return `<div class="chart-bar ${{gainClass}}" style="height: ${{height}}px" title="Jour ${{index + 1}}: ${{gain > 0 ? '+' : ''}}${{gain}}%"></div>`;
-                    }}).join('');
+                        return `<div class="chart-bar ${gainClass}" style="height: ${height}px" title="Jour ${index + 1}: ${gain > 0 ? '+' : ''}${gain}%"></div>`;
+                    }).join('');
                     
                     const gainClass = totalGain >= 0 ? 'positive' : 'negative';
                     const gainSign = totalGain >= 0 ? '+' : '';
                     const percentageSign = gainPercentage >= 0 ? '+' : '';
                     
                     return `
-                        <div class="performance-card ${{workflow.color}}">
+                        <div class="performance-card ${workflow.color}">
                             <div class="performance-header">
                                 <div class="performance-title">
-                                    <div class="performance-icon">${{workflow.icon}}</div>
-                                    <span>${{workflow.title}}</span>
+                                    <div class="performance-icon">${workflow.icon}</div>
+                                    <span>${workflow.title}</span>
                                 </div>
                                 <div class="performance-gain">
-                                    <div class="gain-amount ${{gainClass}}">
-                                        ${{gainSign}}${{totalGain.toFixed(2)}}€
+                                    <div class="gain-amount ${gainClass}">
+                                        ${gainSign}${totalGain.toFixed(2)}€
                                     </div>
-                                    <div class="gain-percentage ${{gainClass}}">
-                                        ${{percentageSign}}${{gainPercentage.toFixed(1)}}%
+                                    <div class="gain-percentage ${gainClass}">
+                                        ${percentageSign}${gainPercentage.toFixed(1)}%
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="performance-chart">
                                 <div class="mini-chart">
-                                    ${{chartBars}}
+                                    ${chartBars}
                                 </div>
                             </div>
                             
                             <div class="performance-stats">
                                 <div class="stat-item">
-                                    <div class="stat-value">${{trades}}</div>
+                                    <div class="stat-value">${trades}</div>
                                     <div class="stat-label">Trades</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">${{winRate.toFixed(0)}}%</div>
+                                    <div class="stat-value">${winRate.toFixed(0)}%</div>
                                     <div class="stat-label">Win Rate</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">${{avgGain > 0 ? '+' : ''}}${{avgGain.toFixed(2)}}€</div>
+                                    <div class="stat-value">${avgGain > 0 ? '+' : ''}$${avgGain.toFixed(2)}€</div>
                                     <div class="stat-label">Moy/Trade</div>
                                 </div>
                             </div>
                         </div>
                     `;
-                }}).join('');
+                }).join('');
                 
                 // Animation des barres après insertion
-                setTimeout(() => {{
-                    document.querySelectorAll('.chart-bar').forEach((bar, index) => {{
-                        bar.style.animationDelay = `${{index * 0.1}}s`;
-                    }});
-                }}, 100);
-            }}
+                setTimeout(() => {
+                    document.querySelectorAll('.chart-bar').forEach((bar, index) => {
+                        bar.style.animationDelay = `${index * 0.1}s`;
+                    });
+                }, 100);
+            }
             
-            function updateRecentActivity(data) {{
+            function updateRecentActivity(data) {
                 const activityContainer = document.getElementById('recent-activity');
                 if (!activityContainer) return;
                 
-                const systemHealth = data.system_health || {{}};
+                const systemHealth = data.system_health || {};
+                const currentTime = new Date();
                 
-                // Simuler activité récente basée sur les données système
-                const activities = [
-                    {{
+                // Générer une activité réaliste basée sur les données du système
+                const activities = [];
+                
+                // Activité crypto
+                if (data.crypto) {
+                    activities.push({
                         type: 'crypto',
-                        title: 'Scan crypto terminé',
-                        description: `${{systemHealth.total_executions || 0}} exécutions totales`,
-                        time: '2 min'
-                    }},
-                    {{
-                        type: 'forex',
-                        title: 'Analyse forex',
-                        description: 'EUR/USD signal détecté',
-                        time: '5 min'
-                    }},
-                    {{
-                        type: 'meme',
-                        title: 'Tokens meme scannés',
-                        description: 'Aucun signal fort',
-                        time: '8 min'
-                    }}
-                ];
+                        icon: '₿',
+                        title: 'Crypto Principal',
+                        description: `Scan terminé: ${{data.crypto.pairs_monitored || 5}} paires analysées`,
+                        time: '2 min',
+                        status: 'success'
+                    });
+                }
                 
-                activityContainer.innerHTML = activities.map(activity => `
-                    <div class="activity-item">
-                        <div class="activity-icon ${{activity.type}}">
-                            ${{activity.type === 'crypto' ? '₿' : 
-                               activity.type === 'forex' ? '💱' : '🐸'}}
+                // Activité système
+                if (systemHealth.total_executions > 0) {
+                    activities.push({
+                        type: 'system',
+                        icon: '🔧',
+                        title: 'Système',
+                        description: `${systemHealth.total_executions} exécutions aujourd'hui`,
+                        time: '5 min',
+                        status: 'info'
+                    });
+                }
+                
+                // Activité meme tokens
+                if (data.meme) {
+                    activities.push({
+                        type: 'meme',
+                        icon: '🐸',
+                        title: 'Crypto Meme',
+                        description: `${data.meme.tokens_scanned || 0} tokens scannés`,
+                        time: '8 min',
+                        status: data.meme.tokens_scanned > 0 ? 'warning' : 'info'
+                    });
+                }
+                
+                // Activité forex
+                if (data.forex) {
+                    activities.push({
+                        type: 'forex',
+                        icon: '💱',
+                        title: 'Forex Trading',
+                        description: `Analyse USD/EUR: ${{data.forex.usd_strength || 102}}%`,
+                        time: '12 min',
+                        status: 'success'
+                    });
+                }
+                
+                // Ajouter un timestamp de dernière activité
+                activities.push({
+                    type: 'timestamp',
+                    icon: '🕒',
+                    title: 'Dernière synchronisation',
+                    description: currentTime.toLocaleTimeString('fr-FR'),
+                    time: 'maintenant',
+                    status: 'info'
+                });
+                
+                // Générer le HTML optimisé
+                if (activities.length === 0) {
+                    activityContainer.innerHTML = `
+                        <div class="no-activity">
+                            <div class="no-activity-icon">📊</div>
+                            <div class="no-activity-text">Aucune activité récente</div>
+                            <div class="no-activity-sub">Les workflows vont démarrer sous peu</div>
                         </div>
-                        <div class="activity-content">
-                            <div class="activity-title">${{activity.title}}</div>
-                            <div class="activity-description">${{activity.description}}</div>
-                            <div class="activity-time">il y a ${{activity.time}}</div>
+                    `;
+                } else {
+                    activityContainer.innerHTML = activities.map(activity => `
+                        <div class="activity-item activity-${activity.status}">
+                            <div class="activity-icon-wrapper">
+                                <div class="activity-icon">${activity.icon}</div>
+                                <div class="activity-status-dot status-${activity.status}"></div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-header">
+                                    <span class="activity-title">${activity.title}</span>
+                                    <span class="activity-time">il y a ${{activity.time}}</span>
+                                </div>
+                                <div class="activity-description">${activity.description}</div>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
-            }}
+                    `).join('');
+                }
+            }
             
-            async function refreshData() {{
+            async function refreshData() {
                 await loadPageData(currentPage);
                 showNotification('Données actualisées', 'success');
-            }}
+            }
             
-            function logout() {{
-                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {{
+            function logout() {
+                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
                     document.cookie = 'session_token=; path=/; max-age=0';
                     window.location.reload();
-                }}
-            }}
+                }
+            }
             
             // Système de notifications
-            function showNotification(message, type = 'info') {{
+            function showNotification(message, type = 'info') {
                 const notification = document.createElement('div');
-                notification.className = `notification notification-${{type}}`;
+                notification.className = `notification notification-${type}`;
                 notification.textContent = message;
                 
                 notification.style.cssText = `
@@ -1513,31 +1692,31 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     transition: transform 0.3s ease;
                 `;
                 
-                if (type === 'success') {{
+                if (type === 'success') {
                     notification.style.background = '#10b981';
-                }} else if (type === 'error') {{
+                } else if (type === 'error') {
                     notification.style.background = '#ef4444';
-                }} else {{
+                } else {
                     notification.style.background = '#3b82f6';
-                }}
+                }
                 
                 document.body.appendChild(notification);
                 
                 // Animation d'entrée
-                setTimeout(() => {{
+                setTimeout(() => {
                     notification.style.transform = 'translateX(0)';
-                }}, 100);
+                }, 100);
                 
                 // Suppression automatique
-                setTimeout(() => {{
+                setTimeout(() => {
                     notification.style.transform = 'translateX(100%)';
-                    setTimeout(() => {{
-                        if (notification.parentNode) {{
+                    setTimeout(() => {
+                        if (notification.parentNode) {
                             notification.parentNode.removeChild(notification);
-                        }}
-                    }}, 300);
-                }}, 3000);
-            }}
+                        }
+                    }, 300);
+                }, 3000);
+            }
             
             {workflow_js}
         </script>
