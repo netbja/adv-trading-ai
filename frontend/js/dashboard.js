@@ -53,6 +53,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Charger les données de la page initiale (overview)
     showPage(currentPage); // Assure le chargement de la vue d'ensemble initiale
     // startAutoRefresh(); // Activer si souhaité
+
+    // Configurer les cartes de workflow cliquables sur la page d'aperçu
+    const workflowCards = document.querySelectorAll('.workflow-card[data-page]');
+    workflowCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            const pageId = this.dataset.page;
+            if (pageId) {
+                showPage(pageId);
+            }
+        });
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
 });
 
 function showPage(pageId) {
