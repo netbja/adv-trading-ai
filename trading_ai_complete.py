@@ -8,6 +8,7 @@ import asyncio
 import os
 import logging
 from datetime import datetime
+from dataclasses import asdict
 from fastapi import FastAPI, HTTPException, Request, Depends, Cookie
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -1429,23 +1430,23 @@ async def get_crypto_workflow_details(user_data: dict = Depends(require_auth)):
         current_execution = crypto_engine.current_execution
         
         # Simuler données réalistes
-        return {{
+        return {
             "pairs_monitored": len(crypto_engine.target_pairs),
             "signals_today": len([s for s in crypto_engine.signal_history if s.timestamp.date() == datetime.now().date()]),
             "avg_confidence": 0.75,
             "next_scan_in_seconds": 180,
             "current_execution": asdict(current_execution) if current_execution else None,
-            "pairs_data": {{
-                pair: {{
+            "pairs_data": {
+                pair: {
                     "price": 45000.0 if "BTC" in pair else 2500.0 if "ETH" in pair else 100.0,
                     "change_24h": 2.5,
                     "volume_24h": 250000000
-                }} for pair in crypto_engine.target_pairs
-            }},
+                } for pair in crypto_engine.target_pairs
+            },
             "recent_signals": [asdict(s) for s in crypto_engine.signal_history[-10:]]
-        }}
+        }
     except Exception as e:
-        logger.error(f"Erreur crypto workflow details: {{e}}")
+        logger.error(f"Erreur crypto workflow details: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
 
 @app.get("/api/workflows/meme/details")
@@ -1455,35 +1456,35 @@ async def get_meme_workflow_details(user_data: dict = Depends(require_auth)):
         meme_engine = live_orchestrator.meme_engine
         current_execution = meme_engine.current_execution
         
-        return {{
+        return {
             "tokens_scanned": len(meme_engine.target_tokens),
             "max_viral_score": 85,
             "total_social_mentions": 1250,
             "overall_risk_level": "MEDIUM",
             "current_execution": asdict(current_execution) if current_execution else None,
-            "tokens_data": {{
-                token: {{
+            "tokens_data": {
+                token: {
                     "viral_score": 65,
                     "social_mentions": 250,
                     "change_24h": 15.2,
                     "whale_activity": "medium"
-                }} for token in meme_engine.target_tokens
-            }},
-            "risk_analysis": {{
-                token: {{
+                } for token in meme_engine.target_tokens
+            },
+            "risk_analysis": {
+                token: {
                     "risk_level": "MEDIUM",
                     "risk_score": 45,
-                    "factors": {{
+                    "factors": {
                         "volatility": 25.5,
                         "social_activity": 250,
                         "whale_activity": "medium"
-                    }}
-                }} for token in meme_engine.target_tokens
-            }},
+                    }
+                } for token in meme_engine.target_tokens
+            },
             "viral_alerts": []
-        }}
+        }
     except Exception as e:
-        logger.error(f"Erreur meme workflow details: {{e}}")
+        logger.error(f"Erreur meme workflow details: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
 
 @app.get("/api/workflows/forex/details")
@@ -1493,38 +1494,38 @@ async def get_forex_workflow_details(user_data: dict = Depends(require_auth)):
         forex_engine = live_orchestrator.forex_engine
         current_execution = forex_engine.current_execution
         
-        return {{
+        return {
             "pairs_active": len(forex_engine.currency_pairs),
             "usd_strength_index": 102.5,
             "avg_volatility": 0.021,
             "active_signals_count": 2,
             "current_execution": asdict(current_execution) if current_execution else None,
-            "pairs_data": {{
-                pair: {{
+            "pairs_data": {
+                pair: {
                     "current_rate": 1.0850 if "EUR" in pair else 1.2650 if "GBP" in pair else 149.50,
                     "change_24h": 0.35,
                     "trend": "Haussier"
-                }} for pair in forex_engine.currency_pairs
-            }},
-            "economic_data": {{
+                } for pair in forex_engine.currency_pairs
+            },
+            "economic_data": {
                 "usd_strength_index": 102.5,
                 "global_risk_sentiment": "risk_on",
-                "central_bank_sentiment": {{
+                "central_bank_sentiment": {
                     "fed": "hawkish",
                     "ecb": "neutral"
-                }},
-                "economic_calendar": {{
+                },
+                "economic_calendar": {
                     "high_impact_events_today": 2
-                }}
-            }},
-            "correlations": {{
+                }
+            },
+            "correlations": {
                 "EUR/USD_vs_GBP/USD": 0.75,
                 "USD/JPY_vs_risk_sentiment": -0.65,
                 "AUD/USD_vs_commodities": 0.80
-            }}
-        }}
+            }
+        }
     except Exception as e:
-        logger.error(f"Erreur forex workflow details: {{e}}")
+        logger.error(f"Erreur forex workflow details: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
 
 @app.post("/api/workflows/{{workflow_type}}/force-execute")
