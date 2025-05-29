@@ -1022,39 +1022,39 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
         <script>
             let currentPage = 'overview';
             
-            function showPage(pageId) {
+            function showPage(pageId) {{
                 // Nettoyer les anciens workflows
-                if (currentPage.includes('workflow')) {
+                if (currentPage.includes('workflow')) {{
                     cleanupWorkflowPage(currentPage.replace('-page', ''));
-                }
+                }}
                 
                 // Cacher toutes les pages
-                document.querySelectorAll('.page-content').forEach(page => {
+                document.querySelectorAll('.page-content').forEach(page => {{
                     page.classList.remove('active');
-                });
+                }});
                 
                 // Désactiver tous les liens nav
-                document.querySelectorAll('.nav-link').forEach(link => {
+                document.querySelectorAll('.nav-link').forEach(link => {{
                     link.classList.remove('active');
-                });
+                }});
                 
                 // Afficher la page sélectionnée
                 const targetPage = document.getElementById(pageId + '-page');
-                if (targetPage) {
+                if (targetPage) {{
                     targetPage.classList.add('active');
-                }
+                }}
                 
                 // Activer le lien nav correspondant
                 const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {
+                navLinks.forEach(link => {{
+                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {{
                         link.classList.add('active');
-                    }
-                });
+                    }}
+                }});
                 
                 // Mettre à jour le titre
-                const titles = {
-                    'overview': 'Vue d\'ensemble',
+                const titles = {{
+                    'overview': 'Vue d\\'ensemble',
                     'capital': 'Capital & Performance',
                     'crypto-workflow': 'Workflow Crypto Principal',
                     'meme-workflow': 'Workflow Crypto Meme',
@@ -1062,12 +1062,12 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     'wallets': 'Wallets & Secrets',
                     'settings': 'Paramètres',
                     'logs': 'Logs Système'
-                };
+                }};
                 
                 const titleElement = document.getElementById('page-title');
-                if (titleElement) {
+                if (titleElement) {{
                     titleElement.textContent = titles[pageId] || pageId;
-                }
+                }}
                 
                 currentPage = pageId;
                 
@@ -1076,14 +1076,14 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 
                 // Scroll vers le haut
                 window.scrollTo(0, 0);
-            }
+            }}
             
             // Améliorer la gestion des clics sur les liens de navigation
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {{
                 // Ajouter les event listeners pour tous les liens de navigation
                 const navLinks = document.querySelectorAll('.nav-link[onclick]');
-                navLinks.forEach(link => {
-                    link.addEventListener('click', function(e) {
+                navLinks.forEach(link => {{
+                    link.addEventListener('click', function(e) {{
                         e.preventDefault();
                         e.stopPropagation();
                         
@@ -1091,68 +1091,68 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                         const onclickAttr = this.getAttribute('onclick');
                         const match = onclickAttr.match(/showPage\\('([^']+)'\\)/);
                         
-                        if (match) {
+                        if (match) {{
                             const pageId = match[1];
                             showPage(pageId);
-                        }
-                    });
+                        }}
+                    }});
                     
                     // Améliorer l'accessibilité
                     link.setAttribute('role', 'button');
                     link.setAttribute('tabindex', '0');
                     
                     // Support du clavier
-                    link.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                    link.addEventListener('keydown', function(e) {{
+                        if (e.key === 'Enter' || e.key === ' ') {{
                             e.preventDefault();
                             this.click();
-                        }
-                    });
-                });
+                        }}
+                    }});
+                }});
                 
                 // Charger les données initiales
                 loadOverviewData();
                 
                 // Auto-refresh amélioré
                 startAutoRefresh();
-            });
+            }});
             
-            function startAutoRefresh() {
+            function startAutoRefresh() {{
                 // Refresh toutes les 30 secondes pour la vue d'ensemble
-                setInterval(() => {
-                    if (currentPage === 'overview') {
+                setInterval(() => {{
+                    if (currentPage === 'overview') {{
                         loadOverviewData();
-                    }
-                }, 30000);
-            }
+                    }}
+                }}, 30000);
+            }}
             
-            async function loadPageData(pageId) {
-                try {
-                    if (pageId === 'overview') {
+            async function loadPageData(pageId) {{
+                try {{
+                    if (pageId === 'overview') {{
                         await loadOverviewData();
-                    } else if (pageId.includes('workflow')) {
+                    }} else if (pageId.includes('workflow')) {{
                         const workflowType = pageId.replace('-workflow', '');
                         await loadWorkflowPage(workflowType);
-                    }
-                } catch (error) {
+                    }}
+                }} catch (error) {{
                     console.error('Erreur chargement page:', error);
                     showNotification('Erreur de chargement des données', 'error');
-                }
-            }
+                }}
+            }}
             
-            async function loadOverviewData() {
-                try {
+            async function loadOverviewData() {{
+                try {{
                     // Ajouter indicateur de chargement
                     const lastUpdateElement = document.getElementById('last-update');
-                    if (lastUpdateElement) {
+                    if (lastUpdateElement) {{
                         lastUpdateElement.textContent = 'Chargement...';
-                    }
+                    }}
                     
                     // Charger données dashboard
                     const dashResponse = await fetch('/api/dashboard');
-                    if (!dashResponse.ok) {
+                    if (!dashResponse.ok) {{
                         throw new Error('Erreur API dashboard');
-                    }
+                    }}
                     const dashData = await dashResponse.json();
                     
                     // Mettre à jour métriques avec animation
@@ -1167,144 +1167,144 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     
                     // Charger statut workflows
                     const workflowResponse = await fetch('/api/workflows/live-status');
-                    if (workflowResponse.ok) {
+                    if (workflowResponse.ok) {{
                         const workflowData = await workflowResponse.json();
                         updateWorkflowStatus(workflowData);
                         updateRecentActivity(workflowData);
-                    }
+                    }}
                     
                     // Mettre à jour timestamp
-                    if (lastUpdateElement) {
+                    if (lastUpdateElement) {{
                         lastUpdateElement.textContent = 'Dernière MAJ: ' + new Date().toLocaleTimeString();
-                    }
+                    }}
                     
-                } catch (error) {
+                }} catch (error) {{
                     console.error('Erreur chargement données:', error);
                     showNotification('Erreur de connexion aux données', 'error');
                     
                     // Afficher état offline
                     const lastUpdateElement = document.getElementById('last-update');
-                    if (lastUpdateElement) {
+                    if (lastUpdateElement) {{
                         lastUpdateElement.textContent = 'Erreur de connexion';
-                    }
-                }
-            }
+                    }}
+                }}
+            }}
             
-            function updateMetricWithAnimation(elementId, value) {
+            function updateMetricWithAnimation(elementId, value) {{
                 const element = document.getElementById(elementId);
-                if (element && element.textContent !== value) {
+                if (element && element.textContent !== value) {{
                     element.style.transform = 'scale(1.1)';
                     element.style.transition = 'transform 0.2s ease';
                     
-                    setTimeout(() => {
+                    setTimeout(() => {{
                         element.textContent = value;
                         element.style.transform = 'scale(1)';
-                    }, 100);
-                }
-            }
+                    }}, 100);
+                }}
+            }}
             
-            function updateWorkflowStatus(data) {
+            function updateWorkflowStatus(data) {{
                 const statusContainer = document.getElementById('workflow-status');
                 if (!statusContainer) return;
                 
                 const workflows = [
-                    { key: 'crypto', title: '₿ Crypto Principal', icon: '₿' },
-                    { key: 'meme', title: '🐸 Crypto Meme', icon: '🐸' },
-                    { key: 'forex', title: '💱 Forex', icon: '💱' }
+                    {{ key: 'crypto', title: '₿ Crypto Principal', icon: '₿' }},
+                    {{ key: 'meme', title: '🐸 Crypto Meme', icon: '🐸' }},
+                    {{ key: 'forex', title: '💱 Forex', icon: '💱' }}
                 ];
                 
-                statusContainer.innerHTML = workflows.map(workflow => {
+                statusContainer.innerHTML = workflows.map(workflow => {{
                     const status = data[workflow.key]?.status || 'idle';
                     const execution = data[workflow.key]?.current_execution;
                     
                     return `
                         <div class="workflow-card">
-                            <div class="workflow-status ${status}"></div>
+                            <div class="workflow-status ${{status}}"></div>
                             <div class="workflow-header">
                                 <div class="workflow-title">
-                                    ${workflow.icon} ${workflow.title}
+                                    ${{workflow.icon}} ${{workflow.title}}
                                 </div>
-                                <div class="status-badge status-${status}">
-                                    ${status}
+                                <div class="status-badge status-${{status}}">
+                                    ${{status}}
                                 </div>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Statut</span>
-                                <span class="metric-value">${status === 'idle' ? '⏱️ En attente' : 
+                                <span class="metric-value">${{status === 'idle' ? '⏱️ En attente' : 
                                                            status === 'scanning' ? '🔍 Scan marché' :
                                                            status === 'analyzing' ? '📊 Analyse' :
                                                            status === 'executing' ? '⚡ Exécution' : 
-                                                           '✅ Terminé'}</span>
+                                                           '✅ Terminé'}}</span>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Dernière exec</span>
-                                <span class="metric-value">${execution ? 
-                                    new Date(execution.start_time).toLocaleTimeString() : 'Jamais'}</span>
+                                <span class="metric-value">${{execution ? 
+                                    new Date(execution.start_time).toLocaleTimeString() : 'Jamais'}}</span>
                             </div>
                         </div>
                     `;
-                }).join('');
-            }
+                }}).join('');
+            }}
             
-            function updateRecentActivity(data) {
+            function updateRecentActivity(data) {{
                 const activityContainer = document.getElementById('recent-activity');
                 if (!activityContainer) return;
                 
-                const systemHealth = data.system_health || {};
+                const systemHealth = data.system_health || {{}};
                 
                 // Simuler activité récente basée sur les données système
                 const activities = [
-                    {
+                    {{
                         type: 'crypto',
                         title: 'Scan crypto terminé',
-                        description: `${systemHealth.total_executions || 0} exécutions totales`,
+                        description: `${{systemHealth.total_executions || 0}} exécutions totales`,
                         time: '2 min'
-                    },
-                    {
+                    }},
+                    {{
                         type: 'forex',
                         title: 'Analyse forex',
                         description: 'EUR/USD signal détecté',
                         time: '5 min'
-                    },
-                    {
+                    }},
+                    {{
                         type: 'meme',
                         title: 'Tokens meme scannés',
                         description: 'Aucun signal fort',
                         time: '8 min'
-                    }
+                    }}
                 ];
                 
                 activityContainer.innerHTML = activities.map(activity => `
                     <div class="activity-item">
-                        <div class="activity-icon ${activity.type}">
-                            ${activity.type === 'crypto' ? '₿' : 
-                               activity.type === 'forex' ? '💱' : '🐸'}
+                        <div class="activity-icon ${{activity.type}}">
+                            ${{activity.type === 'crypto' ? '₿' : 
+                               activity.type === 'forex' ? '💱' : '🐸'}}
                         </div>
                         <div class="activity-content">
-                            <div class="activity-title">${activity.title}</div>
-                            <div class="activity-description">${activity.description}</div>
-                            <div class="activity-time">il y a ${activity.time}</div>
+                            <div class="activity-title">${{activity.title}}</div>
+                            <div class="activity-description">${{activity.description}}</div>
+                            <div class="activity-time">il y a ${{activity.time}}</div>
                         </div>
                     </div>
                 `).join('');
-            }
+            }}
             
-            async function refreshData() {
+            async function refreshData() {{
                 await loadPageData(currentPage);
                 showNotification('Données actualisées', 'success');
-            }
+            }}
             
-            function logout() {
-                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            function logout() {{
+                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {{
                     document.cookie = 'session_token=; path=/; max-age=0';
                     window.location.reload();
-                }
-            }
+                }}
+            }}
             
             // Système de notifications
-            function showNotification(message, type = 'info') {
+            function showNotification(message, type = 'info') {{
                 const notification = document.createElement('div');
-                notification.className = `notification notification-${type}`;
+                notification.className = `notification notification-${{type}}`;
                 notification.textContent = message;
                 
                 notification.style.cssText = `
@@ -1320,31 +1320,31 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     transition: transform 0.3s ease;
                 `;
                 
-                if (type === 'success') {
+                if (type === 'success') {{
                     notification.style.background = '#10b981';
-                } else if (type === 'error') {
+                }} else if (type === 'error') {{
                     notification.style.background = '#ef4444';
-                } else {
+                }} else {{
                     notification.style.background = '#3b82f6';
-                }
+                }}
                 
                 document.body.appendChild(notification);
                 
                 // Animation d'entrée
-                setTimeout(() => {
+                setTimeout(() => {{
                     notification.style.transform = 'translateX(0)';
-                }, 100);
+                }}, 100);
                 
                 // Suppression automatique
-                setTimeout(() => {
+                setTimeout(() => {{
                     notification.style.transform = 'translateX(100%)';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
+                    setTimeout(() => {{
+                        if (notification.parentNode) {{
                             notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }, 3000);
-            }
+                        }}
+                    }}, 300);
+                }}, 3000);
+            }}
             
             {workflow_js}
         </script>
