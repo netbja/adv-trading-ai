@@ -985,6 +985,171 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             {workflow_styles}
+            
+            /* === NOUVELLE LAYOUT OVERVIEW === */
+            .overview-header {{
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 1rem;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 2rem;
+                box-shadow: var(--shadow);
+            }}
+            
+            .header-metrics {{
+                display: flex;
+                gap: 3rem;
+                align-items: center;
+                flex: 1;
+            }}
+            
+            .primary-metric {{
+                text-align: center;
+            }}
+            
+            .metric-title {{
+                font-size: 1rem;
+                color: var(--text-secondary);
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }}
+            
+            .metric-main {{
+                font-size: 3rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 0.5rem;
+                line-height: 1;
+            }}
+            
+            .metric-sub {{
+                font-size: 1.25rem;
+                font-weight: 600;
+            }}
+            
+            .metric-sub.positive {{ color: var(--success); }}
+            .metric-sub.negative {{ color: var(--danger); }}
+            
+            .quick-stats {{
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }}
+            
+            .quick-stat {{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 1rem;
+                background: #f8fafc;
+                border-radius: 0.75rem;
+                min-width: 120px;
+            }}
+            
+            .stat-label {{
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                font-weight: 600;
+                text-align: center;
+            }}
+            
+            .stat-value {{
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+            }}
+            
+            .stat-value.positive {{ color: var(--success); }}
+            .stat-value.negative {{ color: var(--danger); }}
+            
+            .header-actions {{
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-end;
+            }}
+            
+            .last-update {{
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }}
+            
+            .section-header {{
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 1.5rem;
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }}
+            
+            .performance-section {{
+                margin-bottom: 3rem;
+            }}
+            
+            .activity-section {{
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 1rem;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+            }}
+            
+            /* === RESPONSIVE POUR NOUVELLE LAYOUT === */
+            @media (max-width: 1024px) {{
+                .overview-header {{
+                    flex-direction: column;
+                    align-items: stretch;
+                }}
+                
+                .header-metrics {{
+                    flex-direction: column;
+                    gap: 2rem;
+                    align-items: center;
+                }}
+                
+                .quick-stats {{
+                    grid-template-columns: repeat(3, 1fr);
+                    width: 100%;
+                }}
+                
+                .header-actions {{
+                    align-items: center;
+                }}
+            }}
+            
+            @media (max-width: 768px) {{
+                .overview-header {{
+                    padding: 1.5rem;
+                }}
+                
+                .header-metrics {{
+                    gap: 1.5rem;
+                }}
+                
+                .metric-main {{
+                    font-size: 2.5rem;
+                }}
+                
+                .quick-stats {{
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }}
+                
+                .quick-stat {{
+                    padding: 0.75rem;
+                    min-width: auto;
+                }}
+            }}
         </style>
     </head>
     <body>
@@ -1070,8 +1235,6 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 <header class="topbar">
                     <h1 class="topbar-title" id="page-title">Vue d'ensemble</h1>
                     <div class="topbar-actions">
-                        <span id="last-update">Dernière MAJ: --:--</span>
-                        <button class="btn btn-secondary" onclick="refreshData()">🔄 Actualiser</button>
                         <button class="btn btn-danger" onclick="logout()">🚪 Déconnexion</button>
                     </div>
                 </header>
@@ -1079,99 +1242,50 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 <div class="content-area">
                     <!-- Page Vue d'ensemble -->
                     <div id="overview-page" class="page-content active">
-                        <div class="grid grid-4" style="margin-bottom: 2rem;">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">Capital Total</div>
-                                        <div class="card-subtitle">Simulation active</div>
+                        <!-- Métriques principales simplifiées -->
+                        <div class="overview-header">
+                            <div class="header-metrics">
+                                <div class="primary-metric">
+                                    <div class="metric-title">Capital Total</div>
+                                    <div class="metric-main" id="current-capital">200.00€</div>
+                                    <div class="metric-sub positive" id="total-return">+0.00%</div>
+                                </div>
+                                
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <span class="stat-label">Workflows Actifs</span>
+                                        <span class="stat-value">3</span>
                                     </div>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Actuel</span>
-                                    <span class="metric-value positive" id="current-capital">200.00€</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Rendement</span>
-                                    <span class="metric-value positive" id="total-return">+0.00%</span>
+                                    <div class="quick-stat">
+                                        <span class="stat-label">Efficacité</span>
+                                        <span class="stat-value positive" id="system-efficiency">100%</span>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <span class="stat-label">Uptime</span>
+                                        <span class="stat-value" id="system-uptime">1 jour</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">Workflows Actifs</div>
-                                        <div class="card-subtitle">Temps réel</div>
-                                    </div>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Crypto</span>
-                                    <span class="metric-value" id="crypto-status">🔄 Actif</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Forex</span>
-                                    <span class="metric-value" id="forex-status">🔄 Actif</span>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">Signaux Détectés</div>
-                                        <div class="card-subtitle">Dernière heure</div>
-                                    </div>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Total</span>
-                                    <span class="metric-value" id="signals-total">0</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Forts</span>
-                                    <span class="metric-value warning" id="signals-strong">0</span>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">Performance</div>
-                                        <div class="card-subtitle">Système</div>
-                                    </div>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Efficacité</span>
-                                    <span class="metric-value positive" id="system-efficiency">100%</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Uptime</span>
-                                    <span class="metric-value" id="system-uptime">1 jour</span>
-                                </div>
+                            <div class="header-actions">
+                                <button class="btn btn-primary" onclick="refreshData()">🔄 Actualiser</button>
+                                <div class="last-update" id="last-update">Dernière MAJ: --:--</div>
                             </div>
                         </div>
                         
-                        <div class="grid grid-2">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">📊 Performance par Workflow</div>
-                                        <div class="card-subtitle">Évolution des gains (7 derniers jours)</div>
-                                    </div>
-                                </div>
-                                <div class="workflow-performance-grid" id="workflow-performance">
-                                    <!-- Contenu chargé dynamiquement -->
-                                </div>
+                        <!-- Cartes de performance des workflows -->
+                        <div class="performance-section">
+                            <h2 class="section-header">📊 Performance par Workflow</h2>
+                            <div class="workflow-performance-grid" id="workflow-performance">
+                                <!-- Contenu chargé dynamiquement -->
                             </div>
-                            
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">⚡ Activité Récente</div>
-                                        <div class="card-subtitle">Dernières actions</div>
-                                    </div>
-                                </div>
-                                <div class="activity-feed" id="recent-activity">
-                                    <!-- Contenu chargé dynamiquement -->
-                                </div>
+                        </div>
+                        
+                        <!-- Activité récente -->
+                        <div class="activity-section">
+                            <h2 class="section-header">⚡ Activité Récente</h2>
+                            <div class="activity-feed" id="recent-activity">
+                                <!-- Contenu chargé dynamiquement -->
                             </div>
                         </div>
                     </div>
