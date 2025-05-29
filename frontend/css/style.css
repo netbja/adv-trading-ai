@@ -277,7 +277,7 @@ body {
     /* width: calc(100vw - var(--sidebar-width)); */ /* Supprimé car géré par la grille */
     min-height: 100vh;
     width: 100%; /* Prendra la largeur de la colonne '1fr' de la grille */
-    /* overflow-x: hidden; /* TEMPORAIREMENT RETIRÉ pour voir si le contenu réapparaît */
+    overflow-x: hidden; /* Empêche les enfants de .main-content de causer un scroll horizontal sur .main-content */
 }
 
 .topbar {
@@ -1042,4 +1042,179 @@ body {
     padding: 3rem;
     font-size: 1.2rem;
     color: var(--text-color-secondary, #6c757d);
+}
+
+/* Styles spécifiques pour la page Capital & Performance */
+
+/* Grille pour les cartes de résumé en haut */
+.performance-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* 3 cartes par ligne sur écrans moyens/larges */
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Style des cartes individuelles de résumé (réutilise .metric-card mais peut être surchargé) */
+.performance-summary-cards .metric-card {
+    background-color: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    text-align: left; /* Aligner le texte à gauche dans ces cartes */
+}
+
+.performance-summary-cards .metric-card .metric-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.performance-summary-cards .metric-card .metric-value {
+    font-size: 1.75rem; /* Un peu plus petit que sur les pages workflow */
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.performance-summary-cards .metric-card .metric-value.positive {
+    color: var(--success);
+}
+
+.performance-summary-cards .metric-card .metric-value.negative {
+    color: var(--danger);
+}
+
+/* Section pour les graphiques */
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.chart-container {
+    background-color: var(--bg-card);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.chart-container h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+.chart-container h3 .section-icon {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.chart-placeholder {
+    min-height: 300px; /* Hauteur minimale pour le placeholder du graphique */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8fafc; /* Un fond légèrement différent pour le placeholder */
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    border: 2px dashed var(--border);
+}
+
+/* Grille pour les détails (KPIs, Objectifs, etc.) */
+.performance-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.card-style { /* Style de base pour les cartes dans cette grille */
+    background-color: var(--bg-card);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.card-style h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+}
+
+.card-style h3 .section-icon {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.card-style ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.card-style li {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-style li strong {
+    color: var(--text-primary);
+    margin-right: 0.5rem; /* Espace entre le label et la valeur */
+}
+
+/* Barre de progression pour les objectifs */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    height: 24px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: var(--success);
+    height: 100%;
+    line-height: 24px;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 0.5rem 0 0 0.5rem; /* Coins arrondis seulement à gauche et en haut/bas si plein */
+    transition: width 0.5s ease-in-out;
+}
+
+.progress-bar[style*="width: 100%"] {
+    border-radius: 0.5rem; /* Tous les coins arrondis si 100% */
+}
+
+/* Statut du système dans les stats opérationnelles */
+.operational-stats-section .status-active {
+    color: var(--success);
+    font-weight: bold;
+}
+
+.operational-stats-section .status-idle {
+    color: var(--secondary);
+    font-weight: bold;
+}
+
+.trade-distribution-section .chart-placeholder {
+    min-height: 200px; /* Moins haut pour ce graphique potentiellement plus simple */
+    margin-bottom: 1rem;
 } 

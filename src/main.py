@@ -7,7 +7,7 @@ Dashboard avec authentification DB, workflows live et gestion des secrets
 import asyncio
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from dataclasses import asdict
 from fastapi import FastAPI, HTTPException, Request, Depends, Cookie, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse
@@ -366,6 +366,80 @@ async def export_workflow_data(workflow_type: str, user_data: dict = Depends(req
     except Exception as e:
         logger.error(f"Erreur export {workflow_type}: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
+
+# Nouvel Endpoint pour Capital & Performance
+@app.get("/api/capital/performance/details")
+async def get_capital_performance_details(user_data: dict = Depends(require_auth)):
+    """Fournit des données détaillées pour la page Capital & Performance."""
+    if not trading_master or not trading_master.capital_manager:
+        raise HTTPException(status_code=503, detail="Système de gestion du capital non initialisé.")
+
+    capital_manager = trading_master.capital_manager
+    days_elapsed = (datetime.now() - capital_manager.start_date).days + 1
+    compound_stats = capital_manager.calculate_compound_growth(days_elapsed)
+    milestone = capital_manager.get_next_milestone_progress()
+
+    # Simuler des données pour les graphiques et KPIs avancés
+    # Évolution du capital (pour un graphique linéaire) - ex: 30 derniers jours
+    capital_history = [
+        {"date": (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d"), "value": round(compound_stats["current_capital"] * random.uniform(0.95 - i*0.002, 1.0 - i*0.001), 2)}
+        for i in range(30)
+    ]
+    capital_history.reverse() # Pour avoir les dates dans l'ordre chronologique
+
+    # Distribution des trades (pour un diagramme circulaire ou à barres)
+    trade_distribution = {
+        "winning_trades": random.randint(60, 100),
+        "losing_trades": random.randint(20, 40),
+        "breakeven_trades": random.randint(5, 15)
+    }
+    total_trades_simulated = sum(trade_distribution.values())
+
+    # Performance mensuelle (pour un graphique à barres)
+    monthly_performance = [
+        {"month": "Jan", "pnl_pct": round(random.uniform(-2, 5), 2)},
+        {"month": "Feb", "pnl_pct": round(random.uniform(1, 8), 2)},
+        {"month": "Mar", "pnl_pct": round(random.uniform(-1, 3), 2)},
+        {"month": "Apr", "pnl_pct": round(random.uniform(2, 6), 2)},
+        # Ajouter d'autres mois si nécessaire
+    ]
+
+    # KPIs avancés (simulés)
+    kpis = {
+        "sharpe_ratio": round(random.uniform(0.5, 2.5), 2),
+        "max_drawdown_pct": round(random.uniform(5, 15), 2),
+        "average_win_pct": round(random.uniform(1, 3), 2),
+        "average_loss_pct": round(random.uniform(0.5, 1.5), 2),
+        "profit_factor": round(random.uniform(1.2, 3.0), 2)
+    }
+
+    return {
+        "user": user_data,
+        "summary": {
+            "initial_capital": compound_stats["initial_capital"],
+            "current_capital": compound_stats["current_capital"],
+            "total_profit": round(compound_stats["current_capital"] - compound_stats["initial_capital"], 2),
+            "total_return_pct": compound_stats["actual_return_pct"],
+            "system_efficiency_pct": compound_stats["system_efficiency_pct"],
+            "annualized_return_pct": compound_stats["annualized_return"]
+        },
+        "milestone": {
+            "next_target": milestone["target_capital"],
+            "progress_pct": milestone["progress_percentage"],
+            "remaining_to_target": milestone["remaining_to_target"]
+        },
+        "charts_data": {
+            "capital_evolution": capital_history,
+            "trade_distribution": trade_distribution,
+            "monthly_performance": monthly_performance
+        },
+        "key_performance_indicators": kpis,
+        "operational_stats": {
+            "uptime_days": days_elapsed,
+            "total_trades_simulated": total_trades_simulated, # Basé sur la simulation ci-dessus
+            "system_active": trading_master.active
+        }
+    }
 
 if __name__ == "__main__":
     print("🧠 DÉMARRAGE TRADING AI PROFESSIONNEL")
