@@ -42,15 +42,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    # Limites de ressources
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
+    # Limites mémoire simples (compatibles)
+    mem_limit: 512m
+    memswap_limit: 512m
 
   # 🗃️ POSTGRESQL - BASE DE DONNÉES (optionnel pour stats)
   postgres:
@@ -93,11 +87,8 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
+    # Limite mémoire simple
+    mem_limit: 256m
 
   # 🌐 NGINX - REVERSE PROXY SIMPLE
   nginx:
