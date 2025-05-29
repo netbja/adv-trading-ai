@@ -1,4 +1,4 @@
-# 🧠 DOCKERFILE POUR SYSTÈME AUTONOME
+# 🧠 DOCKERFILE POUR SYSTÈME AUTONOME - INTERFACE COMPLÈTE
 FROM python:3.11-slim
 
 # Variables d'environnement
@@ -25,7 +25,8 @@ COPY requirements.txt .
 # Installer dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le code source
+# Copier le code source complet
+COPY trading_ai_complete.py .
 COPY smart_capital_growth_system.py .
 COPY roi_10x_trading_system.py .
 COPY zero_mindset_trading_system.py .
@@ -41,9 +42,9 @@ USER trading_ai
 # Port d'exposition
 EXPOSE 8000
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+# Healthcheck pour l'interface web
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/ || exit 1
 
-# Commande par défaut
-CMD ["python", "smart_capital_growth_system.py"] 
+# Commande par défaut - Interface complète
+CMD ["python", "trading_ai_complete.py"] 

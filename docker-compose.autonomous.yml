@@ -1,8 +1,8 @@
-# 🧠 DOCKER COMPOSE - SYSTÈME TRADING AUTONOME
+# 🧠 DOCKER COMPOSE - SYSTÈME TRADING AUTONOME INTERFACE COMPLÈTE
 version: '3.8'
 
 services:
-  # 🧠 SYSTÈME AUTONOME PRINCIPAL
+  # 🧠 INTERFACE TRADING AI COMPLÈTE
   autonomous_trading:
     build:
       context: .
@@ -15,11 +15,12 @@ services:
       - PORT=8000
       - LOG_LEVEL=INFO
       
-      # Base de données (optionnel pour simulation)
+      # Base de données PostgreSQL (nécessaire pour l'interface)
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=${POSTGRES_DB:-trading_ai}
       - POSTGRES_USER=${POSTGRES_USER:-trader}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-TradingDB2025!}
+      - POSTGRES_PORT=5432
       
       # APIs Gratuites (optionnel)
       - DEMO_API_MODE=true
@@ -36,15 +37,18 @@ services:
     networks:
       - trading_network
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    # Limites mémoire simples (compatibles)
-    mem_limit: 512m
-    memswap_limit: 512m
+    # Limites mémoire augmentées pour l'interface complète
+    mem_limit: 1g
+    memswap_limit: 1g
 
   # 🗃️ POSTGRESQL - BASE DE DONNÉES (optionnel pour stats)
   postgres:
