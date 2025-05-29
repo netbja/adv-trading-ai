@@ -164,14 +164,23 @@ async function loadPageData(pageId) {
 
         switch (pageId) {
             case 'overview-page':
-                // Le contenu de l'overview est déjà dans le HTML ou chargé par updateDashboardData
-                // On s'assure juste qu'il n'y a plus de spinner s'il y en avait un.
-                // La fonction updateDashboardData se charge de remplir les bonnes sections.
-                // Pour l'instant, on va supposer que updateDashboardData est appelé au chargement initial.
-                // Si ce n'est pas le cas, il faudrait fetch ici les données générales du dashboard.
-                // Pour l'instant, on ne fait rien de spécial pour overview, son contenu est statique ou mis à jour ailleurs.
-                pageElement.innerHTML = document.getElementById('overview-content-wrapper').innerHTML; // Remettre le contenu original
-                updateDynamicParts(); // S'assurer que les parties dynamiques de l'aperçu sont à jour
+                // Le contenu de l'overview est déjà dans le HTML.
+                // updateDynamicParts() (appelé via loadOverviewData/refreshDashboardData ou initialement)
+                // se charge de mettre à jour les données dynamiques.
+                // On s'assure juste ici que le spinner est retiré si le contenu est visible.
+                if (pageElement.querySelector('.loading-spinner')) {
+                     // Si un spinner est là, on le retire en attendant que updateDynamicParts peuple réellement.
+                     // Mais idéalement, overview-page ne devrait pas avoir de spinner injecté par loadPageData
+                     // si son contenu statique est déjà là.
+                     // Pour l'instant, on s'assure juste d'appeler les mises à jour.
+                }
+                // Appel direct pour s'assurer que les données sont fraîches pour l'aperçu
+                // Note: showPage appelle déjà loadPageData. loadOverviewData est dans refreshDashboardData.
+                // Considerer d'appeler loadOverviewData() ici directement si refreshDashboardData n'est pas systématique.
+                // Pour l'instant, on suppose que le contenu statique est là et updateDynamicParts() est appelé ailleurs.
+                // On ne va pas modifier innerHTML ici pour éviter de le vider par erreur.
+                // On s'assure que les données dynamiques sont chargées
+                loadOverviewData(); 
                 break;
             case 'crypto-workflow-page':
             case 'meme-workflow-page':
