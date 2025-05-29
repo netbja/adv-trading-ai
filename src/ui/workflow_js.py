@@ -534,4 +534,93 @@ def get_workflow_javascript() -> str:
         Object.keys(workflowUpdateIntervals).forEach(stopWorkflowUpdates);
         currentWorkflowData = {};
     }
+    
+    // === GESTION DES ONGLETS ===
+    
+    function showCryptoTab(tabName) {
+        // Masquer tous les contenus d'onglets crypto
+        document.querySelectorAll('#crypto-workflow-page .tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Désactiver tous les boutons d'onglets crypto
+        document.querySelectorAll('#crypto-workflow-page .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Afficher l'onglet sélectionné
+        const targetTab = document.getElementById(`crypto-tab-${tabName}`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        // Activer le bouton correspondant
+        const targetBtn = document.querySelector(`#crypto-workflow-page .tab-btn[onclick="showCryptoTab('${tabName}')"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
+        
+        // Charger les données si nécessaire
+        if (tabName !== 'overview') {
+            loadWorkflowData('crypto');
+        }
+    }
+    
+    function showMemeTab(tabName) {
+        // Masquer tous les contenus d'onglets meme
+        document.querySelectorAll('#meme-workflow-page .tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Désactiver tous les boutons d'onglets meme
+        document.querySelectorAll('#meme-workflow-page .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Afficher l'onglet sélectionné
+        const targetTab = document.getElementById(`meme-tab-${tabName}`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        // Activer le bouton correspondant
+        const targetBtn = document.querySelector(`#meme-workflow-page .tab-btn[onclick="showMemeTab('${tabName}')"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
+        
+        // Charger les données si nécessaire
+        if (tabName !== 'overview') {
+            loadWorkflowData('meme');
+        }
+    }
+    
+    function showForexTab(tabName) {
+        // Masquer tous les contenus d'onglets forex
+        document.querySelectorAll('#forex-workflow-page .tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Désactiver tous les boutons d'onglets forex
+        document.querySelectorAll('#forex-workflow-page .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Afficher l'onglet sélectionné
+        const targetTab = document.getElementById(`forex-tab-${tabName}`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        // Activer le bouton correspondant
+        const targetBtn = document.querySelector(`#forex-workflow-page .tab-btn[onclick="showForexTab('${tabName}')"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
+        
+        // Charger les données si nécessaire
+        if (tabName !== 'overview') {
+            loadWorkflowData('forex');
+        }
+    }
     """ 

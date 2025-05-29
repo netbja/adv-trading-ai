@@ -7,7 +7,7 @@ Vues temps réel pour crypto, meme et forex avec métriques avancées
 from typing import Dict, Any
 
 def get_crypto_workflow_page() -> str:
-    """Page détaillée du workflow crypto - Version corrigée"""
+    """Page détaillée du workflow crypto avec onglets - Version moderne"""
     return """
     <div class="workflow-container">
         <!-- En-tête du workflow -->
@@ -16,110 +16,166 @@ def get_crypto_workflow_page() -> str:
             <p class="workflow-subtitle">Analyse et trading automatisé des principales cryptomonnaies</p>
         </div>
         
-        <!-- Métriques principales -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-label">Paires Surveillées</div>
-                <div class="metric-value" id="crypto-pairs-monitored">5</div>
-            </div>
+        <!-- Navigation par onglets -->
+        <div class="tabs-container">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" onclick="showCryptoTab('overview')">
+                    🏠 Vue d'ensemble
+                </button>
+                <button class="tab-btn" onclick="showCryptoTab('pairs')">
+                    ₿ Paires Surveillées
+                </button>
+                <button class="tab-btn" onclick="showCryptoTab('signals')">
+                    ⚡ Signaux & Analyses
+                </button>
+                <button class="tab-btn" onclick="showCryptoTab('config')">
+                    ⚙️ Configuration
+                </button>
+            </nav>
             
-            <div class="metric-card">
-                <div class="metric-label">Signaux Aujourd'hui</div>
-                <div class="metric-value" id="crypto-signals-today">0</div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-label">Confiance Moyenne</div>
-                <div class="metric-value" id="crypto-avg-confidence">75%</div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-label">Prochain Scan</div>
-                <div class="metric-value" id="crypto-next-scan">3:00</div>
-            </div>
-        </div>
-        
-        <!-- Statut du workflow -->
-        <div class="workflow-status-section">
-            <h2 class="section-title">🔄 Statut en Temps Réel</h2>
-            
-            <div class="status-header">
-                <div class="status-info">
-                    <span>Statut actuel :</span>
-                    <span class="status-badge status-idle" id="crypto-current-status">Idle</span>
-                </div>
-                
-                <div class="workflow-actions">
-                    <button class="action-btn action-btn-primary" onclick="forceWorkflowExecution('crypto')">
-                        ⚡ Forcer Exécution
-                    </button>
-                    <button class="action-btn action-btn-secondary" onclick="exportWorkflowData('crypto')">
-                        📥 Exporter Données
-                    </button>
-                </div>
-            </div>
-            
-            <div class="progress-container">
-                <div class="progress-label" id="crypto-progress-label">En attente du prochain cycle...</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="crypto-progress" style="width: 0%"></div>
-                </div>
-            </div>
-            
-            <!-- Phases du workflow -->
-            <div class="phases-container">
-                <div class="phase-item" id="phase-scanning">
-                    <div class="phase-status">⏳</div>
-                    <div class="phase-name">Scan Marché</div>
-                    <div class="phase-description">Collecte des données de prix</div>
-                </div>
-                
-                <div class="phase-item" id="phase-analyzing">
-                    <div class="phase-status">⏳</div>
-                    <div class="phase-name">Analyse</div>
-                    <div class="phase-description">Traitement des indicateurs</div>
-                </div>
-                
-                <div class="phase-item" id="phase-executing">
-                    <div class="phase-status">⏳</div>
-                    <div class="phase-name">Décision</div>
-                    <div class="phase-description">Génération du signal</div>
-                </div>
-                
-                <div class="phase-item" id="phase-completed">
-                    <div class="phase-status">⏳</div>
-                    <div class="phase-name">Terminé</div>
-                    <div class="phase-description">Cycle complété</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Données détaillées -->
-        <div class="data-grid">
-            <!-- Paires crypto surveillées -->
-            <div class="data-section">
-                <h3 class="data-section-title">₿ Paires Crypto</h3>
-                <div class="pairs-container" id="crypto-pairs-data">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Chargement des données...</div>
-                </div>
-            </div>
-            
-            <!-- Signaux récents -->
-            <div class="data-section">
-                <h3 class="data-section-title">⚡ Signaux Récents</h3>
-                <div class="signals-container">
-                    <div class="signals-header">
-                        <div>Heure</div>
-                        <div>Paire</div>
-                        <div>Type</div>
-                        <div>Force</div>
-                        <div>Conf.</div>
-                        <div>Source</div>
-                        <div>Analyse</div>
+            <!-- Contenu des onglets -->
+            <div class="tabs-content">
+                <!-- Onglet Vue d'ensemble -->
+                <div id="crypto-tab-overview" class="tab-content active">
+                    <!-- Métriques principales -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Paires Surveillées</div>
+                            <div class="metric-value" id="crypto-pairs-monitored">5</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Signaux Aujourd'hui</div>
+                            <div class="metric-value" id="crypto-signals-today">0</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Confiance Moyenne</div>
+                            <div class="metric-value" id="crypto-avg-confidence">75%</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Prochain Scan</div>
+                            <div class="metric-value" id="crypto-next-scan">3:00</div>
+                        </div>
                     </div>
-                    <div id="crypto-signals-table">
-                        <div class="no-signals">Aucun signal récent</div>
+                    
+                    <!-- Statut du workflow -->
+                    <div class="workflow-status-section">
+                        <h2 class="section-title">🔄 Statut en Temps Réel</h2>
+                        
+                        <div class="status-header">
+                            <div class="status-info">
+                                <span>Statut actuel :</span>
+                                <span class="status-badge status-idle" id="crypto-current-status">Idle</span>
+                            </div>
+                            
+                            <div class="workflow-actions">
+                                <button class="action-btn action-btn-primary" onclick="forceWorkflowExecution('crypto')">
+                                    ⚡ Forcer Exécution
+                                </button>
+                                <button class="action-btn action-btn-secondary" onclick="exportWorkflowData('crypto')">
+                                    📥 Exporter Données
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-label" id="crypto-progress-label">En attente du prochain cycle...</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="crypto-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Phases du workflow -->
+                        <div class="phases-container">
+                            <div class="phase-item" id="phase-scanning">
+                                <div class="phase-status">⏳</div>
+                                <div class="phase-name">Scan Marché</div>
+                                <div class="phase-description">Collecte des données de prix</div>
+                            </div>
+                            
+                            <div class="phase-item" id="phase-analyzing">
+                                <div class="phase-status">⏳</div>
+                                <div class="phase-name">Analyse</div>
+                                <div class="phase-description">Traitement des indicateurs</div>
+                            </div>
+                            
+                            <div class="phase-item" id="phase-executing">
+                                <div class="phase-status">⏳</div>
+                                <div class="phase-name">Décision</div>
+                                <div class="phase-description">Génération du signal</div>
+                            </div>
+                            
+                            <div class="phase-item" id="phase-completed">
+                                <div class="phase-status">⏳</div>
+                                <div class="phase-name">Terminé</div>
+                                <div class="phase-description">Cycle complété</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Paires Surveillées -->
+                <div id="crypto-tab-pairs" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">₿ Paires Crypto Surveillées</h3>
+                        <div class="pairs-container" id="crypto-pairs-data">
+                            <div class="no-data">Chargement des données...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Signaux & Analyses -->
+                <div id="crypto-tab-signals" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">⚡ Signaux Récents</h3>
+                        <div class="signals-container">
+                            <div class="signals-header">
+                                <div>Heure</div>
+                                <div>Paire</div>
+                                <div>Type</div>
+                                <div>Force</div>
+                                <div>Conf.</div>
+                                <div>Source</div>
+                                <div>Analyse</div>
+                            </div>
+                            <div id="crypto-signals-table">
+                                <div class="no-signals">Aucun signal récent</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Configuration -->
+                <div id="crypto-tab-config" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">⚙️ Paramètres du Workflow</h3>
+                        <div class="config-grid">
+                            <div class="config-card">
+                                <h4>🔄 Fréquence de Scan</h4>
+                                <p>Intervalle entre les analyses</p>
+                                <div class="config-value">3 minutes</div>
+                            </div>
+                            
+                            <div class="config-card">
+                                <h4>📊 Seuil de Confiance</h4>
+                                <p>Confiance minimum pour signaler</p>
+                                <div class="config-value">75%</div>
+                            </div>
+                            
+                            <div class="config-card">
+                                <h4>💰 Capital par Trade</h4>
+                                <p>Pourcentage maximum par position</p>
+                                <div class="config-value">5%</div>
+                            </div>
+                            
+                            <div class="config-card">
+                                <h4>🎯 Stop Loss</h4>
+                                <p>Protection contre les pertes</p>
+                                <div class="config-value">2%</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -128,7 +184,7 @@ def get_crypto_workflow_page() -> str:
     """
 
 def get_meme_workflow_page() -> str:
-    """Page détaillée du workflow meme - Version corrigée"""
+    """Page détaillée du workflow meme avec onglets - Version moderne"""
     return """
     <div class="workflow-container">
         <!-- En-tête du workflow -->
@@ -137,83 +193,107 @@ def get_meme_workflow_page() -> str:
             <p class="workflow-subtitle">Détection et analyse des tokens meme viraux</p>
         </div>
         
-        <!-- Métriques principales -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-label">Tokens Scannés</div>
-                <div class="metric-value" id="meme-tokens-scanned">5</div>
-            </div>
+        <!-- Navigation par onglets -->
+        <div class="tabs-container">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" onclick="showMemeTab('overview')">
+                    🏠 Vue d'ensemble
+                </button>
+                <button class="tab-btn" onclick="showMemeTab('tokens')">
+                    🚀 Tokens Tendance
+                </button>
+                <button class="tab-btn" onclick="showMemeTab('risks')">
+                    ⚠️ Analyse Risques
+                </button>
+                <button class="tab-btn" onclick="showMemeTab('alerts')">
+                    🔥 Alertes Viralité
+                </button>
+            </nav>
             
-            <div class="metric-card">
-                <div class="metric-label">Score Viral Max</div>
-                <div class="metric-value" id="meme-viral-score">85</div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-label">Mentions Sociales</div>
-                <div class="metric-value" id="meme-social-mentions">1.2K</div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-label">Niveau Risque</div>
-                <div class="metric-value" id="meme-risk-level">MEDIUM</div>
-            </div>
-        </div>
-        
-        <!-- Statut du workflow -->
-        <div class="workflow-status-section">
-            <h2 class="section-title">🔄 Statut en Temps Réel</h2>
-            
-            <div class="status-header">
-                <div class="status-info">
-                    <span>Statut actuel :</span>
-                    <span class="status-badge status-idle" id="meme-current-status">Idle</span>
+            <!-- Contenu des onglets -->
+            <div class="tabs-content">
+                <!-- Onglet Vue d'ensemble -->
+                <div id="meme-tab-overview" class="tab-content active">
+                    <!-- Métriques principales -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Tokens Scannés</div>
+                            <div class="metric-value" id="meme-tokens-scanned">5</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Score Viral Max</div>
+                            <div class="metric-value" id="meme-viral-score">85</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Mentions Sociales</div>
+                            <div class="metric-value" id="meme-social-mentions">1.2K</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Niveau Risque</div>
+                            <div class="metric-value" id="meme-risk-level">MEDIUM</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Statut du workflow -->
+                    <div class="workflow-status-section">
+                        <h2 class="section-title">🔄 Statut en Temps Réel</h2>
+                        
+                        <div class="status-header">
+                            <div class="status-info">
+                                <span>Statut actuel :</span>
+                                <span class="status-badge status-idle" id="meme-current-status">Idle</span>
+                            </div>
+                            
+                            <div class="workflow-actions">
+                                <button class="action-btn action-btn-primary" onclick="forceWorkflowExecution('meme')">
+                                    ⚡ Forcer Exécution
+                                </button>
+                                <button class="action-btn action-btn-secondary" onclick="exportWorkflowData('meme')">
+                                    📥 Exporter Données
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-label" id="meme-progress-label">En attente du prochain cycle...</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="meme-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="workflow-actions">
-                    <button class="action-btn action-btn-primary" onclick="forceWorkflowExecution('meme')">
-                        ⚡ Forcer Exécution
-                    </button>
-                    <button class="action-btn action-btn-secondary" onclick="exportWorkflowData('meme')">
-                        📥 Exporter Données
-                    </button>
+                <!-- Onglet Tokens Tendance -->
+                <div id="meme-tab-tokens" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">🚀 Tokens Meme Tendance</h3>
+                        <div class="meme-tokens-grid" id="meme-tokens-data">
+                            <div class="no-data">Chargement des tokens...</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="progress-container">
-                <div class="progress-label" id="meme-progress-label">En attente du prochain cycle...</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="meme-progress" style="width: 0%"></div>
+                
+                <!-- Onglet Analyse des Risques -->
+                <div id="meme-tab-risks" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">⚠️ Analyse des Risques</h3>
+                        <div class="risk-analysis-container" id="meme-risk-analysis">
+                            <div class="no-data">Chargement de l'analyse...</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Données détaillées -->
-        <div class="data-grid">
-            <!-- Tokens meme tendance -->
-            <div class="data-section">
-                <h3 class="data-section-title">🚀 Tokens Tendance</h3>
-                <div class="meme-tokens-grid" id="meme-tokens-data">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Chargement des tokens...</div>
-                </div>
-            </div>
-            
-            <!-- Analyse des risques -->
-            <div class="data-section">
-                <h3 class="data-section-title">⚠️ Analyse des Risques</h3>
-                <div class="risk-analysis-container" id="meme-risk-analysis">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Chargement de l'analyse...</div>
-                </div>
-            </div>
-            
-            <!-- Alertes viralité -->
-            <div class="data-section">
-                <h3 class="data-section-title">🔥 Alertes Viralité</h3>
-                <div class="alerts-container" id="viral-alerts">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Surveillance en cours...</div>
+                
+                <!-- Onglet Alertes Viralité -->
+                <div id="meme-tab-alerts" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">🔥 Alertes Viralité en Temps Réel</h3>
+                        <div class="alerts-container" id="viral-alerts">
+                            <div class="no-data">Surveillance en cours...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -221,7 +301,7 @@ def get_meme_workflow_page() -> str:
     """
 
 def get_forex_workflow_page() -> str:
-    """Page détaillée du workflow forex - Version corrigée"""
+    """Page détaillée du workflow forex avec onglets - Version moderne"""
     return """
     <div class="workflow-container">
         <!-- En-tête du workflow -->
@@ -230,83 +310,107 @@ def get_forex_workflow_page() -> str:
             <p class="workflow-subtitle">Trading automatisé des devises majeures</p>
         </div>
         
-        <!-- Métriques principales -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-label">Paires Actives</div>
-                <div class="metric-value" id="forex-pairs-active">5</div>
-            </div>
+        <!-- Navigation par onglets -->
+        <div class="tabs-container">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" onclick="showForexTab('overview')">
+                    🏠 Vue d'ensemble
+                </button>
+                <button class="tab-btn" onclick="showForexTab('pairs')">
+                    💱 Paires & Taux
+                </button>
+                <button class="tab-btn" onclick="showForexTab('indicators')">
+                    📊 Indicateurs Éco
+                </button>
+                <button class="tab-btn" onclick="showForexTab('correlations')">
+                    🔗 Corrélations
+                </button>
+            </nav>
             
-            <div class="metric-card">
-                <div class="metric-label">Force USD</div>
-                <div class="metric-value" id="forex-usd-strength">102</div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-label">Volatilité Moy.</div>
-                <div class="metric-value" id="forex-volatility">2.1%</div>
-            </div>
-            
-            <div class="metric-card">
-                <div class="metric-label">Signaux Actifs</div>
-                <div class="metric-value" id="forex-signals-count">2</div>
-            </div>
-        </div>
-        
-        <!-- Statut du workflow -->
-        <div class="workflow-status-section">
-            <h2 class="section-title">🔄 Statut en Temps Réel</h2>
-            
-            <div class="status-header">
-                <div class="status-info">
-                    <span>Statut actuel :</span>
-                    <span class="status-badge status-idle" id="forex-current-status">Idle</span>
+            <!-- Contenu des onglets -->
+            <div class="tabs-content">
+                <!-- Onglet Vue d'ensemble -->
+                <div id="forex-tab-overview" class="tab-content active">
+                    <!-- Métriques principales -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Paires Actives</div>
+                            <div class="metric-value" id="forex-pairs-active">5</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Force USD</div>
+                            <div class="metric-value" id="forex-usd-strength">102</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Volatilité Moy.</div>
+                            <div class="metric-value" id="forex-volatility">2.1%</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Signaux Actifs</div>
+                            <div class="metric-value" id="forex-signals-count">2</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Statut du workflow -->
+                    <div class="workflow-status-section">
+                        <h2 class="section-title">🔄 Statut en Temps Réel</h2>
+                        
+                        <div class="status-header">
+                            <div class="status-info">
+                                <span>Statut actuel :</span>
+                                <span class="status-badge status-idle" id="forex-current-status">Idle</span>
+                            </div>
+                            
+                            <div class="workflow-actions">
+                                <button class="action-btn action-btn-primary" onclick="forceWorkflowExecution('forex')">
+                                    ⚡ Forcer Exécution
+                                </button>
+                                <button class="action-btn action-btn-secondary" onclick="exportWorkflowData('forex')">
+                                    📥 Exporter Données
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-label" id="forex-progress-label">En attente du prochain cycle...</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="forex-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="workflow-actions">
-                    <button class="action-btn action-btn-primary" onclick="forceWorkflowExecution('forex')">
-                        ⚡ Forcer Exécution
-                    </button>
-                    <button class="action-btn action-btn-secondary" onclick="exportWorkflowData('forex')">
-                        📥 Exporter Données
-                    </button>
+                <!-- Onglet Paires & Taux -->
+                <div id="forex-tab-pairs" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">💱 Paires Forex Surveillées</h3>
+                        <div class="pairs-container" id="forex-pairs-data">
+                            <div class="no-data">Chargement des taux...</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="progress-container">
-                <div class="progress-label" id="forex-progress-label">En attente du prochain cycle...</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="forex-progress" style="width: 0%"></div>
+                
+                <!-- Onglet Indicateurs Économiques -->
+                <div id="forex-tab-indicators" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">📊 Indicateurs Économiques</h3>
+                        <div class="economic-indicators" id="economic-indicators">
+                            <div class="no-data">Chargement des indicateurs...</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Données détaillées -->
-        <div class="data-grid">
-            <!-- Paires forex -->
-            <div class="data-section">
-                <h3 class="data-section-title">💱 Paires Forex</h3>
-                <div class="pairs-container" id="forex-pairs-data">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Chargement des taux...</div>
-                </div>
-            </div>
-            
-            <!-- Indicateurs économiques -->
-            <div class="data-section">
-                <h3 class="data-section-title">📊 Indicateurs Économiques</h3>
-                <div class="economic-indicators" id="economic-indicators">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Chargement des indicateurs...</div>
-                </div>
-            </div>
-            
-            <!-- Corrélations -->
-            <div class="data-section">
-                <h3 class="data-section-title">🔗 Corrélations</h3>
-                <div class="correlations-grid" id="correlations-data">
-                    <!-- Contenu chargé dynamiquement -->
-                    <div class="no-data">Calcul des corrélations...</div>
+                
+                <!-- Onglet Corrélations -->
+                <div id="forex-tab-correlations" class="tab-content">
+                    <div class="data-section">
+                        <h3 class="data-section-title">🔗 Analyse des Corrélations</h3>
+                        <div class="correlations-grid" id="correlations-data">
+                            <div class="no-data">Calcul des corrélations...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1045,4 +1149,130 @@ def get_workflow_styles() -> str:
     .correlation-value.positive { color: var(--success); }
     .correlation-value.negative { color: var(--danger); }
     .correlation-value.neutral { color: var(--text-secondary); }
+    
+    /* === SYSTÈME D'ONGLETS === */
+    .tabs-container {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .tabs-nav {
+        display: flex;
+        background: #f8fafc;
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+    }
+    
+    .tab-btn {
+        flex: 1;
+        min-width: 150px;
+        padding: 1rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+    }
+    
+    .tab-btn:hover {
+        background: #f1f5f9;
+        color: var(--text-primary);
+    }
+    
+    .tab-btn.active {
+        background: var(--bg-card);
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+    
+    .tabs-content {
+        padding: 2rem;
+    }
+    
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* === CONFIGURATION === */
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .config-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    
+    .config-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .config-card h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+    
+    .config-card p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+    
+    .config-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        background: var(--bg-card);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 2px solid var(--primary);
+    }
+    
+    /* === RESPONSIVE ONGLETS === */
+    @media (max-width: 768px) {
+        .tabs-nav {
+            flex-direction: column;
+        }
+        
+        .tab-btn {
+            min-width: auto;
+            border-bottom: none;
+            border-right: 3px solid transparent;
+        }
+        
+        .tab-btn.active {
+            border-bottom: none;
+            border-right-color: var(--primary);
+        }
+        
+        .tabs-content {
+            padding: 1.5rem;
+        }
+        
+        .config-grid {
+            grid-template-columns: 1fr;
+        }
+    }
     """ 
