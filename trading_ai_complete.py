@@ -291,6 +291,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 --text-primary: #1e293b;
                 --text-secondary: #64748b;
                 --shadow: 0 1px 3px rgba(0,0,0,0.1);
+                --sidebar-width: 320px;
             }}
             
             * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -300,11 +301,12 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 background: var(--bg-main);
                 color: var(--text-primary);
                 line-height: 1.6;
+                overflow-x: hidden;
             }}
             
             .app-layout {{
                 display: grid;
-                grid-template-columns: 280px 1fr;
+                grid-template-columns: var(--sidebar-width) 1fr;
                 min-height: 100vh;
             }}
             
@@ -316,43 +318,46 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 position: fixed;
                 left: 0;
                 top: 0;
-                width: 280px;
+                width: var(--sidebar-width);
                 height: 100vh;
                 overflow-y: auto;
                 z-index: 100;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             }}
             
             .sidebar-header {{
-                padding: 1.5rem;
+                padding: 2rem 1.5rem;
                 border-bottom: 1px solid var(--border);
                 background: linear-gradient(135deg, var(--primary), var(--primary-dark));
                 color: white;
             }}
             
             .sidebar-header h1 {{
-                font-size: 1.25rem;
-                margin-bottom: 0.25rem;
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+                font-weight: 700;
             }}
             
             .sidebar-header .user-info {{
                 font-size: 0.875rem;
                 opacity: 0.9;
+                font-weight: 500;
             }}
             
             .nav-menu {{
-                padding: 1rem 0;
+                padding: 1.5rem 0;
             }}
             
             .nav-section {{
-                margin-bottom: 2rem;
+                margin-bottom: 2.5rem;
             }}
             
             .nav-section-title {{
-                padding: 0 1.5rem 0.5rem;
+                padding: 0 1.5rem 1rem;
                 font-size: 0.75rem;
-                font-weight: 600;
+                font-weight: 700;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.1em;
                 color: var(--text-secondary);
             }}
             
@@ -363,38 +368,44 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .nav-link {{
                 display: flex;
                 align-items: center;
-                gap: 0.75rem;
-                padding: 0.75rem 1rem;
-                border-radius: 0.5rem;
+                gap: 1rem;
+                padding: 1rem 1.25rem;
+                border-radius: 0.75rem;
                 color: var(--text-secondary);
                 text-decoration: none;
-                transition: all 0.2s;
+                transition: all 0.2s ease;
                 font-weight: 500;
                 cursor: pointer;
+                font-size: 0.95rem;
+                min-height: 48px;
             }}
             
             .nav-link:hover {{
                 background: #f1f5f9;
                 color: var(--primary);
+                transform: translateX(4px);
             }}
             
             .nav-link.active {{
                 background: #dbeafe;
                 color: var(--primary);
                 font-weight: 600;
+                box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
             }}
             
             .nav-icon {{
-                font-size: 1.125rem;
-                width: 20px;
+                font-size: 1.25rem;
+                width: 24px;
                 text-align: center;
+                flex-shrink: 0;
             }}
             
             .status-indicator {{
-                width: 8px;
-                height: 8px;
+                width: 10px;
+                height: 10px;
                 border-radius: 50%;
                 margin-left: auto;
+                flex-shrink: 0;
             }}
             
             .status-active {{ background: var(--success); animation: pulse 2s infinite; }}
@@ -403,54 +414,76 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             
             /* Main content */
             .main-content {{
-                margin-left: 280px;
+                margin-left: var(--sidebar-width);
                 min-height: 100vh;
+                background: var(--bg-main);
             }}
             
             .topbar {{
                 background: var(--bg-card);
                 border-bottom: 1px solid var(--border);
-                padding: 1rem 2rem;
+                padding: 1.5rem 2.5rem;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 position: sticky;
                 top: 0;
                 z-index: 50;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }}
             
             .topbar-title {{
-                font-size: 1.5rem;
-                font-weight: 600;
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--text-primary);
             }}
             
             .topbar-actions {{
                 display: flex;
-                gap: 1rem;
+                gap: 1.5rem;
                 align-items: center;
             }}
             
             .btn {{
-                padding: 0.5rem 1rem;
+                padding: 0.75rem 1.5rem;
                 border: none;
-                border-radius: 0.375rem;
-                font-weight: 500;
+                border-radius: 0.5rem;
+                font-weight: 600;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.2s ease;
                 text-decoration: none;
                 display: inline-flex;
                 align-items: center;
                 gap: 0.5rem;
+                font-size: 0.9rem;
+                min-height: 44px;
             }}
             
-            .btn-primary {{ background: var(--primary); color: white; }}
-            .btn-secondary {{ background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }}
-            .btn-danger {{ background: var(--danger); color: white; }}
+            .btn-primary {{ 
+                background: var(--primary); 
+                color: white; 
+            }}
             
-            .btn:hover {{ transform: translateY(-1px); }}
+            .btn-secondary {{ 
+                background: var(--bg-card); 
+                color: var(--text-secondary); 
+                border: 1px solid var(--border); 
+            }}
+            
+            .btn-danger {{ 
+                background: var(--danger); 
+                color: white; 
+            }}
+            
+            .btn:hover {{ 
+                transform: translateY(-1px); 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }}
             
             .content-area {{
-                padding: 2rem;
+                padding: 2.5rem;
+                max-width: 1400px;
+                margin: 0 auto;
             }}
             
             .page-content {{
@@ -464,7 +497,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             
             .grid {{
                 display: grid;
-                gap: 1.5rem;
+                gap: 2rem;
             }}
             
             .grid-2 {{ grid-template-columns: 1fr 1fr; }}
@@ -474,33 +507,35 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .card {{
                 background: var(--bg-card);
                 border: 1px solid var(--border);
-                border-radius: 0.75rem;
-                padding: 1.5rem;
+                border-radius: 1rem;
+                padding: 2rem;
                 box-shadow: var(--shadow);
-                transition: all 0.2s;
+                transition: all 0.2s ease;
             }}
             
             .card:hover {{
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
             }}
             
             .card-header {{
                 display: flex;
-                justify-content: between;
+                justify-content: space-between;
                 align-items: flex-start;
-                margin-bottom: 1rem;
-                padding-bottom: 1rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1.5rem;
                 border-bottom: 1px solid var(--border);
             }}
             
             .card-title {{
-                font-size: 1.125rem;
-                font-weight: 600;
+                font-size: 1.25rem;
+                font-weight: 700;
                 color: var(--text-primary);
+                margin-bottom: 0.5rem;
             }}
             
             .card-subtitle {{
-                font-size: 0.875rem;
+                font-size: 0.9rem;
                 color: var(--text-secondary);
                 margin-top: 0.25rem;
             }}
@@ -509,7 +544,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 0.75rem 0;
+                padding: 1rem 0;
                 border-bottom: 1px solid #f1f5f9;
             }}
             
@@ -517,32 +552,137 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             
             .metric-label {{
                 color: var(--text-secondary);
-                font-weight: 500;
+                font-weight: 600;
+                font-size: 0.95rem;
             }}
             
             .metric-value {{
-                font-weight: 600;
+                font-weight: 700;
                 color: var(--text-primary);
+                font-size: 1.1rem;
             }}
             
             .metric-value.positive {{ color: var(--success); }}
             .metric-value.negative {{ color: var(--danger); }}
             .metric-value.warning {{ color: var(--warning); }}
             
-            /* Workflow status */
+            /* Responsive design amélioré */
+            @media (max-width: 1200px) {{
+                :root {{
+                    --sidebar-width: 280px;
+                }}
+                
+                .grid-4 {{
+                    grid-template-columns: repeat(2, 1fr);
+                }}
+                
+                .content-area {{
+                    padding: 2rem;
+                }}
+            }}
+            
+            @media (max-width: 768px) {{
+                .app-layout {{
+                    grid-template-columns: 1fr;
+                }}
+                
+                .sidebar {{
+                    transform: translateX(-100%);
+                    transition: transform 0.3s ease;
+                }}
+                
+                .sidebar.mobile-open {{
+                    transform: translateX(0);
+                }}
+                
+                .main-content {{
+                    margin-left: 0;
+                }}
+                
+                .grid-4, .grid-3, .grid-2 {{
+                    grid-template-columns: 1fr;
+                }}
+                
+                .topbar {{
+                    padding: 1rem 1.5rem;
+                }}
+                
+                .content-area {{
+                    padding: 1.5rem;
+                }}
+                
+                .card {{
+                    padding: 1.5rem;
+                }}
+            }}
+            
+            /* Animations */
+            @keyframes fadeIn {{
+                from {{ opacity: 0; transform: translateY(20px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            
+            @keyframes pulse {{
+                0%, 100% {{ opacity: 1; }}
+                50% {{ opacity: 0.5; }}
+            }}
+            
+            /* Améliorations d'accessibilité */
+            .nav-link:focus,
+            .btn:focus {{
+                outline: 2px solid var(--primary);
+                outline-offset: 2px;
+            }}
+            
+            /* Scroll smooth */
+            html {{
+                scroll-behavior: smooth;
+            }}
+            
+            /* Loading states */
+            .loading {{
+                opacity: 0.6;
+                pointer-events: none;
+            }}
+            
+            .loading::after {{
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                margin: -10px 0 0 -10px;
+                border: 2px solid var(--primary);
+                border-radius: 50%;
+                border-top-color: transparent;
+                animation: spin 1s linear infinite;
+            }}
+            
+            @keyframes spin {{
+                to {{ transform: rotate(360deg); }}
+            }}
+            
+            /* Indicateurs de statut améliorés */
             .workflow-grid {{
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 1.5rem;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 2rem;
             }}
             
             .workflow-card {{
                 background: var(--bg-card);
                 border: 1px solid var(--border);
-                border-radius: 0.75rem;
-                padding: 1.5rem;
+                border-radius: 1rem;
+                padding: 2rem;
                 position: relative;
                 overflow: hidden;
+                transition: all 0.2s ease;
+            }}
+            
+            .workflow-card:hover {{
+                transform: translateY(-4px);
+                box-shadow: 0 12px 30px rgba(0,0,0,0.1);
             }}
             
             .workflow-status {{
@@ -564,23 +704,24 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }}
             
             .workflow-title {{
-                font-size: 1.125rem;
-                font-weight: 600;
+                font-size: 1.25rem;
+                font-weight: 700;
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.75rem;
             }}
             
             .status-badge {{
-                padding: 0.25rem 0.75rem;
-                border-radius: 9999px;
+                padding: 0.5rem 1rem;
+                border-radius: 2rem;
                 font-size: 0.75rem;
-                font-weight: 600;
+                font-weight: 700;
                 text-transform: uppercase;
+                letter-spacing: 0.05em;
             }}
             
             .status-idle {{ background: #f1f5f9; color: var(--text-secondary); }}
@@ -590,42 +731,39 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .status-completed {{ background: #d1fae5; color: #065f46; }}
             .status-error {{ background: #fee2e2; color: #991b1b; }}
             
-            /* Animations */
-            @keyframes fadeIn {{
-                from {{ opacity: 0; transform: translateY(10px); }}
-                to {{ opacity: 1; transform: translateY(0); }}
-            }}
-            
-            @keyframes pulse {{
-                0%, 100% {{ opacity: 1; }}
-                50% {{ opacity: 0.5; }}
-            }}
-            
-            .pulse {{ animation: pulse 2s infinite; }}
-            
             /* Activity feed */
             .activity-feed {{
                 max-height: 400px;
                 overflow-y: auto;
+                padding-right: 0.5rem;
             }}
             
             .activity-item {{
                 display: flex;
-                gap: 1rem;
-                padding: 1rem 0;
+                gap: 1.5rem;
+                padding: 1.5rem 0;
                 border-bottom: 1px solid var(--border);
+                transition: all 0.2s ease;
+            }}
+            
+            .activity-item:hover {{
+                background: #f8fafc;
+                border-radius: 0.5rem;
+                margin: 0 -1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
             }}
             
             .activity-item:last-child {{ border-bottom: none; }}
             
             .activity-icon {{
-                width: 40px;
-                height: 40px;
+                width: 48px;
+                height: 48px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.125rem;
+                font-size: 1.25rem;
                 flex-shrink: 0;
             }}
             
@@ -638,19 +776,22 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             .activity-title {{
-                font-weight: 600;
-                margin-bottom: 0.25rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
             }}
             
             .activity-description {{
                 color: var(--text-secondary);
-                font-size: 0.875rem;
+                font-size: 0.9rem;
+                line-height: 1.5;
             }}
             
             .activity-time {{
                 color: var(--text-secondary);
                 font-size: 0.75rem;
-                margin-top: 0.25rem;
+                margin-top: 0.5rem;
+                font-weight: 500;
             }}
             
             {workflow_styles}
@@ -881,30 +1022,38 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
         <script>
             let currentPage = 'overview';
             
-            function showPage(pageId) {{
+            function showPage(pageId) {
                 // Nettoyer les anciens workflows
-                if (currentPage.includes('workflow')) {{
+                if (currentPage.includes('workflow')) {
                     cleanupWorkflowPage(currentPage.replace('-page', ''));
-                }}
+                }
                 
                 // Cacher toutes les pages
-                document.querySelectorAll('.page-content').forEach(page => {{
+                document.querySelectorAll('.page-content').forEach(page => {
                     page.classList.remove('active');
-                }});
+                });
                 
                 // Désactiver tous les liens nav
-                document.querySelectorAll('.nav-link').forEach(link => {{
+                document.querySelectorAll('.nav-link').forEach(link => {
                     link.classList.remove('active');
-                }});
+                });
                 
                 // Afficher la page sélectionnée
-                document.getElementById(pageId + '-page').classList.add('active');
+                const targetPage = document.getElementById(pageId + '-page');
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
                 
-                // Activer le lien nav
-                event.target.closest('.nav-link').classList.add('active');
+                // Activer le lien nav correspondant
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {
+                        link.classList.add('active');
+                    }
+                });
                 
                 // Mettre à jour le titre
-                const titles = {{
+                const titles = {
                     'overview': 'Vue d\'ensemble',
                     'capital': 'Capital & Performance',
                     'crypto-workflow': 'Workflow Crypto Principal',
@@ -913,153 +1062,289 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     'wallets': 'Wallets & Secrets',
                     'settings': 'Paramètres',
                     'logs': 'Logs Système'
-                }};
+                };
                 
-                document.getElementById('page-title').textContent = titles[pageId] || pageId;
+                const titleElement = document.getElementById('page-title');
+                if (titleElement) {
+                    titleElement.textContent = titles[pageId] || pageId;
+                }
+                
                 currentPage = pageId;
                 
                 // Charger les données de la page
                 loadPageData(pageId);
-            }}
+                
+                // Scroll vers le haut
+                window.scrollTo(0, 0);
+            }
             
-            async function loadPageData(pageId) {{
-                if (pageId === 'overview') {{
-                    await loadOverviewData();
-                }} else if (pageId.includes('workflow')) {{
-                    const workflowType = pageId.replace('-workflow', '');
-                    await loadWorkflowPage(workflowType);
-                }}
-            }}
+            // Améliorer la gestion des clics sur les liens de navigation
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ajouter les event listeners pour tous les liens de navigation
+                const navLinks = document.querySelectorAll('.nav-link[onclick]');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Extraire le pageId de l'attribut onclick
+                        const onclickAttr = this.getAttribute('onclick');
+                        const match = onclickAttr.match(/showPage\\('([^']+)'\\)/);
+                        
+                        if (match) {
+                            const pageId = match[1];
+                            showPage(pageId);
+                        }
+                    });
+                    
+                    // Améliorer l'accessibilité
+                    link.setAttribute('role', 'button');
+                    link.setAttribute('tabindex', '0');
+                    
+                    // Support du clavier
+                    link.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.click();
+                        }
+                    });
+                });
+                
+                // Charger les données initiales
+                loadOverviewData();
+                
+                // Auto-refresh amélioré
+                startAutoRefresh();
+            });
             
-            async function loadOverviewData() {{
-                try {{
+            function startAutoRefresh() {
+                // Refresh toutes les 30 secondes pour la vue d'ensemble
+                setInterval(() => {
+                    if (currentPage === 'overview') {
+                        loadOverviewData();
+                    }
+                }, 30000);
+            }
+            
+            async function loadPageData(pageId) {
+                try {
+                    if (pageId === 'overview') {
+                        await loadOverviewData();
+                    } else if (pageId.includes('workflow')) {
+                        const workflowType = pageId.replace('-workflow', '');
+                        await loadWorkflowPage(workflowType);
+                    }
+                } catch (error) {
+                    console.error('Erreur chargement page:', error);
+                    showNotification('Erreur de chargement des données', 'error');
+                }
+            }
+            
+            async function loadOverviewData() {
+                try {
+                    // Ajouter indicateur de chargement
+                    const lastUpdateElement = document.getElementById('last-update');
+                    if (lastUpdateElement) {
+                        lastUpdateElement.textContent = 'Chargement...';
+                    }
+                    
                     // Charger données dashboard
                     const dashResponse = await fetch('/api/dashboard');
+                    if (!dashResponse.ok) {
+                        throw new Error('Erreur API dashboard');
+                    }
                     const dashData = await dashResponse.json();
                     
-                    // Mettre à jour métriques
-                    document.getElementById('current-capital').textContent = 
-                        dashData.capital_growth.current.toFixed(2) + '€';
-                    document.getElementById('total-return').textContent = 
+                    // Mettre à jour métriques avec animation
+                    updateMetricWithAnimation('current-capital', dashData.capital_growth.current.toFixed(2) + '€');
+                    updateMetricWithAnimation('total-return', 
                         (dashData.capital_growth.total_return_pct > 0 ? '+' : '') + 
-                        dashData.capital_growth.total_return_pct.toFixed(1) + '%';
-                    document.getElementById('system-efficiency').textContent = 
-                        dashData.capital_growth.system_efficiency_pct.toFixed(0) + '%';
-                    document.getElementById('system-uptime').textContent = 
-                        dashData.uptime_days + ' jour(s)';
+                        dashData.capital_growth.total_return_pct.toFixed(1) + '%');
+                    updateMetricWithAnimation('system-efficiency', 
+                        dashData.capital_growth.system_efficiency_pct.toFixed(0) + '%');
+                    updateMetricWithAnimation('system-uptime', 
+                        dashData.uptime_days + ' jour(s)');
                     
                     // Charger statut workflows
                     const workflowResponse = await fetch('/api/workflows/live-status');
-                    const workflowData = await workflowResponse.json();
-                    
-                    updateWorkflowStatus(workflowData);
-                    updateRecentActivity(workflowData);
+                    if (workflowResponse.ok) {
+                        const workflowData = await workflowResponse.json();
+                        updateWorkflowStatus(workflowData);
+                        updateRecentActivity(workflowData);
+                    }
                     
                     // Mettre à jour timestamp
-                    document.getElementById('last-update').textContent = 
-                        'Dernière MAJ: ' + new Date().toLocaleTimeString();
+                    if (lastUpdateElement) {
+                        lastUpdateElement.textContent = 'Dernière MAJ: ' + new Date().toLocaleTimeString();
+                    }
                     
-                }} catch (error) {{
+                } catch (error) {
                     console.error('Erreur chargement données:', error);
-                }}
-            }}
+                    showNotification('Erreur de connexion aux données', 'error');
+                    
+                    // Afficher état offline
+                    const lastUpdateElement = document.getElementById('last-update');
+                    if (lastUpdateElement) {
+                        lastUpdateElement.textContent = 'Erreur de connexion';
+                    }
+                }
+            }
             
-            function updateWorkflowStatus(data) {{
+            function updateMetricWithAnimation(elementId, value) {
+                const element = document.getElementById(elementId);
+                if (element && element.textContent !== value) {
+                    element.style.transform = 'scale(1.1)';
+                    element.style.transition = 'transform 0.2s ease';
+                    
+                    setTimeout(() => {
+                        element.textContent = value;
+                        element.style.transform = 'scale(1)';
+                    }, 100);
+                }
+            }
+            
+            function updateWorkflowStatus(data) {
                 const statusContainer = document.getElementById('workflow-status');
+                if (!statusContainer) return;
+                
                 const workflows = [
-                    {{ key: 'crypto', title: '₿ Crypto Principal', icon: '₿' }},
-                    {{ key: 'meme', title: '🐸 Crypto Meme', icon: '🐸' }},
-                    {{ key: 'forex', title: '💱 Forex', icon: '💱' }}
+                    { key: 'crypto', title: '₿ Crypto Principal', icon: '₿' },
+                    { key: 'meme', title: '🐸 Crypto Meme', icon: '🐸' },
+                    { key: 'forex', title: '💱 Forex', icon: '💱' }
                 ];
                 
-                statusContainer.innerHTML = workflows.map(workflow => {{
+                statusContainer.innerHTML = workflows.map(workflow => {
                     const status = data[workflow.key]?.status || 'idle';
                     const execution = data[workflow.key]?.current_execution;
                     
                     return `
                         <div class="workflow-card">
-                            <div class="workflow-status ${{status}}"></div>
+                            <div class="workflow-status ${status}"></div>
                             <div class="workflow-header">
                                 <div class="workflow-title">
-                                    ${{workflow.icon}} ${{workflow.title}}
+                                    ${workflow.icon} ${workflow.title}
                                 </div>
-                                <div class="status-badge status-${{status}}">
-                                    ${{status}}
+                                <div class="status-badge status-${status}">
+                                    ${status}
                                 </div>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Statut</span>
-                                <span class="metric-value">${{status === 'idle' ? '⏱️ En attente' : 
+                                <span class="metric-value">${status === 'idle' ? '⏱️ En attente' : 
                                                            status === 'scanning' ? '🔍 Scan marché' :
                                                            status === 'analyzing' ? '📊 Analyse' :
                                                            status === 'executing' ? '⚡ Exécution' : 
-                                                           '✅ Terminé'}}</span>
+                                                           '✅ Terminé'}</span>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Dernière exec</span>
-                                <span class="metric-value">${{execution ? 
-                                    new Date(execution.start_time).toLocaleTimeString() : 'Jamais'}}</span>
+                                <span class="metric-value">${execution ? 
+                                    new Date(execution.start_time).toLocaleTimeString() : 'Jamais'}</span>
                             </div>
                         </div>
                     `;
-                }}).join('');
-            }}
+                }).join('');
+            }
             
-            function updateRecentActivity(data) {{
+            function updateRecentActivity(data) {
                 const activityContainer = document.getElementById('recent-activity');
-                const systemHealth = data.system_health || {{}};
+                if (!activityContainer) return;
+                
+                const systemHealth = data.system_health || {};
                 
                 // Simuler activité récente basée sur les données système
                 const activities = [
-                    {{
+                    {
                         type: 'crypto',
                         title: 'Scan crypto terminé',
-                        description: `${{systemHealth.total_executions || 0}} exécutions totales`,
+                        description: `${systemHealth.total_executions || 0} exécutions totales`,
                         time: '2 min'
-                    }},
-                    {{
+                    },
+                    {
                         type: 'forex',
                         title: 'Analyse forex',
                         description: 'EUR/USD signal détecté',
                         time: '5 min'
-                    }},
-                    {{
+                    },
+                    {
                         type: 'meme',
                         title: 'Tokens meme scannés',
                         description: 'Aucun signal fort',
                         time: '8 min'
-                    }}
+                    }
                 ];
                 
                 activityContainer.innerHTML = activities.map(activity => `
                     <div class="activity-item">
-                        <div class="activity-icon ${{activity.type}}">
-                            ${{activity.type === 'crypto' ? '₿' : 
-                               activity.type === 'forex' ? '💱' : '🐸'}}
+                        <div class="activity-icon ${activity.type}">
+                            ${activity.type === 'crypto' ? '₿' : 
+                               activity.type === 'forex' ? '💱' : '🐸'}
                         </div>
                         <div class="activity-content">
-                            <div class="activity-title">${{activity.title}}</div>
-                            <div class="activity-description">${{activity.description}}</div>
-                            <div class="activity-time">il y a ${{activity.time}}</div>
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-description">${activity.description}</div>
+                            <div class="activity-time">il y a ${activity.time}</div>
                         </div>
                     </div>
                 `).join('');
-            }}
+            }
             
-            async function refreshData() {{
+            async function refreshData() {
                 await loadPageData(currentPage);
-            }}
+                showNotification('Données actualisées', 'success');
+            }
             
-            function logout() {{
-                document.cookie = 'session_token=; path=/; max-age=0';
-                window.location.reload();
-            }}
+            function logout() {
+                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                    document.cookie = 'session_token=; path=/; max-age=0';
+                    window.location.reload();
+                }
+            }
             
-            // Auto-refresh toutes les 30 secondes
-            setInterval(refreshData, 30000);
-            
-            // Charger données initiales
-            loadOverviewData();
+            // Système de notifications
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.textContent = message;
+                
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    border-radius: 0.5rem;
+                    color: white;
+                    font-weight: 600;
+                    z-index: 1000;
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                `;
+                
+                if (type === 'success') {
+                    notification.style.background = '#10b981';
+                } else if (type === 'error') {
+                    notification.style.background = '#ef4444';
+                } else {
+                    notification.style.background = '#3b82f6';
+                }
+                
+                document.body.appendChild(notification);
+                
+                // Animation d'entrée
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Suppression automatique
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
             
             {workflow_js}
         </script>
