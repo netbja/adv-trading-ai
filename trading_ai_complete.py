@@ -41,18 +41,44 @@ async def startup_event():
     """Initialisation au démarrage"""
     global trading_master
     
+    logger.info("🚀 DÉMARRAGE DU SYSTÈME TRADING AI")
+    logger.info(f"🔍 auth_manager instance: {auth_manager}")
+    logger.info(f"🔍 DATABASE_URL: {DATABASE_URL}")
+    
     # Initialiser base de données
-    await auth_manager.init_db()
-    logger.info("✅ Base de données initialisée")
+    try:
+        logger.info("🔄 Initialisation de la base de données...")
+        await auth_manager.init_db()
+        logger.info("✅ Base de données initialisée")
+        
+        # Test de l'utilisateur admin après init
+        logger.info("🔄 Test de l'utilisateur admin après init...")
+        test_auth = await auth_manager.authenticate_user("admin", "TradingAI2025!", "127.0.0.1", "startup-test")
+        logger.info(f"🔍 Test auth admin result: {test_auth is not None}")
+        if test_auth:
+            logger.info(f"✅ Utilisateur admin trouvé: {test_auth.get('username')}")
+        else:
+            logger.error("❌ Utilisateur admin non trouvé après init!")
+            
+    except Exception as e:
+        logger.error(f"❌ Erreur init DB: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
     
     # Initialiser système de trading
-    trading_master = AutonomousTradingMaster(200.0)
-    await trading_master.initialize_autonomous_system()
-    logger.info("✅ Système de trading initialisé")
+    try:
+        trading_master = AutonomousTradingMaster(200.0)
+        await trading_master.initialize_autonomous_system()
+        logger.info("✅ Système de trading initialisé")
+    except Exception as e:
+        logger.error(f"❌ Erreur init trading master: {e}")
     
     # Démarrer workflows live en arrière-plan
-    asyncio.create_task(live_orchestrator.start_live_workflows())
-    logger.info("✅ Workflows live démarrés")
+    try:
+        asyncio.create_task(live_orchestrator.start_live_workflows())
+        logger.info("✅ Workflows live démarrés")
+    except Exception as e:
+        logger.error(f"❌ Erreur start workflows: {e}")
 
 # Middleware d'authentification
 async def get_current_user(request: Request, session_token: str = Cookie(None)):
