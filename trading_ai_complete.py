@@ -90,107 +90,31 @@ def get_login_page() -> HTMLResponse:
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
+            /* === LOGIN PAGE === */
+            .login-container {{
+                width: 100vw;
+                height: 100vh;
                 display: flex;
-                align-items: center;
                 justify-content: center;
-            }
+                align-items: center;
+                background: var(--bg-main);
+            }}
             
-            .login-container {
-                background: white;
-                padding: 3rem;
-                border-radius: 1rem;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                width: 100%;
-                max-width: 400px;
-            }
+            .logo {{
+                text-align: center; 
+            }}
             
-            .logo {
-                text-align: center;
-                margin-bottom: 2rem;
-            }
-            
-            .logo h1 {
-                font-size: 2rem;
-                color: #2563eb;
+            .logo h1 {{
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--primary);
                 margin-bottom: 0.5rem;
-            }
+            }}
             
-            .logo p {
-                color: #64748b;
-                font-size: 0.9rem;
-            }
-            
-            .form-group {
-                margin-bottom: 1.5rem;
-            }
-            
-            .form-label {
-                display: block;
-                font-weight: 600;
-                color: #374151;
-                margin-bottom: 0.5rem;
-            }
-            
-            .form-input {
-                width: 100%;
-                padding: 0.75rem;
-                border: 2px solid #e5e7eb;
-                border-radius: 0.5rem;
-                font-size: 1rem;
-                transition: border-color 0.2s;
-            }
-            
-            .form-input:focus {
-                outline: none;
-                border-color: #2563eb;
-            }
-            
-            .btn-login {
-                width: 100%;
-                background: #2563eb;
-                color: white;
-                padding: 0.75rem;
-                border: none;
-                border-radius: 0.5rem;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: background 0.2s;
-            }
-            
-            .btn-login:hover {
-                background: #1d4ed8;
-            }
-            
-            .error-message {
-                background: #fef2f2;
-                color: #dc2626;
-                padding: 0.75rem;
-                border-radius: 0.5rem;
-                margin-bottom: 1rem;
-                display: none;
-            }
-            
-            .features {
-                margin-top: 2rem;
-                text-align: center;
-                color: #64748b;
-                font-size: 0.875rem;
-            }
-            
-            .features ul {
-                list-style: none;
-                margin-top: 1rem;
-            }
-            
-            .features li {
-                margin: 0.5rem 0;
-            }
+            .logo p {{
+                font-size: 1.1rem;
+                color: var(--text-secondary);
+            }}
         </style>
     </head>
     <body>
@@ -271,7 +195,8 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
     workflow_styles = get_workflow_styles()
     workflow_js = get_workflow_javascript()
     
-    return HTMLResponse(f"""
+    return HTMLResponse(
+        """
     <!DOCTYPE html>
     <html>
     <head>
@@ -1021,7 +946,8 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 <div class="sidebar-header">
                     <h1>🧠 Trading AI Pro</h1>
                     <div class="user-info">
-                        Connecté: {user_data['username']} ({user_data['role']})
+""" + f"                        Connecté: {{user_data['username']}} ({{user_data['role']}})
+""" + """
                     </div>
                 </div>
                 
@@ -1248,15 +1174,18 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     
                     <!-- Pages Workflows complètes -->
                     <div id="crypto-workflow-page" class="page-content">
-                        {crypto_page}
+""" + f"                        {{crypto_page}}
+""" + """
                     </div>
                     
                     <div id="meme-workflow-page" class="page-content">
-                        {meme_page}
+""" + f"                        {{meme_page}}
+""" + """
                     </div>
                     
                     <div id="forex-workflow-page" class="page-content">
-                        {forex_page}
+""" + f"                        {{forex_page}}
+""" + """
                     </div>
                     
                     <!-- Autres pages (en développement) -->
@@ -1313,7 +1242,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 }});
                 
                 /* Mettre à jour le titre */
-                const titles = {{
+                const titles = {
                     'overview': 'Vue d\\'ensemble',
                     'capital': 'Capital & Performance',
                     'crypto-workflow': 'Workflow Crypto Principal',
@@ -1322,7 +1251,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     'wallets': 'Wallets & Secrets',
                     'settings': 'Paramètres',
                     'logs': 'Logs Système'
-                }};
+                };
                 
                 const titleElement = document.getElementById('page-title');
                 if (titleElement) {{
@@ -1489,8 +1418,8 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 ];
                 
                 performanceContainer.innerHTML = workflows.map(function(workflow) {
-                    const workflowData = data[workflow.key] || {};
-                    const performance = workflowData.performance || {};
+                    const workflowData = data[workflow.key] || {{}};
+                    const performance = workflowData.performance || {{}};
                     // Simulation de données de performance sur 7 jours
                     const weekPerformance = performance.weekly_gains || [0.5, -0.2, 1.2, 0.8, -0.1, 1.5, 0.9];
                     const totalGain = performance.total_gain || 0;
@@ -1626,7 +1555,8 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
         </script>
     </body>
     </html>
-    """)
+    """
+    )
 
 # API ENDPOINTS
 @app.post("/api/login")
