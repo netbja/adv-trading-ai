@@ -298,7 +298,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 --shadow: 0 4px 6px rgba(0,0,0,0.07);
                 --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
                 --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
-                --sidebar-width: 280px;
+                --sidebar-width: 320px;
                 --border-radius: 12px;
                 --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             }}
@@ -310,7 +310,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 background: var(--bg-main);
                 color: var(--text-primary);
                 line-height: 1.6;
-                font-size: 14px;
+                font-size: 15px;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
             }}
@@ -321,7 +321,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 min-height: 100vh;
             }}
             
-            /* === SIDEBAR MODERNE === */
+            /* === SIDEBAR DESKTOP === */
             .sidebar {{
                 background: var(--bg-card);
                 border-right: 1px solid var(--border);
@@ -336,34 +336,34 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             .sidebar-header {{
-                padding: 2rem 1.5rem;
+                padding: 2.5rem 2rem;
                 background: var(--bg-hero);
                 color: white;
             }}
             
             .sidebar-header h1 {{
-                font-size: 1.25rem;
+                font-size: 1.5rem;
                 font-weight: 700;
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.75rem;
             }}
             
             .user-info {{
-                font-size: 0.875rem;
+                font-size: 1rem;
                 opacity: 0.9;
                 font-weight: 500;
             }}
             
             .nav-menu {{
-                padding: 1.5rem 0;
+                padding: 2rem 0;
             }}
             
             .nav-section {{
-                margin-bottom: 2rem;
+                margin-bottom: 2.5rem;
             }}
             
             .nav-section-title {{
-                padding: 0 1.5rem 0.75rem;
-                font-size: 0.75rem;
+                padding: 0 2rem 1rem;
+                font-size: 0.8rem;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
@@ -371,27 +371,28 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             .nav-item {{
-                margin: 0.25rem 1rem;
+                margin: 0.5rem 1.5rem;
             }}
             
             .nav-link {{
                 display: flex;
                 align-items: center;
-                gap: 0.75rem;
-                padding: 0.875rem 1rem;
-                border-radius: 8px;
+                gap: 1rem;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
                 color: var(--text-secondary);
                 text-decoration: none;
                 transition: var(--transition);
                 font-weight: 500;
                 cursor: pointer;
-                font-size: 0.875rem;
+                font-size: 0.95rem;
+                min-height: 48px;
             }}
             
             .nav-link:hover {{
                 background: #f1f5f9;
                 color: var(--primary);
-                transform: translateX(2px);
+                transform: translateX(4px);
             }}
             
             .nav-link.active {{
@@ -402,14 +403,14 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             .nav-icon {{
-                font-size: 1.125rem;
-                width: 20px;
+                font-size: 1.25rem;
+                width: 24px;
                 text-align: center;
             }}
             
             .status-indicator {{
-                width: 8px;
-                height: 8px;
+                width: 10px;
+                height: 10px;
                 border-radius: 50%;
                 margin-left: auto;
             }}
@@ -418,16 +419,17 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .status-scanning {{ background: var(--warning); animation: pulse 2s infinite; }}
             .status-idle {{ background: var(--secondary); }}
             
-            /* === MAIN CONTENT === */
+            /* === MAIN CONTENT DESKTOP === */
             .main-content {{
                 margin-left: var(--sidebar-width);
                 min-height: 100vh;
+                width: calc(100vw - var(--sidebar-width));
             }}
             
             .topbar {{
                 background: var(--bg-card);
                 border-bottom: 1px solid var(--border);
-                padding: 1.25rem 2rem;
+                padding: 1.5rem 3rem;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -435,34 +437,35 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 top: 0;
                 z-index: 50;
                 backdrop-filter: blur(10px);
-                background: rgba(255, 255, 255, 0.9);
+                background: rgba(255, 255, 255, 0.95);
             }}
             
             .topbar-title {{
-                font-size: 1.5rem;
+                font-size: 2rem;
                 font-weight: 700;
                 color: var(--text-primary);
             }}
             
             .topbar-actions {{
                 display: flex;
-                gap: 1rem;
+                gap: 1.5rem;
                 align-items: center;
             }}
             
             .btn {{
-                padding: 0.625rem 1.25rem;
+                padding: 0.75rem 1.5rem;
                 border: none;
-                border-radius: 8px;
+                border-radius: 10px;
                 font-weight: 600;
                 cursor: pointer;
                 transition: var(--transition);
                 text-decoration: none;
                 display: inline-flex;
                 align-items: center;
-                gap: 0.5rem;
-                font-size: 0.875rem;
+                gap: 0.75rem;
+                font-size: 0.95rem;
                 white-space: nowrap;
+                min-height: 44px;
             }}
             
             .btn-primary {{ 
@@ -477,18 +480,19 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             .btn:hover {{ 
-                transform: translateY(-1px); 
-                box-shadow: var(--shadow);
+                transform: translateY(-2px); 
+                box-shadow: var(--shadow-lg);
             }}
             
             .btn-icon {{
-                font-size: 1rem;
+                font-size: 1.125rem;
             }}
             
             .content-area {{
-                padding: 2rem;
-                max-width: 1400px;
+                padding: 3rem;
+                max-width: 1600px;
                 margin: 0 auto;
+                width: 100%;
             }}
             
             .page-content {{
@@ -500,65 +504,74 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 animation: fadeIn 0.3s ease;
             }}
             
-            /* === HERO SECTION === */
+            /* === HERO SECTION DESKTOP === */
             .overview-hero {{
                 background: var(--bg-card);
                 border-radius: var(--border-radius);
-                padding: 2rem;
-                margin-bottom: 2rem;
+                padding: 3rem;
+                margin-bottom: 3rem;
                 box-shadow: var(--shadow);
                 border: 1px solid var(--border);
             }}
             
             .hero-content {{
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                gap: 2rem;
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 4rem;
+                align-items: start;
             }}
             
             .hero-main {{
-                flex: 1;
+                
             }}
             
             .hero-title {{
-                font-size: 1.875rem;
+                font-size: 2.5rem;
                 font-weight: 700;
                 color: var(--text-primary);
-                margin-bottom: 1.5rem;
+                margin-bottom: 2rem;
+                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }}
             
             .hero-metrics {{
-                display: flex;
-                gap: 3rem;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 4rem;
                 align-items: center;
             }}
             
             .metric-primary {{
                 text-align: center;
+                padding: 2rem;
+                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+                border-radius: 15px;
+                border: 1px solid var(--border);
             }}
             
             .metric-label {{
                 display: block;
-                font-size: 0.875rem;
+                font-size: 1rem;
                 color: var(--text-secondary);
                 font-weight: 600;
-                margin-bottom: 0.5rem;
+                margin-bottom: 1rem;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.1em;
             }}
             
             .metric-value {{
                 display: block;
-                font-size: 2.5rem;
+                font-size: 3.5rem;
                 font-weight: 700;
                 color: var(--text-primary);
                 line-height: 1;
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.5rem;
             }}
             
             .metric-change {{
-                font-size: 1rem;
+                font-size: 1.25rem;
                 font-weight: 600;
             }}
             
@@ -568,27 +581,33 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .metric-grid {{
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 1.5rem;
+                gap: 2rem;
             }}
             
             .metric-item {{
                 text-align: center;
-                padding: 1rem;
+                padding: 1.5rem;
                 background: #f8fafc;
-                border-radius: 8px;
+                border-radius: 12px;
                 border: 1px solid var(--border);
+                transition: var(--transition);
+            }}
+            
+            .metric-item:hover {{
+                transform: translateY(-2px);
+                box-shadow: var(--shadow);
             }}
             
             .metric-number {{
                 display: block;
-                font-size: 1.5rem;
+                font-size: 2rem;
                 font-weight: 700;
                 color: var(--text-primary);
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.5rem;
             }}
             
             .metric-text {{
-                font-size: 0.75rem;
+                font-size: 0.875rem;
                 color: var(--text-secondary);
                 font-weight: 600;
                 text-transform: uppercase;
@@ -598,129 +617,136 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .hero-actions {{
                 display: flex;
                 flex-direction: column;
-                gap: 1rem;
+                gap: 1.5rem;
                 align-items: flex-end;
             }}
             
             .status-info {{
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
-                font-size: 0.875rem;
+                gap: 0.75rem;
+                font-size: 1rem;
                 color: var(--text-secondary);
+                padding: 1rem 1.5rem;
+                background: #f8fafc;
+                border-radius: 10px;
+                border: 1px solid var(--border);
             }}
             
-            /* === WORKFLOWS CARDS === */
+            /* === WORKFLOWS CARDS DESKTOP === */
             .workflows-section {{
-                margin-bottom: 2rem;
+                margin-bottom: 3rem;
             }}
             
             .section-header {{
-                margin-bottom: 1.5rem;
+                margin-bottom: 2rem;
             }}
             
             .section-header h3 {{
-                font-size: 1.25rem;
+                font-size: 1.75rem;
                 font-weight: 700;
                 color: var(--text-primary);
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.5rem;
             }}
             
             .section-header p {{
                 color: var(--text-secondary);
-                font-size: 0.875rem;
+                font-size: 1.1rem;
             }}
             
             .workflow-cards-grid {{
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                gap: 1.5rem;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
             }}
             
             .workflow-card {{
                 background: var(--bg-card);
                 border: 1px solid var(--border);
                 border-radius: var(--border-radius);
-                padding: 1.5rem;
+                padding: 2rem;
                 cursor: pointer;
                 transition: var(--transition);
                 box-shadow: var(--shadow-sm);
                 position: relative;
                 overflow: hidden;
+                min-height: 280px;
             }}
             
             .workflow-card:hover {{
-                transform: translateY(-4px);
-                box-shadow: var(--shadow-lg);
+                transform: translateY(-6px);
+                box-shadow: var(--shadow-xl);
                 border-color: var(--primary);
             }}
             
             .workflow-card.crypto {{
-                border-top: 3px solid #f59e0b;
+                border-top: 4px solid #f59e0b;
             }}
             
             .workflow-card.meme {{
-                border-top: 3px solid #8b5cf6;
+                border-top: 4px solid #8b5cf6;
             }}
             
             .workflow-card.forex {{
-                border-top: 3px solid #3b82f6;
+                border-top: 4px solid #3b82f6;
             }}
             
             .card-header {{
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }}
             
             .card-icon {{
-                font-size: 2rem;
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
+                font-size: 2.5rem;
+                width: 64px;
+                height: 64px;
+                border-radius: 16px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+                border: 2px solid var(--border);
             }}
             
             .card-status {{
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.75rem;
             }}
             
             .status-dot {{
-                width: 8px;
-                height: 8px;
+                width: 10px;
+                height: 10px;
                 border-radius: 50%;
             }}
             
             .status-text {{
-                font-size: 0.75rem;
+                font-size: 0.8rem;
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
             }}
             
             .card-content h4 {{
-                font-size: 1.125rem;
+                font-size: 1.5rem;
                 font-weight: 700;
                 color: var(--text-primary);
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.75rem;
             }}
             
             .card-content p {{
                 color: var(--text-secondary);
-                font-size: 0.875rem;
-                margin-bottom: 1rem;
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+                line-height: 1.5;
             }}
             
             .card-metrics {{
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                gap: 1rem;
+                gap: 1.5rem;
             }}
             
             .card-metric {{
@@ -729,24 +755,24 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             
             .card-metric .value {{
                 display: block;
-                font-size: 1.125rem;
+                font-size: 1.25rem;
                 font-weight: 700;
                 color: var(--text-primary);
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.5rem;
             }}
             
             .card-metric .value.positive {{ color: var(--success); }}
             .card-metric .value.warning {{ color: var(--warning); }}
             
             .card-metric .label {{
-                font-size: 0.75rem;
+                font-size: 0.875rem;
                 color: var(--text-secondary);
                 font-weight: 500;
             }}
             
             .card-footer {{
-                margin-top: 1rem;
-                padding-top: 1rem;
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
                 border-top: 1px solid var(--border);
                 text-align: center;
             }}
@@ -754,26 +780,26 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .view-details {{
                 color: var(--primary);
                 font-weight: 600;
-                font-size: 0.875rem;
+                font-size: 1rem;
             }}
             
-            /* === ACTIVITY TIMELINE === */
+            /* === ACTIVITY TIMELINE DESKTOP === */
             .activity-section {{
                 background: var(--bg-card);
                 border: 1px solid var(--border);
                 border-radius: var(--border-radius);
-                padding: 1.5rem;
+                padding: 2.5rem;
                 box-shadow: var(--shadow-sm);
             }}
             
             .activity-timeline {{
-                max-height: 300px;
+                max-height: 400px;
                 overflow-y: auto;
             }}
             
             /* === ANIMATIONS === */
             @keyframes fadeIn {{
-                from {{ opacity: 0; transform: translateY(10px); }}
+                from {{ opacity: 0; transform: translateY(20px); }}
                 to {{ opacity: 1; transform: translateY(0); }}
             }}
             
@@ -783,24 +809,45 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             }}
             
             /* === RESPONSIVE === */
-            @media (max-width: 1024px) {{
-                :root {{
-                    --sidebar-width: 260px;
+            @media (max-width: 1400px) {{
+                .content-area {{
+                    padding: 2rem;
                 }}
                 
                 .hero-content {{
-                    flex-direction: column;
-                    gap: 1.5rem;
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
                 }}
                 
                 .hero-metrics {{
-                    flex-direction: column;
+                    grid-template-columns: 1fr;
                     gap: 2rem;
-                    align-items: stretch;
                 }}
                 
-                .metric-grid {{
-                    grid-template-columns: repeat(3, 1fr);
+                .workflow-cards-grid {{
+                    grid-template-columns: repeat(2, 1fr);
+                }}
+            }}
+            
+            @media (max-width: 1024px) {{
+                :root {{
+                    --sidebar-width: 280px;
+                }}
+                
+                .topbar {{
+                    padding: 1.25rem 2rem;
+                }}
+                
+                .topbar-title {{
+                    font-size: 1.5rem;
+                }}
+                
+                .hero-title {{
+                    font-size: 2rem;
+                }}
+                
+                .workflow-cards-grid {{
+                    grid-template-columns: 1fr;
                 }}
             }}
             
@@ -816,23 +863,20 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 
                 .main-content {{
                     margin-left: 0;
+                    width: 100vw;
                 }}
                 
                 .content-area {{
-                    padding: 1rem;
+                    padding: 1.5rem;
                 }}
                 
-                .workflow-cards-grid {{
-                    grid-template-columns: 1fr;
+                .overview-hero {{
+                    padding: 2rem;
                 }}
                 
                 .metric-grid {{
                     grid-template-columns: 1fr;
                     gap: 1rem;
-                }}
-                
-                .hero-metrics {{
-                    gap: 1.5rem;
                 }}
                 
                 .card-metrics {{
@@ -844,8 +888,6 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
             .positive {{ color: var(--success) !important; }}
             .negative {{ color: var(--danger) !important; }}
             .warning {{ color: var(--warning) !important; }}
-            
-            /* Suppression des anciens styles non utilisés */
         </style>
     </head>
     <body>
