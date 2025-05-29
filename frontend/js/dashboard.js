@@ -193,13 +193,7 @@ async function loadPageData(pageId) {
                 contentHTML = await loadWorkflowPage(workflowType);
                 pageElement.innerHTML = contentHTML;
                 break;
-            case 'capital-performance-page':
-                data = await fetchData('/api/capital/performance/details');
-                contentHTML = buildCapitalPerformanceHTML(data);
-                pageElement.innerHTML = contentHTML;
-                // Initialiser les graphiques ici si nécessaire (prochaine étape)
-                // Exemple: initCapitalCharts(data.charts_data);
-                break;
+            // Le cas 'capital-performance-page' est supprimé ici
             // Ajouter d'autres cas pour les nouvelles pages ici
             default:
                 pageElement.innerHTML = '<p>Contenu non disponible pour cette page.</p>';
@@ -898,96 +892,6 @@ function showNotification(message, type = 'info') {
     }, 3000); // Durée d'affichage
 }
 
-function buildCapitalPerformanceHTML(data) {
-    if (!data) return '<p>Données de performance non disponibles.</p>';
-
-    const summary = data.summary;
-    const milestone = data.milestone;
-    const kpis = data.key_performance_indicators;
-    const operational = data.operational_stats;
-
-    // Formatter les nombres pour affichage
-    const formatCurrency = (value) => value !== undefined ? value.toLocaleString('fr-FR', { style: 'currency', currency: 'USD' }) : 'N/A';
-    const formatPercent = (value) => value !== undefined ? value.toFixed(2) + ' %' : 'N/A';
-
-    return `
-        <section class="performance-summary-cards">
-            <div class="metric-card">
-                <div class="metric-label">Capital Initial</div>
-                <div class="metric-value">${formatCurrency(summary.initial_capital)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Capital Actuel</div>
-                <div class="metric-value">${formatCurrency(summary.current_capital)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Profit Total</div>
-                <div class="metric-value ${summary.total_profit >= 0 ? 'positive' : 'negative'}">${formatCurrency(summary.total_profit)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Rendement Total</div>
-                <div class="metric-value ${summary.total_return_pct >= 0 ? 'positive' : 'negative'}">${formatPercent(summary.total_return_pct)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Rdt Annuel Estimé</div>
-                <div class="metric-value ${summary.annualized_return_pct >= 0 ? 'positive' : 'negative'}">${formatPercent(summary.annualized_return_pct)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Efficacité Système</div>
-                <div class="metric-value">${formatPercent(summary.system_efficiency_pct)}</div>
-            </div>
-        </section>
-
-        <section class="charts-section">
-            <div class="chart-container">
-                <h3><span class="section-icon">📈</span>Évolution du Capital</h3>
-                <div id="capital-evolution-chart" class="chart-placeholder">Graphique de l'évolution du capital ici</div>
-            </div>
-            <div class="chart-container">
-                <h3><span class="section-icon">📊</span>Performance Mensuelle</h3>
-                <div id="monthly-performance-chart" class="chart-placeholder">Graphique de la performance mensuelle ici</div>
-            </div>
-        </section>
-        
-        <div class="performance-details-grid">
-            <section class="kpi-section card-style">
-                <h3><span class="section-icon">🔑</span>Indicateurs Clés de Performance (KPIs)</h3>
-                <ul>
-                    <li><strong>Ratio de Sharpe:</strong> ${kpis.sharpe_ratio !== undefined ? kpis.sharpe_ratio : 'N/A'}</li>
-                    <li><strong>Max Drawdown:</strong> ${formatPercent(kpis.max_drawdown_pct)}</li>
-                    <li><strong>Gain Moyen / Trade Gagnant:</strong> ${formatPercent(kpis.average_win_pct)}</li>
-                    <li><strong>Perte Moyenne / Trade Perdant:</strong> ${formatPercent(kpis.average_loss_pct)}</li>
-                    <li><strong>Facteur de Profit:</strong> ${kpis.profit_factor !== undefined ? kpis.profit_factor : 'N/A'}</li>
-                </ul>
-            </section>
-
-            <section class="milestone-section card-style">
-                <h3><span class="section-icon">🎯</span>Objectif Actuel</h3>
-                <p><strong>Prochain Palier:</strong> ${formatCurrency(milestone.next_target)}</p>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: ${milestone.progress_pct}%;">${formatPercent(milestone.progress_pct)}</div>
-                </div>
-                <p><strong>Restant à atteindre:</strong> ${formatCurrency(milestone.remaining_to_target)}</p>
-            </section>
-            
-            <section class="operational-stats-section card-style">
-                <h3><span class="section-icon">⚙️</span>Statistiques Opérationnelles</h3>
-                <ul>
-                    <li><strong>Jours d'activité:</strong> ${operational.uptime_days}</li>
-                    <li><strong>Nombre total de trades (simulé):</strong> ${operational.total_trades_simulated}</li>
-                    <li><strong>Statut du système:</strong> <span class="status-${operational.system_active ? 'active' : 'idle'}">${operational.system_active ? 'Actif' : 'Inactif'}</span></li>
-                </ul>
-            </section>
-
-            <section class="trade-distribution-section card-style">
-                 <h3><span class="section-icon">⚖️</span>Distribution des Trades (Simulé)</h3>
-                 <div id="trade-distribution-chart" class="chart-placeholder">Graphique de distribution des trades ici</div>
-                 <ul>
-                    <li><strong>Trades Gagnants:</strong> ${data.charts_data.trade_distribution.winning_trades}</li>
-                    <li><strong>Trades Perdants:</strong> ${data.charts_data.trade_distribution.losing_trades}</li>
-                    <li><strong>Trades Nuls (Breakeven):</strong> ${data.charts_data.trade_distribution.breakeven_trades}</li>
-                 </ul>
-            </section>
-        </div>
-    `;
+async function fetchData(url, options = {}) {
+    // ... existing code ...
 }
