@@ -1245,6 +1245,91 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                         </div>
                     `;
                 }}).join('');
+                
+                // Mettre à jour aussi les statuts dans la sidebar si on est sur la vue d'ensemble
+                if (currentPage === 'overview') {{
+                    updateSidebarStatus(data);
+                }}
+            }}
+            
+            function updateSidebarStatus(data) {{
+                // Mettre à jour les indicateurs dans la sidebar
+                const cryptoStatus = document.getElementById('crypto-status');
+                const forexStatus = document.getElementById('forex-status');
+                
+                if (cryptoStatus) {{
+                    const status = data.crypto?.status || 'idle';
+                    cryptoStatus.textContent = status === 'idle' ? '🔄 Actif' : 
+                                              status === 'scanning' ? '🔍 Scan' :
+                                              status === 'analyzing' ? '📊 Analyse' : '⚡ Exec';
+                }}
+                
+                if (forexStatus) {{
+                    const status = data.forex?.status || 'idle';
+                    forexStatus.textContent = status === 'idle' ? '🔄 Actif' : 
+                                             status === 'scanning' ? '🔍 Scan' :
+                                             status === 'analyzing' ? '📊 Analyse' : '⚡ Exec';
+                }}
+            }}
+            
+            // Fonction séparée pour les pages de workflow détaillées
+            function updateDetailedWorkflowStatus(workflowType, execution) {{
+                const statusElement = document.getElementById(`${{workflowType}}-current-status`);
+                const progressElement = document.getElementById(`${{workflowType}}-progress`);
+                const labelElement = document.getElementById(`${{workflowType}}-progress-label`);
+                
+                // Vérifier que les éléments existent avant de les mettre à jour
+                if (!statusElement || !progressElement || !labelElement) {{
+                    return;
+                }}
+                
+                if (!execution) {{
+                    statusElement.textContent = 'Idle';
+                    statusElement.className = 'status-badge status-idle';
+                    progressElement.style.width = '0%';
+                    labelElement.textContent = 'En attente du prochain cycle...';
+                    return;
+                }}
+                
+                const status = execution.status;
+                const phases = ['scanning', 'analyzing', 'executing', 'completed'];
+                const currentPhaseIndex = phases.indexOf(status);
+                
+                // Mettre à jour badge de statut
+                statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusElement.className = `status-badge status-${{status}}`;
+                
+                // Mettre à jour barre de progression
+                const progressPercent = currentPhaseIndex >= 0 ? ((currentPhaseIndex + 1) / phases.length) * 100 : 0;
+                progressElement.style.width = progressPercent + '%';
+                
+                // Mettre à jour phases
+                const phaseLabels = {{
+                    'scanning': 'Scan des marchés en cours...',
+                    'analyzing': 'Analyse technique des signaux...',
+                    'executing': 'Génération de la décision finale...',
+                    'completed': 'Cycle terminé avec succès!'
+                }};
+                
+                labelElement.textContent = phaseLabels[status] || 'État inconnu';
+                
+                // Mettre à jour les icônes de phases
+                phases.forEach((phase, index) => {{
+                    const phaseElement = document.getElementById(`phase-${{phase}}`);
+                    if (phaseElement) {{
+                        phaseElement.classList.remove('active', 'completed');
+                        
+                        if (index < currentPhaseIndex) {{
+                            phaseElement.classList.add('completed');
+                            phaseElement.querySelector('.phase-status').textContent = '✅';
+                        }} else if (index === currentPhaseIndex) {{
+                            phaseElement.classList.add('active');
+                            phaseElement.querySelector('.phase-status').textContent = '🔄';
+                        }} else {{
+                            phaseElement.querySelector('.phase-status').textContent = '⏳';
+                        }}
+                    }}
+                }});
             }}
             
             function updateRecentActivity(data) {{

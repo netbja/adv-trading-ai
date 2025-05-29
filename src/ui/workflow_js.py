@@ -83,6 +83,11 @@ def get_workflow_javascript() -> str:
         const progressElement = document.getElementById(`${workflowType}-progress`);
         const labelElement = document.getElementById(`${workflowType}-progress-label`);
         
+        // Vérifier que les éléments existent avant de les manipuler
+        if (!statusElement || !progressElement || !labelElement) {
+            return; // Page non compatible avec cette fonction
+        }
+        
         if (!execution) {
             statusElement.textContent = 'Idle';
             statusElement.className = 'status-badge status-idle';
