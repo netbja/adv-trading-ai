@@ -302,9 +302,7 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 --border-radius: 12px;
                 --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             }}
-            
             * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-            
             body {{
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
                 background: var(--bg-main);
@@ -1470,52 +1468,45 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                 if (!performanceContainer) return;
                 
                 const workflows = [
-                    {{ 
+                    { 
                         key: 'crypto', 
                         title: 'Crypto Principal', 
                         icon: '₿',
                         color: 'crypto'
-                    }},
-                    {{ 
+                    },
+                    { 
                         key: 'meme', 
                         title: 'Crypto Meme', 
                         icon: '🐸',
                         color: 'meme'
-                    }},
-                    {{ 
+                    },
+                    { 
                         key: 'forex', 
                         title: 'Forex Trading', 
                         icon: '💱',
                         color: 'forex'
-                    }}
+                    }
                 ];
                 
-                performanceContainer.innerHTML = workflows.map(workflow => {{
+                performanceContainer.innerHTML = workflows.map(function(workflow) {
                     const workflowData = data[workflow.key] || {};
                     const performance = workflowData.performance || {};
-                    
                     // Simulation de données de performance sur 7 jours
-                    const weekPerformance = performance.weekly_gains || [
-                        0.5, -0.2, 1.2, 0.8, -0.1, 1.5, 0.9
-                    ];
-                    
+                    const weekPerformance = performance.weekly_gains || [0.5, -0.2, 1.2, 0.8, -0.1, 1.5, 0.9];
                     const totalGain = performance.total_gain || 0;
                     const gainPercentage = performance.gain_percentage || 0;
                     const trades = performance.total_trades || 0;
                     const winRate = performance.win_rate || 0;
                     const avgGain = performance.avg_gain_per_trade || 0;
-                    
                     // Créer les barres du graphique
-                    const chartBars = weekPerformance.map((gain, index) => {{
+                    const chartBars = weekPerformance.map((gain, index) => {
                         const height = Math.max(Math.abs(gain) * 30, 4); // Min 4px
                         const gainClass = gain >= 0 ? 'positive' : 'negative';
                         return `<div class="chart-bar ${gainClass}" style="height: ${height}px" title="Jour ${index + 1}: ${gain > 0 ? '+' : ''}${gain}%"></div>`;
-                    }}).join('');
-                    
+                    }).join('');
                     const gainClass = totalGain >= 0 ? 'positive' : 'negative';
                     const gainSign = totalGain >= 0 ? '+' : '';
                     const percentageSign = gainPercentage >= 0 ? '+' : '';
-                    
                     return `
                         <div class="performance-card ${workflow.color}">
                             <div class="performance-header">
@@ -1532,13 +1523,11 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="performance-chart">
                                 <div class="mini-chart">
                                     ${chartBars}
                                 </div>
                             </div>
-                            
                             <div class="performance-stats">
                                 <div class="stat-item">
                                     <div class="stat-value">${trades}</div>
@@ -1549,20 +1538,20 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                                     <div class="stat-label">Win Rate</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">${{avgGain > 0 ? '+' : ''}}€${{avgGain.toFixed(2)}}</div>
+                                    <div class="stat-value">${avgGain > 0 ? '+' : ''}€${avgGain.toFixed(2)}</div>
                                     <div class="stat-label">Moy/Trade</div>
                                 </div>
                             </div>
                         </div>
                     `;
-                }}).join('');
+                }).join('');
                 
                 // Animation des barres après insertion
-                setTimeout(() => {{
-                    document.querySelectorAll('.chart-bar').forEach((bar, index) => {{
+                setTimeout(() => {
+                    document.querySelectorAll('.chart-bar').forEach((bar, index) => {
                         bar.style.animationDelay = `${index * 0.1}s`;
-                    }});
-                }}, 100);
+                    });
+                }, 100);
             }}
             
             function updateRecentActivity(data) {{
