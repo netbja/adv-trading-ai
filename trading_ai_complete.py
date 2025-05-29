@@ -1634,8 +1634,6 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                     }}, 300);
                 }}, 3000);
             }}
-            
-            {workflow_js}
         </script>
     </body>
     </html>
