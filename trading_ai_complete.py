@@ -1582,32 +1582,20 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                         icon: '₿',
                         title: 'Crypto Principal',
                         description: `Scan terminé: ${{data.crypto.pairs_monitored || 5}} paires analysées`,
-                        time: '2 min',
+                        time: 'il y a 2min',
                         status: 'success'
                     });
                 }
                 
-                // Activité système
-                if (systemHealth.total_executions > 0) {
-                    activities.push({
-                        type: 'system',
-                        icon: '🔧',
-                        title: 'Système',
-                        description: `${systemHealth.total_executions} exécutions aujourd'hui`,
-                        time: '5 min',
-                        status: 'info'
-                    });
-                }
-                
-                // Activité meme tokens
+                // Activité meme
                 if (data.meme) {
                     activities.push({
                         type: 'meme',
                         icon: '🐸',
                         title: 'Crypto Meme',
-                        description: `${data.meme.tokens_scanned || 0} tokens scannés`,
-                        time: '8 min',
-                        status: data.meme.tokens_scanned > 0 ? 'warning' : 'info'
+                        description: `${{data.meme.tokens_monitored || 12}} tokens analysés`,
+                        time: 'il y a 5min',
+                        status: 'info'
                     });
                 }
                 
@@ -1617,33 +1605,40 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                         type: 'forex',
                         icon: '💱',
                         title: 'Forex Trading',
-                        description: `Analyse USD/EUR: ${{data.forex.usd_strength || 102}}%`,
-                        time: '12 min',
+                        description: `Analyse des corrélations USD/EUR terminée`,
+                        time: 'il y a 8min',
                         status: 'success'
                     });
                 }
                 
-                // Ajouter un timestamp de dernière activité
-                activities.push({
-                    type: 'timestamp',
-                    icon: '🕒',
-                    title: 'Dernière synchronisation',
-                    description: currentTime.toLocaleTimeString('fr-FR'),
-                    time: 'maintenant',
-                    status: 'info'
-                });
+                // Activité système
+                if (systemHealth.status) {
+                    activities.push({
+                        type: 'system',
+                        icon: '🔧',
+                        title: 'Système',
+                        description: `Santé du système: ${{systemHealth.status}}`,
+                        time: 'il y a 1min',
+                        status: systemHealth.status === 'healthy' ? 'success' : 'warning'
+                    });
+                }
                 
-                // Générer le HTML optimisé
+                // Si pas d'activité, message par défaut
                 if (activities.length === 0) {
                     activityContainer.innerHTML = `
                         <div class="no-activity">
-                            <div class="no-activity-icon">📊</div>
+                            <div class="no-activity-icon">😴</div>
                             <div class="no-activity-text">Aucune activité récente</div>
-                            <div class="no-activity-sub">Les workflows vont démarrer sous peu</div>
+                            <div class="no-activity-sub">Les workflows vont bientôt démarrer</div>
                         </div>
                     `;
-                } else {
-                    activityContainer.innerHTML = activities.map(activity => `
+                    return;
+                }
+                
+                // Générer le HTML
+                let html = '';
+                activities.forEach(activity => {
+                    html += `
                         <div class="activity-item activity-${activity.status}">
                             <div class="activity-icon-wrapper">
                                 <div class="activity-icon">${activity.icon}</div>
@@ -1651,14 +1646,16 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
                             </div>
                             <div class="activity-content">
                                 <div class="activity-header">
-                                    <span class="activity-title">${activity.title}</span>
-                                    <span class="activity-time">il y a ${{activity.time}}</span>
+                                    <div class="activity-title">${activity.title}</div>
+                                    <div class="activity-time">${activity.time}</div>
                                 </div>
                                 <div class="activity-description">${activity.description}</div>
                             </div>
                         </div>
-                    `).join('');
-                }
+                    `;
+                });
+                
+                activityContainer.innerHTML = html;
             }
             
             async function refreshData() {
