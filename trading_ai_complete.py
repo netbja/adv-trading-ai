@@ -1862,7 +1862,7 @@ async def get_forex_workflow_details(user_data: dict = Depends(require_auth)):
         logger.error(f"Erreur forex workflow details: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
 
-@app.post("/api/workflows/{{workflow_type}}/force-execute")
+@app.post("/api/workflows/{workflow_type}/force-execute")
 async def force_workflow_execution(workflow_type: str, user_data: dict = Depends(require_auth)):
     """Force l'exécution d'un workflow"""
     try:
@@ -1875,12 +1875,12 @@ async def force_workflow_execution(workflow_type: str, user_data: dict = Depends
         else:
             raise HTTPException(status_code=400, detail="Type de workflow invalide")
         
-        return {{"message": f"Exécution forcée du workflow {{workflow_type}} démarrée"}}
+        return {"message": f"Exécution forcée du workflow {workflow_type} démarrée"}
     except Exception as e:
-        logger.error(f"Erreur force execution {{workflow_type}}: {{e}}")
+        logger.error(f"Erreur force execution {workflow_type}: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
 
-@app.get("/api/workflows/{{workflow_type}}/export")
+@app.get("/api/workflows/{workflow_type}/export")
 async def export_workflow_data(workflow_type: str, user_data: dict = Depends(require_auth)):
     """Exporte les données d'un workflow"""
     try:
@@ -1893,21 +1893,21 @@ async def export_workflow_data(workflow_type: str, user_data: dict = Depends(req
         else:
             raise HTTPException(status_code=400, detail="Type de workflow invalide")
         
-        export_data = {{
+        export_data = {
             "workflow_type": workflow_type,
             "export_date": datetime.now().isoformat(),
             "data": [asdict(item) for item in data]
-        }}
+        }
         
         from fastapi.responses import JSONResponse
         import json
         
         response = JSONResponse(export_data)
-        response.headers["Content-Disposition"] = f"attachment; filename={{workflow_type}}_export.json"
+        response.headers["Content-Disposition"] = f"attachment; filename={workflow_type}_export.json"
         return response
         
     except Exception as e:
-        logger.error(f"Erreur export {{workflow_type}}: {{e}}")
+        logger.error(f"Erreur export {workflow_type}: {e}")
         raise HTTPException(status_code=500, detail="Erreur serveur")
 
 if __name__ == "__main__":
