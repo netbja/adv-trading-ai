@@ -316,6 +316,161 @@ function updateRecentActivity(data) {
     activityContainer.innerHTML = htmlContent;
 }
 
+function buildCryptoWorkflowHTML(data) {
+    let html = `<h2><span class="nav-icon">₿</span> Workflow Crypto Principal</h2>`;
+
+    // Section Métriques Clés
+    html += `
+        <div class="workflow-metrics-grid">
+            <div class="metric-card">
+                <span class="metric-value">${data.pairs_monitored || 'N/A'}</span>
+                <span class="metric-label">Paires Monitorées</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${data.signals_today || 'N/A'}</span>
+                <span class="metric-label">Signaux Aujourd'hui</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${(data.avg_confidence * 100).toFixed(0) || 'N/A'}%</span>
+                <span class="metric-label">Confiance Moyenne</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${data.next_scan_in_seconds ? (data.next_scan_in_seconds / 60).toFixed(1) + ' min' : 'N/A'}</span>
+                <span class="metric-label">Prochain Scan</span>
+            </div>
+        </div>
+    `;
+
+    // Section Exécution en Cours
+    html += `<h3><span class="section-icon">⚙️</span> Exécution en Cours</h3>`;
+    if (data.current_execution) {
+        html += `
+            <div class="execution-details">
+                <p><strong>Statut:</strong> ${data.current_execution.status || 'N/A'}</p>
+                <p><strong>Début:</strong> ${new Date(data.current_execution.start_time).toLocaleString() || 'N/A'}</p>
+                <p><strong>Détails:</strong> ${data.current_execution.details || 'Aucun'}</p>
+            </div>`;
+    } else {
+        html += `<p>Aucune exécution en cours.</p>`;
+    }
+
+    // Section Données des Paires
+    html += `<h3><span class="section-icon">📈</span> Données des Paires</h3>`;
+    if (data.pairs_data && Object.keys(data.pairs_data).length > 0) {
+        html += `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Paire</th>
+                            <th>Prix</th>
+                            <th>Variation 24h</th>
+                            <th>Volume 24h</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        for (const pair in data.pairs_data) {
+            const pData = data.pairs_data[pair];
+            html += `
+                        <tr>
+                            <td>${pair}</td>
+                            <td>${pData.price !== undefined ? pData.price.toFixed(2) : 'N/A'}</td>
+                            <td class="${pData.change_24h > 0 ? 'positive' : pData.change_24h < 0 ? 'negative' : ''}">${pData.change_24h !== undefined ? pData.change_24h.toFixed(2) + '%' : 'N/A'}</td>
+                            <td>${pData.volume_24h !== undefined ? pData.volume_24h.toLocaleString() : 'N/A'}</td>
+                        </tr>`;
+        }
+        html += `
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += `<p>Aucune donnée de paires disponible.</p>`;
+    }
+
+    // Section Signaux Récents
+    html += `<h3><span class="section-icon">🔔</span> Signaux Récents</h3>`;
+    if (data.recent_signals && data.recent_signals.length > 0) {
+        html += `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date/Heure</th>
+                            <th>Paire</th>
+                            <th>Type</th>
+                            <th>Prix d'entrée</th>
+                            <th>Confiance</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        data.recent_signals.forEach(signal => {
+            html += `
+                        <tr>
+                            <td>${new Date(signal.timestamp).toLocaleString()}</td>
+                            <td>${signal.pair}</td>
+                            <td>${signal.type}</td>
+                            <td>${signal.entry_price !== undefined ? signal.entry_price.toFixed(2) : 'N/A'}</td>
+                            <td>${signal.confidence_score !== undefined ? (signal.confidence_score * 100).toFixed(0) + '%' : 'N/A'}</td>
+                        </tr>`;
+        });
+        html += `
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += `<p>Aucun signal récent.</p>`;
+    }
+    
+    // Section Actions
+    html += `
+        <h3><span class="section-icon">🛠️</span> Actions</h3>
+        <div class="workflow-actions">
+            <button class="btn btn-primary" onclick="forceExecuteWorkflow('crypto')">Forcer Exécution</button>
+            <button class="btn btn-secondary" onclick="exportWorkflowData('crypto')">Exporter Données</button>
+        </div>
+    `;
+
+    return html;
+}
+
+async function forceExecuteWorkflow(workflowType) {
+    if (!confirm(`Êtes-vous sûr de vouloir forcer l'exécution du workflow ${workflowType} ?`)) return;
+    try {
+        const response = await fetch(`/api/workflows/${workflowType}/force-execute`, { method: 'POST' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || 'Erreur serveur');
+        showNotification(result.message || `Exécution forcée de ${workflowType} démarrée.`, 'success');
+        loadWorkflowPage(workflowType); 
+    } catch (error) {
+        console.error(`Erreur lors de la forçage d'exécution pour ${workflowType}:`, error);
+        showNotification(`Erreur: ${error.message}`, 'error');
+    }
+}
+
+async function exportWorkflowData(workflowType) {
+    try {
+        const response = await fetch(`/api/workflows/${workflowType}/export`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Erreur lors de l'exportation');
+        }
+        const blob = await response.blob();
+        const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${workflowType}_export.json`;
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        showNotification('Exportation des données terminée.', 'success');
+    } catch (error) {
+        console.error(`Erreur lors de l'exportation pour ${workflowType}:`, error);
+        showNotification(`Erreur d'exportation: ${error.message}`, 'error');
+    }
+}
+
 async function loadWorkflowPage(workflowType) {
     console.log(`Chargement de la page de workflow: ${workflowType}`);
     const pageContentDiv = document.getElementById(`${workflowType}-workflow-page`);
@@ -324,32 +479,58 @@ async function loadWorkflowPage(workflowType) {
         return;
     }
 
+    // Affiche un spinner ou un message de chargement
+    pageContentDiv.innerHTML = `<h2>${pageTitles[workflowType + '-workflow'] || workflowType}</h2><div class="loading-spinner">Chargement des données du workflow...</div>`;
+
     try {
-        // Étape 1: Essayer de récupérer le contenu HTML pré-rendu d'une API
-        // Nous devrons créer ces endpoints API dans trading_ai_complete.py
-        // Exemple: /api/pages/crypto-workflow-content
-        // const response = await fetch(`/api/pages/${workflowType}-workflow-content`);
-        // if (!response.ok) throw new Error(`Erreur chargement HTML pour ${workflowType}`);
-        // const htmlContent = await response.text();
-        // pageContentDiv.innerHTML = htmlContent;
+        if (workflowType === 'crypto') {
+            const response = await fetch(`/api/workflows/crypto/details`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Erreur inconnue lors de la récupération des détails.' }));
+                throw new Error(`Erreur ${response.status}: ${errorData.detail}`);
+            }
+            const data = await response.json();
+            pageContentDiv.innerHTML = buildCryptoWorkflowHTML(data);
+        } else if (workflowType === 'meme') {
+            // TODO: Implémenter pour Meme workflow
+            pageContentDiv.innerHTML = `<h2>${pageTitles['meme-workflow']}</h2><p>Le chargement dynamique pour le workflow Meme est en cours de développement.</p><p>Données attendues de <code>/api/workflows/meme/details</code>.</p>`;
+             // Exemple d'appel (quand prêt):
+            // const response = await fetch(`/api/workflows/meme/details`);
+            // if (!response.ok) throw new Error('Erreur chargement détails Meme');
+            // const data = await response.json();
+            // pageContentDiv.innerHTML = buildMemeWorkflowHTML(data); // buildMemeWorkflowHTML à créer
+        } else if (workflowType === 'forex') {
+            // TODO: Implémenter pour Forex workflow
+            pageContentDiv.innerHTML = `<h2>${pageTitles['forex-workflow']}</h2><p>Le chargement dynamique pour le workflow Forex est en cours de développement.</p><p>Données attendues de <code>/api/workflows/forex/details</code>.</p>`;
+            // Exemple d'appel (quand prêt):
+            // const response = await fetch(`/api/workflows/forex/details`);
+            // if (!response.ok) throw new Error('Erreur chargement détails Forex');
+            // const data = await response.json();
+            // pageContentDiv.innerHTML = buildForexWorkflowHTML(data); // buildForexWorkflowHTML à créer
+        } else {
+            pageContentDiv.innerHTML = `<h2>Workflow Inconnu</h2><p>Ce type de workflow n'est pas géré.</p>`;
+        }
 
-        // Pour l'instant, on affiche juste un message placeholder
-        const title = pageTitles[`${workflowType}-workflow`] || `Workflow ${workflowType}`;
-        pageContentDiv.innerHTML = `<h2>${title}</h2><p>Le chargement dynamique du contenu de cette page est en cours de développement.</p><p>Les données spécifiques à ce workflow (venant de <code>/api/workflows/${workflowType}/details</code>) seront chargées et affichées ici.</p>`;
-        
-        // Étape 2 (future): Charger les données spécifiques au workflow (ex: /api/workflows/crypto/details)
-        // et les utiliser pour peupler/mettre à jour le contenu HTML chargé à l'étape 1.
-        // const detailsResponse = await fetch(`/api/workflows/${workflowType}/details`);
-        // if (!detailsResponse.ok) throw new Error (\`Erreur chargement détails pour ${workflowType}\`);
-        // const detailsData = await detailsResponse.json();
-        // populateWorkflowDetails(workflowType, detailsData); // Une nouvelle fonction à créer
-
-        // Étape 3 (future): Initialiser les graphiques ou autres éléments interactifs spécifiques à ce workflow
-        // if (typeof initCryptoCharts === 'function') initCryptoCharts();
+        // Optionnel: Initialiser des graphiques ou autres éléments interactifs spécifiques à ce workflow
+        // if (workflowType === 'crypto' && typeof initCryptoCharts === 'function') initCryptoCharts(data);
 
     } catch (error) {
         console.error(`Erreur chargement page workflow ${workflowType}:`, error);
-        pageContentDiv.innerHTML = `<p class="error-message" style="display:block; background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem;">Erreur de chargement du contenu pour ${workflowType}.</p>`;
+        let titleForError = "Erreur";
+        if (pageTitles[workflowType + '-workflow']) {
+            titleForError = pageTitles[workflowType + '-workflow'];
+        } else {
+            titleForError = workflowType;
+        }
+        
+        let msgText = "Erreur de chargement du contenu.";
+        if (error && error.message) {
+            msgText = error.message;
+        }
+
+        pageContentDiv.innerHTML = "<h2>" + titleForError + "</h2>" +
+                                 "<p class=\"error-message\" style=\"display:block; background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem;\">" +
+                                 "Erreur pour " + workflowType + ": " + msgText + "</p>";
     }
 }
 
