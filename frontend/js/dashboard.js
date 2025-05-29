@@ -152,8 +152,12 @@ async function loadUserData() {
 }
 
 async function loadPageData(pageId) {
-    const pageElement = document.getElementById(pageId);
-    if (!pageElement) return;
+    const pageElement = document.getElementById(pageId + '-page');
+    if (!pageElement) {
+        console.error(`Élément de page non trouvé pour ID: ${pageId}-page`);
+        // Peut-être afficher une erreur dans un conteneur de fallback ou ne rien faire
+        return;
+    }
 
     // Afficher un spinner de chargement générique
     pageElement.innerHTML = '<div class="loading-spinner">Chargement des données...</div>';
