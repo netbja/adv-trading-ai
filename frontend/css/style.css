@@ -1,0 +1,905 @@
+/* Styles pour le dashboard */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #f0f2f5;
+    /* Styles globaux ici si nécessaire */
+}
+
+#app {
+    padding: 20px;
+}
+
+/* === STYLES PAGE DE CONNEXION === */
+.login-page-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Fond général de la page login */
+    padding: 1rem; /* Un peu d'espace si la fenêtre est petite */
+}
+
+.login-container { /* Le bloc blanc central */
+    background: white;
+    padding: 2rem; /* Ajusté pour un meilleur espacement */
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 420px; /* Légèrement plus large */
+    text-align: left; /* Les textes à l'intérieur seront alignés à gauche par défaut */
+}
+
+.login-container .logo {
+    text-align: center; 
+    margin-bottom: 2rem;
+}
+
+.login-container .logo h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Assurer la même police qu'avant */
+    font-size: 2rem;
+    color: #2563eb;
+    margin-bottom: 0.5rem;
+}
+
+.login-container .logo p {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box; /* Important pour que padding et border ne dépassent pas la width */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.btn-login {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-login:hover {
+    background: #1d4ed8;
+}
+
+.error-message {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    display: none; /* Caché par défaut, affiché par JS */
+    text-align: center;
+}
+
+.features {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin-top: 2rem;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.features ul {
+    list-style: none;
+    margin-top: 1rem;
+    padding-left: 0; /* Supprimer le padding par défaut des ul */
+}
+
+.features li {
+    margin: 0.5rem 0;
+}
+
+/* Styles pour la page de connexion (peuvent être affinés) */
+#login-app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+}
+
+/* === STYLES DASHBOARD === */
+/* === INTERFACE MODERNE - TRADING AI === */
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #1e40af;
+    --secondary: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --border: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+    --sidebar-width: 320px;
+    --border-radius: 12px;
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Réinitialisation globale pour le dashboard si nécessaire, 
+   mais body est déjà stylé au début du fichier. 
+   On s'assure que les styles du dashboard ne sont pas surchargés par ceux du login. */
+
+.app-layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    min-height: 100vh;
+}
+
+/* === SIDEBAR DESKTOP === */
+.sidebar {
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+
+.sidebar-header {
+    padding: 2.5rem 2rem;
+    background: var(--bg-hero);
+    color: white;
+}
+
+.sidebar-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.user-info {
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.nav-menu {
+    padding: 2rem 0;
+}
+
+.nav-section {
+    margin-bottom: 2.5rem;
+}
+
+.nav-section-title {
+    padding: 0 2rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+}
+
+.nav-item {
+    margin: 0.5rem 1.5rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition);
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.95rem;
+    min-height: 48px;
+}
+
+.nav-link:hover {
+    background: #f1f5f9;
+    color: var(--primary);
+    transform: translateX(4px);
+}
+
+.nav-link.active {
+    background: #dbeafe;
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-icon {
+    font-size: 1.25rem;
+    width: 24px;
+    text-align: center;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: auto;
+}
+
+.status-active { background: var(--success); }
+.status-scanning { background: var(--warning); animation: pulse 2s infinite; }
+.status-idle { background: var(--secondary); }
+
+/* === MAIN CONTENT DESKTOP === */
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    width: calc(100vw - var(--sidebar-width));
+}
+
+.topbar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.topbar-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.topbar-actions {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    min-height: 44px;
+}
+
+.btn-primary { 
+    background: var(--primary); 
+    color: white; 
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-danger { 
+    background: var(--danger); 
+    color: white; 
+}
+
+.btn:hover { 
+    transform: translateY(-2px); 
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-icon {
+    font-size: 1.125rem;
+}
+
+.content-area {
+    padding: 3rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page-content {
+    display: none;
+    /* Styles spécifiques à la page sont ici si besoin, sinon animation gérée par JS */
+}
+
+.page-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* === HERO SECTION DESKTOP === */
+.overview-hero {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 3rem;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.hero-main {
+    /* Vide pour l'instant */
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-metrics {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.metric-primary {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border-radius: 15px;
+    border: 1px solid var(--border);
+}
+
+.metric-label {
+    display: block;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.metric-value {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.metric-change {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.metric-change.positive { color: var(--success); }
+.metric-change.negative { color: var(--danger); }
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.metric-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.metric-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.metric-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.metric-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.status-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+/* === WORKFLOWS CARDS DESKTOP === */
+.workflows-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+}
+
+.section-header h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.workflow-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    gap: 2rem;
+}
+
+.workflow-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex; /* Pour aligner le footer en bas */
+    flex-direction: column; /* Pour aligner le footer en bas */
+}
+
+.workflow-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary);
+}
+
+.workflow-card.crypto {
+    border-top: 4px solid #f59e0b;
+}
+
+.workflow-card.meme {
+    border-top: 4px solid #8b5cf6;
+}
+
+.workflow-card.forex {
+    border-top: 4px solid #3b82f6;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 2px solid var(--border);
+}
+
+.card-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-content {
+    flex-grow: 1; /* Pour que le contenu pousse le footer en bas */
+}
+
+.card-content h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.card-content p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.card-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.card-metric {
+    text-align: center;
+}
+
+.card-metric .value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.card-metric .value.positive { color: var(--success); }
+.card-metric .value.warning { color: var(--warning); }
+
+.card-metric .label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.card-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.view-details {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* === ACTIVITY TIMELINE DESKTOP === */
+.activity-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.activity-timeline {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 1rem; /* Pour la scrollbar */
+}
+
+/* === ACTIVITÉ RÉCENTE AMÉLIORÉE === */
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    transition: var(--transition);
+    margin-bottom: 0.75rem;
+    border: 1px solid transparent;
+}
+
+.activity-item:hover {
+    background: #f8fafc;
+    border-color: var(--border);
+    transform: translateX(4px);
+}
+
+.activity-icon-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 1px solid var(--border);
+}
+
+.activity-status-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-success { background: var(--success); }
+.status-info { background: var(--primary); }
+.status-warning { background: var(--warning); }
+.status-error { background: var(--danger); }
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    gap: 1rem;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.activity-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.no-activity {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+}
+
+.no-activity-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.no-activity-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.no-activity-sub {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Styles spécifiques par type d'activité */
+.activity-success .activity-icon {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: var(--success);
+}
+
+.activity-info .activity-icon {
+    background: linear-gradient(135deg, #dbeafe, #93c5fd);
+    color: var(--primary);
+}
+
+.activity-warning .activity-icon {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: var(--warning);
+}
+
+.activity-error .activity-icon {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: var(--danger);
+}
+
+/* === STYLES DES PAGES WORKFLOWS SPÉCIFIQUES (Chargés dynamiquement ou ici) === */
+/* Placeholder pour les styles de get_workflow_styles() */
+
+/* === ANIMATIONS === */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1400px) {
+    .content-area {
+        padding: 2rem;
+    }
+    
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .hero-metrics {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .workflow-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 280px;
+    }
+    
+    .topbar {
+        padding: 1.25rem 2rem;
+    }
+    
+    .topbar-title {
+        font-size: 1.5rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        grid-template-columns: 1fr; /* Sidebar masquée par défaut */
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        /* Ajouter ici un état .sidebar.open { transform: translateX(0); } si on veut un menu burger */
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100vw;
+    }
+    
+    .content-area {
+        padding: 1.5rem;
+    }
+    
+    .overview-hero {
+        padding: 2rem;
+    }
+    
+    .metric-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .card-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* === UTILITIES === */
+.positive { color: var(--success) !important; }
+.negative { color: var(--danger) !important; }
+.warning { color: var(--warning) !important; }
+
+/* Styles pour les notifications (si on les garde en JS pur) */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateX(120%); /* Commence hors écran */
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-lg);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    background: var(--success);
+}
+
+.notification-error {
+    background: var(--danger);
+}
+
+.notification-info {
+    background: var(--primary);
+}
+
+/* Fin des styles du dashboard principal. 
+   Les styles spécifiques aux pages de workflow (anciennement get_workflow_styles()) 
+   seront ajoutés ultérieurement ou chargés dynamiquement. */ 

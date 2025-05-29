@@ -31,6 +31,7 @@ COPY smart_capital_growth_system.py .
 COPY roi_10x_trading_system.py .
 COPY zero_mindset_trading_system.py .
 COPY src/ ./src/
+COPY frontend/ ./frontend/
 
 # Créer répertoires pour logs et data
 RUN mkdir -p /app/logs /app/data

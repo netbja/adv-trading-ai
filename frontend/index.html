@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading AI • Dashboard Pro</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🧠 Trading AI Pro</h1>
+                <div class="user-info">
+                    <!-- User info will be loaded by JS -->
+                    <span id="username-display">Chargement...</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <div class="nav-item">
+                        <a class="nav-link active" data-page="overview">
+                            <span class="nav-icon">📊</span>
+                            Vue d'ensemble
+                            <div class="status-indicator status-active"></div>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="capital">
+                            <span class="nav-icon">💰</span>
+                            Capital & Performance
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Workflows Live</div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="crypto-workflow">
+                            <span class="nav-icon">₿</span>
+                            Crypto Principal
+                            <div class="status-indicator status-active pulse" id="status-crypto-workflow"></div>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="meme-workflow">
+                            <span class="nav-icon">🐸</span>
+                            Crypto Meme
+                            <div class="status-indicator status-active pulse" id="status-meme-workflow"></div>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="forex-workflow">
+                            <span class="nav-icon">💱</span>
+                            Forex Trading
+                            <div class="status-indicator status-active pulse" id="status-forex-workflow"></div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestion</div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="wallets">
+                            <span class="nav-icon">🔐</span>
+                            Wallets & Secrets
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="settings">
+                            <span class="nav-icon">⚙️</span>
+                            Paramètres
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" data-page="logs">
+                            <span class="nav-icon">📋</span>
+                            Logs Système
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1 class="topbar-title" id="page-title">Vue d'ensemble</h1>
+                <div class="topbar-actions">
+                    <button class="btn btn-danger" id="logout-button">🚪 Déconnexion</button>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <!-- Page Vue d'ensemble -->
+                <div id="overview-page" class="page-content active">
+                    <!-- Header avec métriques principales -->
+                    <div class="overview-hero">
+                        <div class="hero-content">
+                            <div class="hero-main">
+                                <h2 class="hero-title">Portfolio Trading AI</h2>
+                                <div class="hero-metrics">
+                                    <div class="metric-primary">
+                                        <span class="metric-label">Capital Total</span>
+                                        <span class="metric-value" id="current-capital">--.--€</span>
+                                        <span class="metric-change positive" id="total-return">+.--%</span>
+                                    </div>
+                                    <div class="metric-grid">
+                                        <div class="metric-item">
+                                            <span class="metric-number" id="system-efficiency">--%</span>
+                                            <span class="metric-text">Efficacité</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-number" id="active-workflows">--</span>
+                                            <span class="metric-text">Workflows Actifs</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-number" id="system-uptime">--</span>
+                                            <span class="metric-text">Jour(s) Uptime</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hero-actions">
+                                <button class="btn btn-primary" id="refresh-data-button">
+                                    <span class="btn-icon">🔄</span>
+                                    Actualiser
+                                </button>
+                                <div class="status-info">
+                                    <div class="status-indicator status-active"></div>
+                                    <span id="last-update">Dernière MAJ: --:--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cartes Workflows avec navigation -->
+                    <div class="workflows-section">
+                        <div class="section-header">
+                            <h3>🚀 Workflows de Trading</h3>
+                            <p>Cliquez sur un workflow pour voir les détails</p>
+                        </div>
+                        <div class="workflow-cards-grid" id="workflow-cards-grid">
+                             <div class="workflow-card crypto" data-page="crypto-workflow">
+                                <div class="card-header">
+                                    <div class="card-icon">₿</div>
+                                    <div class="card-status">
+                                        <span class="status-dot status-active" id="dot-crypto-workflow"></span>
+                                        <span class="status-text" id="text-crypto-workflow">Actif</span>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <h4>Crypto Principal</h4>
+                                    <p>BTC, ETH, principales altcoins</p>
+                                    <div class="card-metrics">
+                                        <div class="card-metric">
+                                            <span class="value" id="crypto-signals-today">--</span>
+                                            <span class="label">Signaux aujourd'hui</span>
+                                        </div>
+                                        <div class="card-metric">
+                                            <span class="value positive" id="crypto-perf-7d">+.--%</span>
+                                            <span class="label">Performance 7j</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="view-details">Voir détails →</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-card meme" data-page="meme-workflow">
+                                <div class="card-header">
+                                    <div class="card-icon">🐸</div>
+                                    <div class="card-status">
+                                        <span class="status-dot status-scanning" id="dot-meme-workflow"></span>
+                                        <span class="status-text" id="text-meme-workflow">Scan...</span>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <h4>Crypto Meme</h4>
+                                    <p>Tokens viraux, analyse sentiment</p>
+                                    <div class="card-metrics">
+                                        <div class="card-metric">
+                                            <span class="value" id="meme-tokens-scanned">--</span>
+                                            <span class="label">Tokens scannés</span>
+                                        </div>
+                                        <div class="card-metric">
+                                            <span class="value warning" id="meme-risk-level">MOYEN</span>
+                                            <span class="label">Niveau de risque</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="view-details">Voir détails →</span>
+                                </div>
+                            </div>
+
+                            <div class="workflow-card forex" data-page="forex-workflow">
+                                <div class="card-header">
+                                    <div class="card-icon">💱</div>
+                                    <div class="card-status">
+                                        <span class="status-dot status-active" id="dot-forex-workflow"></span>
+                                        <span class="status-text" id="text-forex-workflow">Actif</span>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <h4>Forex Trading</h4>
+                                    <p>EUR/USD, GBP/USD, USD/JPY</p>
+                                    <div class="card-metrics">
+                                        <div class="card-metric">
+                                            <span class="value" id="forex-usd-strength">--.--</span>
+                                            <span class="label">USD Strength</span>
+                                        </div>
+                                        <div class="card-metric">
+                                            <span class="value positive" id="forex-perf-24h">+.--%</span>
+                                            <span class="label">Performance 24h</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="view-details">Voir détails →</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité récente -->
+                    <div class="activity-section">
+                        <div class="section-header">
+                            <h3>⚡ Activité Récente</h3>
+                        </div>
+                        <div class="activity-timeline" id="recent-activity">
+                            <div class="no-activity">
+                                <div class="no-activity-icon">📊</div>
+                                <div class="no-activity-text">Aucune activité récente</div>
+                                <div class="no-activity-sub">Les données seront chargées ici.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- Fin #overview-page -->
+                
+                <!-- Pages Workflows complètes -->
+                <div id="crypto-workflow-page" class="page-content">
+                    <h2>Workflow Crypto Principal</h2>
+                    <p>Contenu du workflow crypto chargé par JS...</p>
+                    <!-- Le contenu spécifique de src.ui.workflow_pages.get_crypto_workflow_page() sera inséré ici par JS -->
+                </div>
+                
+                <div id="meme-workflow-page" class="page-content">
+                    <h2>Workflow Crypto Meme</h2>
+                    <p>Contenu du workflow meme chargé par JS...</p>
+                </div>
+                
+                <div id="forex-workflow-page" class="page-content">
+                    <h2>Workflow Forex Trading</h2>
+                    <p>Contenu du workflow forex chargé par JS...</p>
+                </div>
+                
+                <!-- Autres pages -->
+                <div id="capital-page" class="page-content">
+                    <h2>Capital & Performance</h2>
+                    <p>En développement...</p>
+                </div>
+                <div id="wallets-page" class="page-content">
+                    <h2>Wallets & Secrets</h2>
+                    <p>En développement...</p>
+                </div>
+                <div id="settings-page" class="page-content">
+                    <h2>Paramètres</h2>
+                    <p>En développement...</p>
+                </div>
+                <div id="logs-page" class="page-content">
+                    <h2>Logs Système</h2>
+                    <p>En développement...</p>
+                </div>
+            </div> <!-- Fin .content-area -->
+        </main>
+    </div>
+    
+    <!-- Modals ou autres éléments flottants ici si besoin -->
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html> 
