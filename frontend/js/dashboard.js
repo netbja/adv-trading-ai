@@ -433,6 +433,259 @@ function buildCryptoWorkflowHTML(data) {
     return html;
 }
 
+function buildMemeWorkflowHTML(data) {
+    let html = `<h2><span class="nav-icon">🐸</span> Workflow Crypto Meme</h2>`;
+
+    // Section Métriques Clés
+    html += `
+        <div class="workflow-metrics-grid">
+            <div class="metric-card">
+                <span class="metric-value">${data.tokens_scanned || 'N/A'}</span>
+                <span class="metric-label">Tokens Scannés</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${data.max_viral_score || 'N/A'}</span>
+                <span class="metric-label">Score Viral Max</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${data.total_social_mentions || 'N/A'}</span>
+                <span class="metric-label">Mentions Sociales (Total)</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value" style="color: ${data.overall_risk_level === 'HIGH' ? 'var(--danger)' : data.overall_risk_level === 'MEDIUM' ? 'var(--warning)' : 'var(--success)'}">${data.overall_risk_level || 'N/A'}</span>
+                <span class="metric-label">Niveau de Risque Global</span>
+            </div>
+        </div>
+    `;
+
+    // Section Exécution en Cours
+    html += `<h3><span class="section-icon">⚙️</span> Exécution en Cours</h3>`;
+    if (data.current_execution) {
+        html += `
+            <div class="execution-details">
+                <p><strong>Statut:</strong> ${data.current_execution.status || 'N/A'}</p>
+                <p><strong>Début:</strong> ${new Date(data.current_execution.start_time).toLocaleString() || 'N/A'}</p>
+                <p><strong>Détails:</strong> ${data.current_execution.details || 'Aucun'}</p>
+            </div>`;
+    } else {
+        html += `<p>Aucune exécution en cours.</p>`;
+    }
+
+    // Section Données des Tokens
+    html += `<h3><span class="section-icon">🪙</span> Données des Tokens Viraux</h3>`;
+    if (data.tokens_data && Object.keys(data.tokens_data).length > 0) {
+        html += `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Score Viral</th>
+                            <th>Mentions Sociales</th>
+                            <th>Variation 24h</th>
+                            <th>Activité Whale</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        for (const token in data.tokens_data) {
+            const tData = data.tokens_data[token];
+            html += `
+                        <tr>
+                            <td>${token}</td>
+                            <td>${tData.viral_score || 'N/A'}</td>
+                            <td>${tData.social_mentions || 'N/A'}</td>
+                            <td class="${tData.change_24h > 0 ? 'positive' : tData.change_24h < 0 ? 'negative' : ''}">${tData.change_24h !== undefined ? tData.change_24h.toFixed(2) + '%' : 'N/A'}</td>
+                            <td>${tData.whale_activity || 'N/A'}</td>
+                        </tr>`;
+        }
+        html += `
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += `<p>Aucune donnée de tokens disponible.</p>`;
+    }
+
+    // Section Analyse de Risque
+    html += `<h3><span class="section-icon">🔬</span> Analyse de Risque Détaillée</h3>`;
+    if (data.risk_analysis && Object.keys(data.risk_analysis).length > 0) {
+         html += `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Niveau Risque</th>
+                            <th>Score Risque</th>
+                            <th>Volatilité</th>
+                            <th>Activité Sociale</th>
+                            <th>Activité Whale</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        for (const token in data.risk_analysis) {
+            const rData = data.risk_analysis[token];
+            html += `
+                        <tr>
+                            <td>${token}</td>
+                            <td style="color: ${rData.risk_level === 'HIGH' ? 'var(--danger)' : rData.risk_level === 'MEDIUM' ? 'var(--warning)' : 'var(--success)'}">${rData.risk_level || 'N/A'}</td>
+                            <td>${rData.risk_score || 'N/A'}</td>
+                            <td>${rData.factors?.volatility || 'N/A'}</td>
+                            <td>${rData.factors?.social_activity || 'N/A'}</td>
+                            <td>${rData.factors?.whale_activity || 'N/A'}</td>
+                        </tr>`;
+        }
+        html += `
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += `<p>Aucune analyse de risque disponible.</p>`;
+    }
+    
+    // Section Alertes Virales
+    html += `<h3><span class="section-icon">🚨</span> Alertes Virales Récentes</h3>`;
+    if (data.viral_alerts && data.viral_alerts.length > 0) {
+        html += `<ul class="data-list">`;
+        data.viral_alerts.forEach(alert => {
+            html += `<li>${JSON.stringify(alert)}</li>`;
+        });
+        html += `</ul>`;
+    } else {
+        html += `<p>Aucune alerte virale récente.</p>`;
+    }
+
+    // Section Actions
+    html += `
+        <h3><span class="section-icon">🛠️</span> Actions</h3>
+        <div class="workflow-actions">
+            <button class="btn btn-primary" onclick="forceExecuteWorkflow('meme')">Forcer Exécution</button>
+            <button class="btn btn-secondary" onclick="exportWorkflowData('meme')">Exporter Données</button>
+        </div>
+    `;
+    return html;
+}
+
+function buildForexWorkflowHTML(data) {
+    let html = `<h2><span class="nav-icon">💱</span> Workflow Forex Trading</h2>`;
+
+    // Section Métriques Clés
+    html += `
+        <div class="workflow-metrics-grid">
+            <div class="metric-card">
+                <span class="metric-value">${data.pairs_active || 'N/A'}</span>
+                <span class="metric-label">Paires Actives</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${data.usd_strength_index || 'N/A'}</span>
+                <span class="metric-label">Indice Force USD</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${(data.avg_volatility * 100).toFixed(2) || 'N/A'}%</span>
+                <span class="metric-label">Volatilité Moyenne</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">${data.active_signals_count || 'N/A'}</span>
+                <span class="metric-label">Signaux Actifs</span>
+            </div>
+        </div>
+    `;
+
+    // Section Exécution en Cours
+    html += `<h3><span class="section-icon">⚙️</span> Exécution en Cours</h3>`;
+    if (data.current_execution) {
+        html += `
+            <div class="execution-details">
+                <p><strong>Statut:</strong> ${data.current_execution.status || 'N/A'}</p>
+                <p><strong>Début:</strong> ${new Date(data.current_execution.start_time).toLocaleString() || 'N/A'}</p>
+                <p><strong>Détails:</strong> ${data.current_execution.details || 'Aucun'}</p>
+            </div>`;
+    } else {
+        html += `<p>Aucune exécution en cours.</p>`;
+    }
+
+    // Section Données des Paires Forex
+    html += `<h3><span class="section-icon">💹</span> Données des Paires Forex</h3>`;
+    if (data.pairs_data && Object.keys(data.pairs_data).length > 0) {
+        html += `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Paire</th>
+                            <th>Taux Actuel</th>
+                            <th>Variation 24h</th>
+                            <th>Tendance</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        for (const pair in data.pairs_data) {
+            const pData = data.pairs_data[pair];
+            html += `
+                        <tr>
+                            <td>${pair}</td>
+                            <td>${pData.current_rate !== undefined ? pData.current_rate.toFixed(4) : 'N/A'}</td>
+                            <td class="${pData.change_24h > 0 ? 'positive' : pData.change_24h < 0 ? 'negative' : ''}">${pData.change_24h !== undefined ? pData.change_24h.toFixed(2) + '%' : 'N/A'}</td>
+                            <td>${pData.trend || 'N/A'}</td>
+                        </tr>`;
+        }
+        html += `
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += `<p>Aucune donnée de paires Forex disponible.</p>`;
+    }
+
+    // Section Données Économiques
+    html += `<h3><span class="section-icon">🌍</span> Indicateurs Économiques Clés</h3>`;
+    if (data.economic_data) {
+        const eco = data.economic_data;
+        html += `
+            <div class="workflow-metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-value">${eco.usd_strength_index || 'N/A'}</span>
+                    <span class="metric-label">Indice Force USD</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value">${eco.global_risk_sentiment || 'N/A'}</span>
+                    <span class="metric-label">Sentiment Risque Global</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value">${eco.economic_calendar?.high_impact_events_today || 'N/A'}</span>
+                    <span class="metric-label">Événements Impact Fort (jour)</span>
+                </div>
+            </div>
+            <h4>Sentiment des Banques Centrales:</h4>
+            <p><strong>FED:</strong> ${eco.central_bank_sentiment?.fed || 'N/A'} | <strong>ECB:</strong> ${eco.central_bank_sentiment?.ecb || 'N/A'}</p>
+            `;
+    } else {
+        html += `<p>Aucune donnée économique disponible.</p>`;
+    }
+    
+    // Section Corrélations
+    html += `<h3><span class="section-icon">🔗</span> Corrélations Actives</h3>`;
+    if (data.correlations && Object.keys(data.correlations).length > 0) {
+        html += `<ul class="data-list">`;
+        for (const corr in data.correlations) {
+            html += `<li><strong>${corr}:</strong> ${data.correlations[corr]}</li>`;
+        }
+        html += `</ul>`;
+    } else {
+        html += `<p>Aucune donnée de corrélation disponible.</p>`;
+    }
+
+    // Section Actions
+    html += `
+        <h3><span class="section-icon">🛠️</span> Actions</h3>
+        <div class="workflow-actions">
+            <button class="btn btn-primary" onclick="forceExecuteWorkflow('forex')">Forcer Exécution</button>
+            <button class="btn btn-secondary" onclick="exportWorkflowData('forex')">Exporter Données</button>
+        </div>
+    `;
+    return html;
+}
+
 async function forceExecuteWorkflow(workflowType) {
     if (!confirm(`Êtes-vous sûr de vouloir forcer l'exécution du workflow ${workflowType} ?`)) return;
     try {
@@ -479,40 +732,46 @@ async function loadWorkflowPage(workflowType) {
         return;
     }
 
-    // Affiche un spinner ou un message de chargement
     pageContentDiv.innerHTML = `<h2>${pageTitles[workflowType + '-workflow'] || workflowType}</h2><div class="loading-spinner">Chargement des données du workflow...</div>`;
 
     try {
-        if (workflowType === 'crypto') {
-            const response = await fetch(`/api/workflows/crypto/details`);
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ detail: 'Erreur inconnue lors de la récupération des détails.' }));
-                throw new Error(`Erreur ${response.status}: ${errorData.detail}`);
-            }
-            const data = await response.json();
-            pageContentDiv.innerHTML = buildCryptoWorkflowHTML(data);
-        } else if (workflowType === 'meme') {
-            // TODO: Implémenter pour Meme workflow
-            pageContentDiv.innerHTML = `<h2>${pageTitles['meme-workflow']}</h2><p>Le chargement dynamique pour le workflow Meme est en cours de développement.</p><p>Données attendues de <code>/api/workflows/meme/details</code>.</p>`;
-             // Exemple d'appel (quand prêt):
-            // const response = await fetch(`/api/workflows/meme/details`);
-            // if (!response.ok) throw new Error('Erreur chargement détails Meme');
-            // const data = await response.json();
-            // pageContentDiv.innerHTML = buildMemeWorkflowHTML(data); // buildMemeWorkflowHTML à créer
-        } else if (workflowType === 'forex') {
-            // TODO: Implémenter pour Forex workflow
-            pageContentDiv.innerHTML = `<h2>${pageTitles['forex-workflow']}</h2><p>Le chargement dynamique pour le workflow Forex est en cours de développement.</p><p>Données attendues de <code>/api/workflows/forex/details</code>.</p>`;
-            // Exemple d'appel (quand prêt):
-            // const response = await fetch(`/api/workflows/forex/details`);
-            // if (!response.ok) throw new Error('Erreur chargement détails Forex');
-            // const data = await response.json();
-            // pageContentDiv.innerHTML = buildForexWorkflowHTML(data); // buildForexWorkflowHTML à créer
-        } else {
-            pageContentDiv.innerHTML = `<h2>Workflow Inconnu</h2><p>Ce type de workflow n'est pas géré.</p>`;
+        let data;
+        let response;
+        switch (workflowType) {
+            case 'crypto':
+                response = await fetch(`/api/workflows/crypto/details`);
+                if (!response.ok) {
+                    const errorDataCrypto = await response.json().catch(() => ({ detail: 'Erreur inconnue (crypto).' }));
+                    throw new Error(`Erreur ${response.status}: ${errorDataCrypto.detail}`);
+                }
+                data = await response.json();
+                pageContentDiv.innerHTML = buildCryptoWorkflowHTML(data);
+                break;
+            case 'meme':
+                response = await fetch(`/api/workflows/meme/details`);
+                if (!response.ok) {
+                    const errorDataMeme = await response.json().catch(() => ({ detail: 'Erreur inconnue (meme).' }));
+                    throw new Error(`Erreur ${response.status}: ${errorDataMeme.detail}`);
+                }
+                data = await response.json();
+                pageContentDiv.innerHTML = buildMemeWorkflowHTML(data);
+                break;
+            case 'forex':
+                response = await fetch(`/api/workflows/forex/details`);
+                if (!response.ok) {
+                    const errorDataForex = await response.json().catch(() => ({ detail: 'Erreur inconnue (forex).' }));
+                    throw new Error(`Erreur ${response.status}: ${errorDataForex.detail}`);
+                }
+                data = await response.json();
+                pageContentDiv.innerHTML = buildForexWorkflowHTML(data);
+                break;
+            default:
+                pageContentDiv.innerHTML = `<h2>Workflow Inconnu</h2><p>Ce type de workflow n'est pas géré.</p>`;
+                return; // Sortir si type inconnu pour éviter le code post-switch
         }
 
         // Optionnel: Initialiser des graphiques ou autres éléments interactifs spécifiques à ce workflow
-        // if (workflowType === 'crypto' && typeof initCryptoCharts === 'function') initCryptoCharts(data);
+        // if (typeof initWorkflowCharts === 'function') initWorkflowCharts(workflowType, data);
 
     } catch (error) {
         console.error(`Erreur chargement page workflow ${workflowType}:`, error);
