@@ -19,11 +19,11 @@ import random
 import secrets
 
 # Imports des modules
-from src.auth.secure_auth import SecureAuthManager
-from src.workflows.live_trading_engine import LiveTradingOrchestrator
-from src.ui.workflow_pages import get_crypto_workflow_page, get_meme_workflow_page, get_forex_workflow_page, get_workflow_styles
-from src.ui.workflow_js import get_workflow_javascript
-from smart_capital_growth_system import IntelligentCompoundGrowth, AutonomousTradingMaster
+from .auth.secure_auth import SecureAuthManager
+from .workflows.live_trading_engine import LiveTradingOrchestrator
+from .ui.workflow_pages import get_crypto_workflow_page, get_meme_workflow_page, get_forex_workflow_page, get_workflow_styles
+from .ui.workflow_js import get_workflow_javascript
+from .smart_capital_growth_system import IntelligentCompoundGrowth, AutonomousTradingMaster
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

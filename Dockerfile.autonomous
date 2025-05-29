@@ -26,10 +26,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code source complet
-COPY trading_ai_complete.py .
-COPY smart_capital_growth_system.py .
-COPY roi_10x_trading_system.py .
-COPY zero_mindset_trading_system.py .
+# COPY trading_ai_complete.py . # Supprimé/Commenté car main.py est dans src/
+# COPY smart_capital_growth_system.py . # Supprimé, maintenant dans src/
+# COPY roi_10x_trading_system.py . # Supprimé, maintenant dans src/
+# COPY zero_mindset_trading_system.py . # Supprimé, maintenant dans src/
 COPY src/ ./src/
 COPY frontend/ ./frontend/
 
@@ -48,4 +48,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
 # Commande par défaut - Interface complète
-CMD ["python", "trading_ai_complete.py"] 
+# CMD ["python", "trading_ai_complete.py"] # Ancienne commande
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"] # Nouvelle commande avec Uvicorn 

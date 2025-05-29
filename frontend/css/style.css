@@ -277,7 +277,7 @@ body {
     /* width: calc(100vw - var(--sidebar-width)); */ /* Supprimé car géré par la grille */
     min-height: 100vh;
     width: 100%; /* Prendra la largeur de la colonne '1fr' de la grille */
-    overflow-x: hidden; /* Empêche les enfants de .main-content de causer un scroll horizontal sur .main-content */
+    /* overflow-x: hidden; /* TEMPORAIREMENT RETIRÉ pour voir si le contenu réapparaît */
 }
 
 .topbar {
