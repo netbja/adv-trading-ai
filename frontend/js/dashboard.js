@@ -155,49 +155,55 @@ async function loadPageData(pageId) {
     const pageElement = document.getElementById(pageId + '-page');
     if (!pageElement) {
         console.error(`Élément de page non trouvé pour ID: ${pageId}-page`);
-        // Peut-être afficher une erreur dans un conteneur de fallback ou ne rien faire
         return;
     }
 
-    // Afficher un spinner de chargement générique
+    // Si c'est la page d'aperçu, son contenu statique est déjà là.
+    // On appelle juste loadOverviewData pour rafraîchir les parties dynamiques.
+    if (pageId === 'overview') { 
+        await loadOverviewData();
+        // S'assurer qu'un éventuel spinner précédent est retiré (si showPage l'avait mis)
+        // Normalement, pour overview, on ne devrait pas systématiquement mettre de spinner via innerHTML ici.
+        // Si la page "overview-page" contenait un spinner par défaut dans son HTML, il faudrait le gérer.
+        // Pour l'instant, on se contente de s'assurer que les données sont chargées.
+        return; // Ne pas exécuter la suite qui met un spinner générique.
+    }
+
+    // Pour toutes les autres pages, afficher un spinner de chargement générique
     pageElement.innerHTML = '<div class="loading-spinner">Chargement des données...</div>';
 
     try {
-        let data;
         let contentHTML = '';
 
         switch (pageId) {
-            case 'overview-page':
-                // Le contenu de l'overview est déjà dans le HTML.
-                // updateDynamicParts() (appelé via loadOverviewData/refreshDashboardData ou initialement)
-                // se charge de mettre à jour les données dynamiques.
-                // On s'assure juste ici que le spinner est retiré si le contenu est visible.
-                if (pageElement.querySelector('.loading-spinner')) {
-                     // Si un spinner est là, on le retire en attendant que updateDynamicParts peuple réellement.
-                     // Mais idéalement, overview-page ne devrait pas avoir de spinner injecté par loadPageData
-                     // si son contenu statique est déjà là.
-                     // Pour l'instant, on s'assure juste d'appeler les mises à jour.
-                }
-                // Appel direct pour s'assurer que les données sont fraîches pour l'aperçu
-                // Note: showPage appelle déjà loadPageData. loadOverviewData est dans refreshDashboardData.
-                // Considerer d'appeler loadOverviewData() ici directement si refreshDashboardData n'est pas systématique.
-                // Pour l'instant, on suppose que le contenu statique est là et updateDynamicParts() est appelé ailleurs.
-                // On ne va pas modifier innerHTML ici pour éviter de le vider par erreur.
-                // On s'assure que les données dynamiques sont chargées
-                loadOverviewData(); 
-                break;
-            case 'crypto-workflow-page':
-            case 'meme-workflow-page':
-            case 'forex-workflow-page':
-                const workflowType = pageId.split('-')[0]; // crypto, meme, ou forex
+            // Le cas 'overview' est géré au-dessus.
+            case 'crypto-workflow': // CORRIGÉ: utilise pageId directement
+            case 'meme-workflow':   // CORRIGÉ: utilise pageId directement
+            case 'forex-workflow':  // CORRIGÉ: utilise pageId directement
+                const workflowType = pageId.split('-')[0]; // Donne 'crypto', 'meme', ou 'forex'
                 contentHTML = await loadWorkflowPage(workflowType);
                 pageElement.innerHTML = contentHTML;
                 break;
-            // Le cas 'capital-performance-page' est supprimé ici
-            // Ajouter d'autres cas pour les nouvelles pages ici
+            // Le cas 'capital-performance-page' a été retiré précédemment.
+            // Pour les pages comme 'capital', 'wallets', 'settings', 'logs',
+            // elles ont un contenu statique "En développement..." dans index.html
+            // et ne devraient pas atteindre ce switch si leur div est correctement affichée par showPage.
+            // Si elles l'atteignent, c'est qu'elles n'ont pas été gérées comme 'overview'.
+            // On pourrait ajouter un traitement spécifique si elles devaient être dynamiques.
             default:
+                // Si on arrive ici pour une page qui a son propre contenu statique (comme 'capital-page')
+                // c'est que la logique de `showPage` et ce `loadPageData` n'est pas parfaitement alignée
+                // pour les pages à contenu statique simple. Pour l'instant, on assume que les pages
+                // non-overview et non-workflow qui ont du contenu statique ne passent pas par ici
+                // ou que leur contenu est déjà géré par showPage.
+                // Si une page comme "capital" (qui pointe vers "capital-page") arrive ici,
+                // la ligne pageElement.innerHTML ci-dessus aura mis un spinner.
+                // Il faut alors soit la gérer spécifiquement, soit s'assurer que showPage suffit.
+                // La page "capital" affiche "En développement" et est gérée par showPage.
+                // Ce default est donc pour les pageId non reconnus.
+                console.warn("Contenu non disponible ou non géré dynamiquement pour pageId:", pageId);
                 pageElement.innerHTML = '<p>Contenu non disponible pour cette page.</p>';
-                return;
+                break;
         }
     } catch (error) {
         console.error("Erreur lors du chargement des données de la page:", error);
