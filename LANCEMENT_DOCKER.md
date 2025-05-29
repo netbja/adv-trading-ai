@@ -6,7 +6,29 @@ Tu as raison, tu es en Docker et sans clés API pour le moment. J'ai créé une 
 
 ---
 
-## 🚀 **DÉMARRAGE RAPIDE (2 COMMANDES)**
+## 🎮 **CHOISIR TON MODE**
+
+### **Mode ACCESSIBLE** (recommandé pour débuter)
+Interface web simple avec analytics intégrées
+```bash
+# Dans .env
+PROFESSIONAL_MODE=false
+
+# Lancer
+docker-compose -f docker-compose.autonomous.yml up -d
+```
+
+### **Mode PROFESSIONNEL** (pour utilisateurs avancés)
+Ajoute Grafana + Prometheus pour visualisations avancées
+```bash
+# Dans .env
+PROFESSIONAL_MODE=true
+
+# Lancer avec profil professionnel
+docker-compose -f docker-compose.autonomous.yml --profile professional up -d
+```
+
+## 🚀 **LANCEMENT RAPIDE**
 
 ### **1. Copier configuration**
 ```bash
@@ -152,137 +174,19 @@ Phase 3: APIs PREMIUM (1000€+)
 ./backup/autonomous/   # Backups automatiques
 ```
 
-### **Base de Données**
-```bash
-# PostgreSQL accessible sur :
-localhost:5432
-DB: trading_ai
-User: trader
-Pass: TradingDB2025!
-```
+## ⭐ **INTERFACES DISPONIBLES**
 
-### **Backups Automatiques**
-Le système sauvegarde automatiquement :
-- État du capital
-- Historique des trades
-- Performance metrics
-- Configuration milestones
+### **Mode Accessible**
+- **🎯 Dashboard Principal** : http://localhost
+  - Login: `admin` / `TradingAI2025!`
+  - Interface complète avec crypto, forex, analytics
 
----
+### **Mode Professionnel** (si activé)
+- **🎯 Dashboard Principal** : http://localhost 
+- **📊 Grafana Avancé** : http://localhost:3000
+  - Login: `admin` / `TradingAI2025!`
+  - Visualisations professionnelles pré-configurées
+- **📈 Prometheus Métriques** : http://localhost:9090
+  - Métriques brutes pour analystes
 
-## 🔥 **MONITORING & ALERTES**
-
-### **Logs Temps Réel**
-```bash
-# Performance
-docker logs -f trading_ai_autonomous | grep "RAPPORT"
-
-# Erreurs
-docker logs -f trading_ai_autonomous | grep "ERROR"
-
-# Milestones
-docker logs -f trading_ai_autonomous | grep "MILESTONE"
-```
-
-### **Métriques Automatiques**
-- Performance horaire/quotidienne
-- Efficacité vs target théorique  
-- Progression milestones
-- Stats trades simulés
-- Santé système
-
----
-
-## 🎯 **EXEMPLE DÉMARRAGE COMPLET**
-
-```bash
-# 1. Aller dans le répertoire du projet
-cd /home/sysnet/adv-trading-ai
-
-# 2. Copier configuration
-cp env.autonomous.example .env
-
-# 3. Créer répertoires si besoin
-mkdir -p logs/autonomous data/autonomous backup/autonomous configs/nginx
-
-# 4. Lancer système complet
-docker-compose -f docker-compose.autonomous.yml up -d
-
-# 5. Vérifier statut
-docker-compose -f docker-compose.autonomous.yml ps
-
-# 6. Voir les logs
-docker logs -f trading_ai_autonomous
-
-# 7. Ouvrir interface
-# http://localhost:8000
-```
-
----
-
-## 💡 **AVANTAGES DOCKER AUTONOME**
-
-### **🔄 Auto-Restart**
-```
-✅ Redémarre automatiquement si crash
-✅ Survit aux redémarrages serveur
-✅ Gestion mémoire optimisée
-✅ Isolation complète
-```
-
-### **📊 Monitoring Intégré**
-```
-✅ Interface web responsive
-✅ Dashboard Grafana professionnel
-✅ Healthchecks automatiques
-✅ Logs structurés
-```
-
-### **⚡ Performance**
-```
-✅ Ressources limitées (512MB max)
-✅ Optimisation CPU/mémoire
-✅ Cache intelligent
-✅ Networking optimisé
-```
-
----
-
-## 🎉 **TU ES PRÊT !**
-
-**Commande finale :**
-```bash
-docker-compose -f docker-compose.autonomous.yml up -d
-```
-
-**Puis va sur :**
-```
-http://localhost:8000
-```
-
-**Et regarde ton capital grandir automatiquement ! 💰**
-
----
-
-## 🆘 **DÉPANNAGE**
-
-### **Port déjà utilisé**
-```bash
-# Changer port dans .env
-AUTONOMOUS_PORT=8001
-HTTP_PORT=81
-```
-
-### **Pas assez de mémoire**
-```bash
-# Réduire limites dans docker-compose.autonomous.yml
-memory: 256M
-```
-
-### **Problème de build**
-```bash
-# Forcer rebuild
-docker-compose -f docker-compose.autonomous.yml build --no-cache
-```
-
-**🧠 L'IA va maintenant gérer ton capital 24/7 en Docker ! 🚀** 
+## 🧠 **APRÈS LE LANCEMENT**

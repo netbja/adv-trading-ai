@@ -4,20 +4,33 @@ global:
   evaluation_interval: 15s
 
 rule_files:
-  - "trading_rules.yml"
+  # - "first_rules.yml"
+  # - "second_rules.yml"
 
 scrape_configs:
+  # Monitoring du système de trading
+  - job_name: 'trading-ai'
+    static_configs:
+      - targets: ['autonomous_trading:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Monitoring Prometheus lui-même
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'node-exporter'
+  # Monitoring PostgreSQL (si disponible)
+  - job_name: 'postgres'
     static_configs:
-      - targets: ['node_exporter:9100']
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
 
-  - job_name: 'trading-ai'
+  # Monitoring Grafana
+  - job_name: 'grafana'
     static_configs:
-      - targets: ['host.docker.internal:8080'] # N8N metrics endpoint
+      - targets: ['grafana:3000']
+    scrape_interval: 30s
 
 alerting:
   alertmanagers:

@@ -68,18 +68,21 @@ services:
       timeout: 5s
       retries: 10
 
-  # 📊 GRAFANA - DASHBOARD (optionnel pour monitoring)
+  # 📊 GRAFANA - DASHBOARDS PROFESSIONNELS (optionnel)
   grafana:
     image: grafana/grafana:latest
     container_name: trading_ai_grafana_autonomous
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-TradingAI2025!}
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_INSTALL_PLUGINS=grafana-clock-panel
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
       - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/trading-dashboard.json
     volumes:
       - grafana_autonomous_data:/var/lib/grafana
       - ./logs/grafana:/var/log/grafana
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
     ports:
       - "${GRAFANA_PORT:-3000}:3000"
     networks:
@@ -87,8 +90,35 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+      - prometheus
     # Limite mémoire simple
     mem_limit: 256m
+    profiles:
+      - professional  # Démarrer seulement en mode pro
+
+  # 📈 PROMETHEUS - MÉTRIQUES SYSTÈME (optionnel)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trading_ai_prometheus_autonomous
+    volumes:
+      - prometheus_autonomous_data:/prometheus
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - trading_network
+    restart: unless-stopped
+    # Limite mémoire simple
+    mem_limit: 256m
+    profiles:
+      - professional  # Démarrer seulement en mode pro
 
   # 🌐 NGINX - REVERSE PROXY SIMPLE
   nginx:
@@ -118,6 +148,8 @@ volumes:
   postgres_autonomous_data:
     driver: local
   grafana_autonomous_data:
+    driver: local
+  prometheus_autonomous_data:
     driver: local
 
 # 🔧 CONFIGURATION VARIABLES D'ENVIRONNEMENT

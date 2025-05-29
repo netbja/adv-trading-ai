@@ -16,19 +16,29 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass
 import logging
 import math
-from fastapi import FastAPI, HTTPException, Response
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Response, Depends, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
+import secrets
 
 # Imports de nos systèmes
 try:
     from roi_10x_trading_system import ROI10xTradingSystem
     from src.infrastructure.rpc_optimizer import AutoTradingRPCManager
     from src.social_intelligence.social_monitor import SocialTradingIntegrator
+    from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
 except ImportError:
     # Mode simulation si modules pas disponibles
     print("⚠️ Mode simulation - modules réels non disponibles")
+    # Fallback pour prometheus_client si pas installé
+    try:
+        from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
+    except ImportError:
+        Counter = Gauge = None
+        generate_latest = lambda: "# Prometheus non disponible"
+        CONTENT_TYPE_LATEST = "text/plain"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,6 +47,24 @@ logger = logging.getLogger(__name__)
 DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
 API_MODE = "SIMULATION" if DEMO_MODE else "LIVE"
 PORT = int(os.getenv("PORT", "8000"))
+PROFESSIONAL_MODE = os.getenv("PROFESSIONAL_MODE", "false").lower() == "true"
+
+# Authentification
+security = HTTPBasic()
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "TradingAI2025!")
+
+def authenticate_user(credentials: HTTPBasicCredentials = Depends(security)):
+    """Vérification authentification"""
+    is_correct_username = secrets.compare_digest(credentials.username, ADMIN_USERNAME)
+    is_correct_password = secrets.compare_digest(credentials.password, ADMIN_PASSWORD)
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 app = FastAPI(title="🧠 Trading AI Autonome", version="1.0.0")
 
@@ -101,7 +129,7 @@ class IntelligentCompoundGrowth:
         # Phase 3: Croissance soutenue (4-6 mois)
         milestones.append(CapitalMilestone(
             target_amount=2500.0,  # 1000€ → 2500€ (+150%)
-            description="�� Capital significatif - Diversification automatique",
+            description="Capital significatif - Diversification automatique",
             action_required="DIVERSIFY_AUTO",
             human_approval_needed=False,
             compound_rate=0.9,  # Réinvestir 90%
@@ -245,6 +273,26 @@ class IntelligentCompoundGrowth:
             # Garder seulement 30 derniers jours
             if len(self.daily_returns) > 30:
                 self.daily_returns = self.daily_returns[-30:]
+                
+        # Mettre à jour métriques Prometheus
+        self._update_prometheus_metrics()
+                
+    def _update_prometheus_metrics(self):
+        """Met à jour les métriques Prometheus"""
+        if not trading_capital_current:
+            return
+            
+        try:
+            days_elapsed = (datetime.now() - self.start_date).days + 1
+            compound_stats = self.calculate_compound_growth(days_elapsed)
+            
+            trading_capital_current.set(self.current_capital)
+            trading_return_percentage.set(compound_stats["actual_return_pct"])
+            trading_system_efficiency.set(compound_stats["system_efficiency_pct"])
+            trading_uptime_days.set(days_elapsed)
+            trading_profit_total.set(self.total_profit)
+        except Exception as e:
+            logger.warning(f"Erreur mise à jour métriques Prometheus: {e}")
 
 class AutonomousTradingMaster:
     """Maître autonome du trading - gère TOUT automatiquement"""
@@ -361,8 +409,13 @@ class AutonomousTradingMaster:
         if profit > 0:
             self.daily_stats["successful_trades"] += 1
             self.daily_stats["profit_today"] += profit
+            # Mettre à jour métriques Prometheus
+            if trading_trades_successful:
+                trading_trades_successful.inc()
         else:
             self.daily_stats["loss_today"] += abs(profit)
+            if trading_trades_failed:
+                trading_trades_failed.inc()
             
         self.daily_stats["trades_executed"] += 1
         
@@ -483,8 +536,8 @@ async def health_check():
     }
 
 @app.get("/dashboard")
-async def get_dashboard():
-    """Dashboard complet du système autonome"""
+async def get_dashboard(username: str = Depends(authenticate_user)):
+    """Dashboard complet du système autonome - PROTÉGÉ"""
     if not master_instance:
         raise HTTPException(status_code=503, detail="Système non initialisé")
     
@@ -496,6 +549,7 @@ async def get_dashboard():
         "system_status": "FULLY_AUTONOMOUS" if not master_instance.human_intervention_required else "AWAITING_APPROVAL",
         "mode": API_MODE,
         "uptime_days": days_elapsed,
+        "authenticated_user": username,
         "capital_growth": {
             "initial": compound_stats["initial_capital"],
             "current": compound_stats["current_capital"],
@@ -522,98 +576,733 @@ async def get_dashboard():
 
 @app.get("/", response_class=HTMLResponse)
 async def get_frontend():
-    """Interface web avec visibilité temps réel"""
+    """Interface web professionnelle pour trading autonome"""
     return """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>🧠 Trading AI Autonome - Live Dashboard</title>
+        <title>Trading AI • Autonomous System</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            /* Variables CSS professionnelles */
+            :root {
+                --primary-blue: #2563eb;
+                --primary-dark: #1e293b;
+                --bg-main: #f8fafc;
+                --bg-card: #ffffff;
+                --border-light: #e2e8f0;
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --success-green: #10b981;
+                --warning-orange: #f59e0b;
+                --danger-red: #ef4444;
+                --accent-purple: #8b5cf6;
+            }
+            
+            /* Reset et base */
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #fff; }
-            .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .header h1 { color: #00ff88; font-size: 2.5rem; margin-bottom: 10px; }
-            .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px; }
-            .card { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 20px; }
-            .card h3 { color: #00ff88; margin-bottom: 15px; }
-            .metric { display: flex; justify-content: space-between; margin: 10px 0; }
-            .metric-value { font-weight: bold; color: #fff; }
-            .positive { color: #00ff88; }
-            .negative { color: #ff4444; }
-            .progress-bar { width: 100%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-            .progress-fill { height: 100%; background: linear-gradient(90deg, #00ff88, #00aa55); transition: width 0.5s ease; }
-            .refresh-btn { background: #00ff88; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 20px auto; display: block; }
-            .refresh-btn:hover { background: #00aa55; }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: var(--bg-main);
+                color: var(--text-primary);
+                line-height: 1.6;
+            }
             
-            .live-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-            .logs-container { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 20px; height: 400px; overflow-y: auto; }
-            .decisions-container { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 20px; height: 400px; overflow-y: auto; }
-            .log-entry { margin: 5px 0; padding: 5px; background: #2a2a2a; border-radius: 3px; font-size: 0.9em; }
-            .decision-entry { margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 5px; border-left: 3px solid #00ff88; }
-            .timestamp { color: #888; font-size: 0.8em; }
+            /* Layout principal */
+            .app-layout {
+                display: grid;
+                grid-template-columns: 250px 1fr;
+                min-height: 100vh;
+            }
             
-            .auto-refresh { color: #00ff88; text-align: center; margin-top: 20px; }
+            /* Sidebar navigation */
+            .sidebar {
+                background: var(--bg-card);
+                border-right: 1px solid var(--border-light);
+                padding: 1.5rem 0;
+                box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+            }
+            
+            .sidebar-brand {
+                padding: 0 1.5rem 2rem;
+                border-bottom: 1px solid var(--border-light);
+                margin-bottom: 2rem;
+            }
+            
+            .sidebar-brand h1 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--primary-blue);
+                margin-bottom: 0.25rem;
+            }
+            
+            .sidebar-brand p {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+            }
+            
+            .nav-menu {
+                list-style: none;
+            }
+            
+            .nav-item {
+                margin: 0.25rem 1rem;
+            }
+            
+            .nav-link {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: all 0.2s ease;
+                font-weight: 500;
+            }
+            
+            .nav-link:hover {
+                background: #f1f5f9;
+                color: var(--primary-blue);
+            }
+            
+            .nav-link.active {
+                background: #dbeafe;
+                color: var(--primary-blue);
+                font-weight: 600;
+            }
+            
+            .nav-icon {
+                width: 20px;
+                text-align: center;
+            }
+            
+            /* Main content */
+            .main-content {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* Top bar */
+            .top-bar {
+                background: var(--bg-card);
+                border-bottom: 1px solid var(--border-light);
+                padding: 1rem 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+            
+            .status-badge {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background: #ecfdf5;
+                color: var(--success-green);
+                padding: 0.5rem 1rem;
+                border-radius: 2rem;
+                font-size: 0.875rem;
+                font-weight: 600;
+            }
+            
+            .status-dot {
+                width: 8px;
+                height: 8px;
+                background: var(--success-green);
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+            }
+            
+            /* Content area */
+            .content-area {
+                flex: 1;
+                padding: 2rem;
+                overflow-y: auto;
+            }
+            
+            /* Page content */
+            .page-content {
+                display: none;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            .page-content.active {
+                display: block;
+            }
+            
+            /* Grid layouts */
+            .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+            .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+            .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+            
+            /* Cards professionnelles */
+            .card {
+                background: var(--bg-card);
+                border: 1px solid var(--border-light);
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                transition: all 0.2s ease;
+            }
+            
+            .card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--border-light);
+            }
+            
+            .card-title {
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+            
+            .card-subtitle {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                margin-top: 0.25rem;
+            }
+            
+            /* Métriques */
+            .metric {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            
+            .metric:last-child {
+                border-bottom: none;
+            }
+            
+            .metric-label {
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+            
+            .metric-value {
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+            
+            .metric-value.positive { color: var(--success-green); }
+            .metric-value.negative { color: var(--danger-red); }
+            .metric-value.warning { color: var(--warning-orange); }
+            
+            /* Progress bar */
+            .progress-container {
+                margin: 1rem 0;
+            }
+            
+            .progress-bar {
+                width: 100%;
+                height: 8px;
+                background: #f1f5f9;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, var(--primary-blue), var(--accent-purple));
+                transition: width 0.8s ease;
+            }
+            
+            .progress-text {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                margin-top: 0.5rem;
+            }
+            
+            /* Buttons */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-size: 0.875rem;
+            }
+            
+            .btn-primary {
+                background: var(--primary-blue);
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background: #1d4ed8;
+                transform: translateY(-1px);
+            }
+            
+            .btn-secondary {
+                background: white;
+                color: var(--text-secondary);
+                border: 1px solid var(--border-light);
+            }
+            
+            .btn-secondary:hover {
+                background: #f8fafc;
+                border-color: var(--primary-blue);
+                color: var(--primary-blue);
+            }
+            
+            /* Tables pour trading */
+            .trading-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 1rem;
+            }
+            
+            .trading-table th,
+            .trading-table td {
+                text-align: left;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border-light);
+            }
+            
+            .trading-table th {
+                background: #f8fafc;
+                font-weight: 600;
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+            }
+            
+            .trading-table tr:hover {
+                background: #f8fafc;
+            }
+            
+            .signal-badge {
+                padding: 0.25rem 0.75rem;
+                border-radius: 1rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+            
+            .signal-buy { background: #ecfdf5; color: var(--success-green); }
+            .signal-sell { background: #fef2f2; color: var(--danger-red); }
+            .signal-hold { background: #f1f5f9; color: var(--text-secondary); }
+            
+            /* Logs */
+            .logs-container {
+                background: #1e293b;
+                color: #e2e8f0;
+                padding: 1.5rem;
+                border-radius: 0.5rem;
+                height: 400px;
+                overflow-y: auto;
+                font-family: 'Monaco', 'Menlo', monospace;
+                font-size: 0.875rem;
+            }
+            
+            .log-entry {
+                margin: 0.25rem 0;
+                padding: 0.5rem;
+                border-radius: 0.25rem;
+                border-left: 3px solid var(--primary-blue);
+                background: rgba(255,255,255,0.05);
+            }
+            
+            /* Configuration forms */
+            .config-form {
+                display: grid;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .form-label {
+                font-weight: 600;
+                color: var(--text-primary);
+                font-size: 0.875rem;
+            }
+            
+            .form-input {
+                padding: 0.75rem;
+                border: 1px solid var(--border-light);
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                transition: border-color 0.2s ease;
+            }
+            
+            .form-input:focus {
+                outline: none;
+                border-color: var(--primary-blue);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+            
+            /* Animations */
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            /* Responsive */
+            @media (max-width: 1024px) {
+                .app-layout {
+                    grid-template-columns: 1fr;
+                }
+                .sidebar {
+                    display: none;
+                }
+                .grid-2, .grid-3, .grid-4 {
+                    grid-template-columns: 1fr;
+                }
+            }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="header">
-                <h1>🧠 Trading AI Autonome</h1>
-                <p>Système 100% autonome avec croissance intelligente - VISIBILITÉ COMPLÈTE</p>
-                <div class="auto-refresh">🔄 Mise à jour automatique toutes les 10 secondes</div>
-            </div>
-            
-            <button class="refresh-btn" onclick="loadAll()">🔄 Actualiser Maintenant</button>
-            
-            <div class="status-grid" id="dashboard">
-                <div class="card">
-                    <h3>⏳ Chargement...</h3>
-                    <p>Récupération des données en cours...</p>
-                </div>
-            </div>
-
-            <div class="live-section">
-                <div class="logs-container">
-                    <h3 style="color: #00ff88; margin-bottom: 15px;">📊 Logs Système Temps Réel</h3>
-                    <div id="logs">Chargement des logs...</div>
+        <div class="app-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <h1>Trading AI</h1>
+                    <p>Autonomous System</p>
                 </div>
                 
-                <div class="decisions-container">
-                    <h3 style="color: #00ff88; margin-bottom: 15px;">🎯 Décisions de Trading</h3>
-                    <div id="decisions">Chargement des décisions...</div>
+                <nav>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" onclick="showPage('dashboard')">
+                                <span class="nav-icon">📊</span>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="showPage('crypto')">
+                                <span class="nav-icon">₿</span>
+                                Crypto Markets
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="showPage('forex')">
+                                <span class="nav-icon">💱</span>
+                                Forex Trading
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="showPage('analytics')">
+                                <span class="nav-icon">📈</span>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="showPage('logs')">
+                                <span class="nav-icon">📋</span>
+                                System Logs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="showPage('config')">
+                                <span class="nav-icon">⚙️</span>
+                                Configuration
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+            
+            <!-- Main content -->
+            <main class="main-content">
+                <!-- Top bar -->
+                <header class="top-bar">
+                    <h1 class="page-title" id="page-title">Dashboard</h1>
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        System Active
+                    </div>
+                </header>
+                
+                <!-- Content area -->
+                <div class="content-area">
+                    <!-- Dashboard Page -->
+                    <div id="dashboard-page" class="page-content active">
+                        <div class="grid-3" id="dashboard-metrics">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Loading...</h3>
+                                </div>
+                                <p>Retrieving system data...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-2" style="margin-top: 2rem;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Recent Activity</h3>
+                                </div>
+                                <div id="quick-activity">Loading...</div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Trading Decisions</h3>
+                                </div>
+                                <div id="quick-decisions">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Crypto Page -->
+                    <div id="crypto-page" class="page-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Cryptocurrency Markets</h3>
+                                <p class="card-subtitle">Real-time crypto trading opportunities</p>
+                            </div>
+                            <table class="trading-table" id="crypto-table">
+                                <thead>
+                                    <tr>
+                                        <th>Pair</th>
+                                        <th>Price</th>
+                                        <th>24h Change</th>
+                                        <th>Volume</th>
+                                        <th>Signal</th>
+                                        <th>Confidence</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6">Loading crypto data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Forex Page -->
+                    <div id="forex-page" class="page-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Forex Markets</h3>
+                                <p class="card-subtitle">Foreign exchange trading signals</p>
+                            </div>
+                            <table class="trading-table" id="forex-table">
+                                <thead>
+                                    <tr>
+                                        <th>Pair</th>
+                                        <th>Price</th>
+                                        <th>24h Change</th>
+                                        <th>Signal</th>
+                                        <th>Confidence</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5">Loading forex data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Analytics Page -->
+                    <div id="analytics-page" class="page-content">
+                        <div class="grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Market Analytics</h3>
+                                </div>
+                                <div id="market-analytics">Loading...</div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Performance Metrics</h3>
+                                </div>
+                                <div id="performance-metrics">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Logs Page -->
+                    <div id="logs-page" class="page-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">System Logs</h3>
+                                <button class="btn btn-secondary" onclick="loadLogs()">Refresh</button>
+                            </div>
+                            <div class="logs-container" id="system-logs">
+                                Loading system logs...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuration Page -->
+                    <div id="config-page" class="page-content">
+                        <div class="grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Environment Configuration</h3>
+                                    <button class="btn btn-secondary" onclick="loadConfig()">Reload</button>
+                                </div>
+                                <div id="env-config">Loading configuration...</div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">System Controls</h3>
+                                </div>
+                                <div class="config-form">
+                                    <button class="btn btn-primary" onclick="controlSystem('start')">Start System</button>
+                                    <button class="btn btn-secondary" onclick="controlSystem('stop')">Stop System</button>
+                                    <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Mode Professionnel</h3>
+                                    <p class="card-subtitle">Grafana + Prometheus</p>
+                                </div>
+                                <div id="professional-mode-info">
+                                    <div class="metric">
+                                        <span class="metric-label">Status</span>
+                                        <span class="metric-value" id="pro-mode-status">Loading...</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Grafana</span>
+                                        <span class="metric-value">
+                                            <a href="http://localhost:3000" target="_blank" style="color: var(--primary-blue);">
+                                                http://localhost:3000
+                                            </a>
+                                        </span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Prometheus</span>
+                                        <span class="metric-value">
+                                            <a href="http://localhost:9090" target="_blank" style="color: var(--primary-blue);">
+                                                http://localhost:9090
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem; padding: 1rem; background: #f1f5f9; border-radius: 0.5rem;">
+                                    <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);">Guide Mode Pro</h4>
+                                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Active Grafana pour des visualisations avancées et Prometheus pour les métriques détaillées.
+                                    </p>
+                                    <a href="/guide-professionnel" target="_blank" class="btn btn-primary">
+                                        📖 Voir le Guide Complet
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </main>
         </div>
 
         <script>
+            // Navigation
+            function showPage(pageId) {
+                // Update page title
+                const titles = {
+                    'dashboard': 'Dashboard',
+                    'crypto': 'Crypto Markets',
+                    'forex': 'Forex Trading',
+                    'analytics': 'Analytics',
+                    'logs': 'System Logs',
+                    'config': 'Configuration'
+                };
+                
+                document.getElementById('page-title').textContent = titles[pageId] || 'Dashboard';
+                
+                // Hide all pages
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Remove active from all nav links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // Show selected page
+                document.getElementById(pageId + '-page').classList.add('active');
+                
+                // Activate nav link
+                event.target.classList.add('active');
+                
+                // Load page data
+                loadPageData(pageId);
+            }
+
+            function loadPageData(pageId) {
+                switch(pageId) {
+                    case 'dashboard':
+                        loadDashboard();
+                        loadQuickActivity();
+                        loadQuickDecisions();
+                        break;
+                    case 'crypto':
+                    case 'forex':
+                        loadTradingStreams();
+                        break;
+                    case 'analytics':
+                        loadAnalytics();
+                        break;
+                    case 'logs':
+                        loadLogs();
+                        break;
+                    case 'config':
+                        loadConfig();
+                        break;
+                }
+            }
+
+            // Dashboard functions
             async function loadDashboard() {
                 try {
                     const response = await fetch('/dashboard');
                     const data = await response.json();
                     
-                    const dashboard = document.getElementById('dashboard');
-                    dashboard.innerHTML = `
+                    document.getElementById('dashboard-metrics').innerHTML = `
                         <div class="card">
-                            <h3>💰 Capital & Performance</h3>
-                            <div class="metric">
-                                <span>Capital Initial:</span>
-                                <span class="metric-value">${data.capital_growth.initial.toFixed(2)}€</span>
+                            <div class="card-header">
+                                <h3 class="card-title">Capital Performance</h3>
                             </div>
                             <div class="metric">
-                                <span>Capital Actuel:</span>
+                                <span class="metric-label">Current Capital</span>
                                 <span class="metric-value positive">${data.capital_growth.current.toFixed(2)}€</span>
                             </div>
                             <div class="metric">
-                                <span>Rendement Total:</span>
+                                <span class="metric-label">Total Return</span>
                                 <span class="metric-value ${data.capital_growth.total_return_pct > 0 ? 'positive' : 'negative'}">
                                     ${data.capital_growth.total_return_pct > 0 ? '+' : ''}${data.capital_growth.total_return_pct.toFixed(1)}%
                                 </span>
                             </div>
                             <div class="metric">
-                                <span>Efficacité Système:</span>
+                                <span class="metric-label">System Efficiency</span>
                                 <span class="metric-value ${data.capital_growth.system_efficiency_pct > 100 ? 'positive' : 'negative'}">
                                     ${data.capital_growth.system_efficiency_pct.toFixed(1)}%
                                 </span>
@@ -621,41 +1310,178 @@ async def get_frontend():
                         </div>
                         
                         <div class="card">
-                            <h3>🎯 Progression Milestone</h3>
+                            <div class="card-header">
+                                <h3 class="card-title">Milestone Progress</h3>
+                            </div>
                             ${data.milestone_progress.current_milestone ? `
-                                <p><strong>${data.milestone_progress.current_milestone.description}</strong></p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${Math.min(100, data.milestone_progress.progress_percentage)}%"></div>
+                                <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                                    ${data.milestone_progress.current_milestone.description}
+                                </p>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${Math.min(100, data.milestone_progress.progress_percentage)}%"></div>
+                                    </div>
+                                    <div class="progress-text">
+                                        <span>${data.milestone_progress.progress_percentage.toFixed(1)}% Complete</span>
+                                        <span>Target: ${data.milestone_progress.current_milestone.target}€</span>
+                                    </div>
                                 </div>
-                                <div class="metric">
-                                    <span>Progression:</span>
-                                    <span class="metric-value">${data.milestone_progress.progress_percentage.toFixed(1)}%</span>
-                                </div>
-                                <div class="metric">
-                                    <span>Objectif:</span>
-                                    <span class="metric-value">${data.milestone_progress.current_milestone.target}€</span>
-                                </div>
-                            ` : `<p>Tous les milestones atteints!</p>`}
+                            ` : `<p>All milestones achieved! 🎉</p>`}
                         </div>
                         
                         <div class="card">
-                            <h3>⚡ État Système</h3>
+                            <div class="card-header">
+                                <h3 class="card-title">System Status</h3>
+                            </div>
                             <div class="metric">
-                                <span>Mode:</span>
+                                <span class="metric-label">Mode</span>
                                 <span class="metric-value">${data.mode}</span>
                             </div>
                             <div class="metric">
-                                <span>Statut:</span>
-                                <span class="metric-value positive">${data.system_status.replace('_', ' ')}</span>
+                                <span class="metric-label">Uptime</span>
+                                <span class="metric-value">${data.uptime_days} day(s)</span>
                             </div>
                             <div class="metric">
-                                <span>Uptime:</span>
-                                <span class="metric-value">${data.uptime_days} jour(s)</span>
+                                <span class="metric-label">User</span>
+                                <span class="metric-value">${data.authenticated_user}</span>
                             </div>
                         </div>
                     `;
                 } catch (error) {
-                    console.error('Erreur dashboard:', error);
+                    console.error('Dashboard error:', error);
+                }
+            }
+
+            async function loadQuickActivity() {
+                try {
+                    const response = await fetch('/system-logs');
+                    const data = await response.json();
+                    
+                    const activityDiv = document.getElementById('quick-activity');
+                    if (data.recent_logs && data.recent_logs.length > 0) {
+                        activityDiv.innerHTML = data.recent_logs
+                            .filter(log => log.trim())
+                            .slice(-3)
+                            .map(log => `<div class="log-entry" style="background: #f8fafc; color: var(--text-primary); border-left: 3px solid var(--primary-blue); margin: 0.5rem 0; padding: 0.75rem; border-radius: 0.25rem;">${log}</div>`)
+                            .join('');
+                    } else {
+                        activityDiv.innerHTML = '<p class="metric-label">No recent activity</p>';
+                    }
+                } catch (error) {
+                    console.error('Activity error:', error);
+                }
+            }
+
+            async function loadQuickDecisions() {
+                try {
+                    const response = await fetch('/trading-decisions');
+                    const data = await response.json();
+                    
+                    const decisionsDiv = document.getElementById('quick-decisions');
+                    decisionsDiv.innerHTML = data.recent_decisions
+                        .slice(0, 3)
+                        .map(decision => `
+                            <div style="margin: 1rem 0; padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem;">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem;">${decision.decision}</div>
+                                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                    ${decision.action} • Impact: ${decision.capital_impact}
+                                </div>
+                            </div>
+                        `)
+                        .join('');
+                } catch (error) {
+                    console.error('Decisions error:', error);
+                }
+            }
+
+            async function loadTradingStreams() {
+                try {
+                    const response = await fetch('/trading-streams');
+                    const data = await response.json();
+                    
+                    // Update crypto table
+                    const cryptoTableBody = document.querySelector('#crypto-table tbody');
+                    if (cryptoTableBody) {
+                        cryptoTableBody.innerHTML = data.crypto_markets
+                            .map(crypto => `
+                                <tr>
+                                    <td style="font-weight: 600;">${crypto.pair}</td>
+                                    <td>${crypto.price.toLocaleString()}</td>
+                                    <td class="${crypto.change_24h > 0 ? 'positive' : 'negative'}">
+                                        ${crypto.change_24h > 0 ? '+' : ''}${crypto.change_24h.toFixed(2)}%
+                                    </td>
+                                    <td>${(crypto.volume_24h / 1000000).toFixed(1)}M</td>
+                                    <td><span class="signal-badge signal-${crypto.signal.toLowerCase()}">${crypto.signal}</span></td>
+                                    <td>${(crypto.confidence * 100).toFixed(0)}%</td>
+                                </tr>
+                            `)
+                            .join('');
+                    }
+                    
+                    // Update forex table
+                    const forexTableBody = document.querySelector('#forex-table tbody');
+                    if (forexTableBody) {
+                        forexTableBody.innerHTML = data.forex_markets
+                            .map(forex => `
+                                <tr>
+                                    <td style="font-weight: 600;">${forex.pair}</td>
+                                    <td>${forex.price.toFixed(4)}</td>
+                                    <td class="${forex.change_24h > 0 ? 'positive' : 'negative'}">
+                                        ${forex.change_24h > 0 ? '+' : ''}${forex.change_24h.toFixed(2)}%
+                                    </td>
+                                    <td><span class="signal-badge signal-${forex.signal.toLowerCase()}">${forex.signal}</span></td>
+                                    <td>${(forex.confidence * 100).toFixed(0)}%</td>
+                                </tr>
+                            `)
+                            .join('');
+                    }
+                } catch (error) {
+                    console.error('Trading streams error:', error);
+                }
+            }
+
+            async function loadAnalytics() {
+                try {
+                    const response = await fetch('/trading-streams');
+                    const data = await response.json();
+                    
+                    document.getElementById('market-analytics').innerHTML = `
+                        <div class="metric">
+                            <span class="metric-label">Total Opportunities</span>
+                            <span class="metric-value">${data.analytics.total_opportunities}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">High Confidence Signals</span>
+                            <span class="metric-value">${data.analytics.high_confidence_signals}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Market Sentiment</span>
+                            <span class="metric-value ${data.analytics.market_sentiment === 'BULLISH' ? 'positive' : 'negative'}">
+                                ${data.analytics.market_sentiment}
+                            </span>
+                        </div>
+                    `;
+                    
+                    // Load performance metrics
+                    const dashResponse = await fetch('/dashboard');
+                    const dashData = await dashResponse.json();
+                    
+                    document.getElementById('performance-metrics').innerHTML = `
+                        <div class="metric">
+                            <span class="metric-label">Daily Target</span>
+                            <span class="metric-value">${dashData.capital_growth.daily_target.toFixed(3)}%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Annualized Return</span>
+                            <span class="metric-value positive">${dashData.capital_growth.annualized_return_pct.toFixed(1)}%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Auto Reinvest</span>
+                            <span class="metric-value">${dashData.compound_strategy.auto_reinvest ? 'Enabled' : 'Disabled'}</span>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Analytics error:', error);
                 }
             }
 
@@ -664,77 +1490,124 @@ async def get_frontend():
                     const response = await fetch('/system-logs');
                     const data = await response.json();
                     
-                    const logsDiv = document.getElementById('logs');
+                    const logsDiv = document.getElementById('system-logs');
                     if (data.recent_logs && data.recent_logs.length > 0) {
                         logsDiv.innerHTML = data.recent_logs
                             .filter(log => log.trim())
-                            .slice(-15)  // 15 dernières lignes
                             .map(log => `<div class="log-entry">${log}</div>`)
                             .join('');
                     } else {
-                        logsDiv.innerHTML = '<div class="log-entry">Aucun log récent</div>';
+                        logsDiv.innerHTML = '<div class="log-entry">No logs available</div>';
                     }
                 } catch (error) {
-                    console.error('Erreur logs:', error);
+                    console.error('Logs error:', error);
                 }
             }
 
-            async function loadDecisions() {
+            async function loadConfig() {
                 try {
-                    const response = await fetch('/trading-decisions');
+                    const response = await fetch('/config');
                     const data = await response.json();
                     
-                    const decisionsDiv = document.getElementById('decisions');
-                    decisionsDiv.innerHTML = data.recent_decisions
-                        .map(decision => `
-                            <div class="decision-entry">
-                                <div class="timestamp">${new Date(decision.timestamp).toLocaleTimeString()}</div>
-                                <div><strong>${decision.decision}</strong></div>
-                                <div>Action: ${decision.action} | Impact: ${decision.capital_impact}</div>
-                                <div style="font-size: 0.9em; color: #ccc;">${decision.reasoning}</div>
-                            </div>
-                        `)
-                        .join('');
+                    const configDiv = document.getElementById('env-config');
+                    configDiv.innerHTML = `
+                        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Environment Variables</h4>
+                        ${Object.entries(data.environment_vars)
+                            .map(([key, value]) => `
+                                <div class="metric">
+                                    <span class="metric-label">${key}</span>
+                                    <span class="metric-value" style="font-family: monospace;">${value}</span>
+                                </div>
+                            `)
+                            .join('')}
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem;">
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                Config file: ${data.config_file_exists ? '✅ Found' : '❌ Not found'}<br>
+                                Path: <code>${data.config_file_path}</code>
+                            </p>
+                        </div>
+                    `;
+                    
+                    // Mettre à jour status mode professionnel
+                    const proModeStatus = document.getElementById('pro-mode-status');
+                    if (proModeStatus) {
+                        const isProfessional = data.environment_vars.PROFESSIONAL_MODE === 'true';
+                        proModeStatus.innerHTML = isProfessional 
+                            ? '<span style="color: var(--success-green);">✅ Activé</span>'
+                            : '<span style="color: var(--text-secondary);">⚪ Mode Accessible</span>';
+                    }
                 } catch (error) {
-                    console.error('Erreur décisions:', error);
+                    console.error('Config error:', error);
                 }
             }
 
-            async function loadAll() {
-                await loadDashboard();
-                await loadLogs();
-                await loadDecisions();
+            async function controlSystem(action) {
+                try {
+                    const response = await fetch(`/${action}`, { method: 'POST' });
+                    const result = await response.json();
+                    alert(`${action}: ${result.message}`);
+                    loadDashboard();
+                } catch (error) {
+                    alert(`Error ${action}: ${error.message}`);
+                }
             }
 
-            // Charger au démarrage
-            loadAll();
+            function exportData() {
+                fetch('/dashboard')
+                    .then(response => response.json())
+                    .then(data => {
+                        const dataStr = JSON.stringify(data, null, 2);
+                        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                        const url = URL.createObjectURL(dataBlob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `trading-data-${new Date().toISOString().split('T')[0]}.json`;
+                        link.click();
+                    })
+                    .catch(error => alert('Export error: ' + error.message));
+            }
 
-            // Auto-refresh toutes les 10 secondes
-            setInterval(loadAll, 10000);
+            // Auto-refresh dashboard only
+            setInterval(() => {
+                const currentPage = document.querySelector('.page-content.active').id.replace('-page', '');
+                if (currentPage === 'dashboard') {
+                    loadDashboard();
+                    loadQuickActivity();
+                    loadQuickDecisions();
+                } else if (currentPage === 'crypto' || currentPage === 'forex') {
+                    loadTradingStreams();
+                }
+            }, 10000);
+
+            // Load dashboard on startup
+            loadDashboard();
+            loadQuickActivity();
+            loadQuickDecisions();
         </script>
     </body>
     </html>
     """
 
 @app.post("/start")
-async def start_system():
-    """Démarre le système"""
+async def start_system(username: str = Depends(authenticate_user)):
+    """Démarre le système - PROTÉGÉ"""
     if master_instance:
         master_instance.active = True
-        return {"status": "started", "message": "Système autonome activé"}
+        return {"status": "started", "message": "Système autonome activé", "user": username}
     raise HTTPException(status_code=503, detail="Système non initialisé")
 
 @app.post("/stop")
-async def stop_system():
-    """Arrête le système"""
+async def stop_system(username: str = Depends(authenticate_user)):
+    """Arrête le système - PROTÉGÉ"""
     if master_instance:
         master_instance.active = False
-        return {"status": "stopped", "message": "Système autonome arrêté"}
+        return {"status": "stopped", "message": "Système autonome arrêté", "user": username}
     raise HTTPException(status_code=503, detail="Système non initialisé")
 
 @app.get("/live-feed")
-async def get_live_feed():
-    """Feed temps réel des actions du système"""
+async def get_live_feed(username: str = Depends(authenticate_user)):
+    """Feed temps réel des actions du système - PROTÉGÉ"""
     if not master_instance:
         raise HTTPException(status_code=503, detail="Système non initialisé")
     
@@ -753,8 +1626,8 @@ async def get_live_feed():
     }
 
 @app.get("/system-logs")
-async def get_system_logs():
-    """Logs système récents"""
+async def get_system_logs(username: str = Depends(authenticate_user)):
+    """Logs système récents - PROTÉGÉ"""
     try:
         # Lire les dernières lignes de log
         import subprocess
@@ -770,8 +1643,8 @@ async def get_system_logs():
         return {"error": f"Impossible de lire les logs: {e}", "recent_logs": []}
 
 @app.get("/trading-decisions")
-async def get_trading_decisions():
-    """Historique des décisions de trading"""
+async def get_trading_decisions(username: str = Depends(authenticate_user)):
+    """Historique des décisions de trading - PROTÉGÉ"""
     if not master_instance:
         raise HTTPException(status_code=503, detail="Système non initialisé")
     
@@ -802,6 +1675,151 @@ async def favicon():
         <text x="16" y="24" text-anchor="middle" font-size="20" fill="#00ff88">🧠</text>
     </svg>"""
     return Response(content=favicon_svg, media_type="image/svg+xml")
+
+@app.get("/config")
+async def get_config(username: str = Depends(authenticate_user)):
+    """Configuration système depuis .env - PROTÉGÉ"""
+    try:
+        config = {}
+        env_file = os.path.join(os.path.dirname(__file__), '.env')
+        
+        # Lire .env si existe
+        if os.path.exists(env_file):
+            with open(env_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        config[key] = value
+        
+        # Ajouter les variables d'environnement actuelles
+        env_vars = {
+            'DEMO_MODE': os.getenv('DEMO_MODE', 'true'),
+            'INITIAL_CAPITAL': os.getenv('INITIAL_CAPITAL', '200'),
+            'LOG_LEVEL': os.getenv('LOG_LEVEL', 'INFO'),
+            'ADMIN_USERNAME': os.getenv('ADMIN_USERNAME', 'admin'),
+            'ADMIN_PASSWORD': '***hidden***',  # Ne pas exposer le mot de passe
+            'POSTGRES_HOST': os.getenv('POSTGRES_HOST', 'postgres'),
+            'POSTGRES_DB': os.getenv('POSTGRES_DB', 'trading_ai'),
+            'POSTGRES_USER': os.getenv('POSTGRES_USER', 'trader'),
+            'OPENAI_API_KEY': '***hidden***' if os.getenv('OPENAI_API_KEY') else 'Non configuré',
+            'TELEGRAM_BOT_TOKEN': '***hidden***' if os.getenv('TELEGRAM_BOT_TOKEN') else 'Non configuré',
+            'TELEGRAM_CHAT_ID': os.getenv('TELEGRAM_CHAT_ID', 'Non configuré'),
+        }
+        
+        return {
+            "config_file": config,
+            "environment_vars": env_vars,
+            "config_file_exists": os.path.exists(env_file),
+            "config_file_path": env_file
+        }
+        
+    except Exception as e:
+        return {"error": f"Erreur lecture configuration: {e}"}
+
+@app.get("/trading-streams")
+async def get_trading_streams(username: str = Depends(authenticate_user)):
+    """Flux de trading en temps réel - PROTÉGÉ"""
+    if not master_instance:
+        raise HTTPException(status_code=503, detail="Système non initialisé")
+    
+    # Simulation de flux crypto/forex
+    import random
+    
+    crypto_pairs = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BONK/USDT', 'WIF/USDT']
+    forex_pairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD']
+    
+    crypto_data = []
+    forex_data = []
+    
+    for pair in crypto_pairs:
+        base_price = {'BTC/USDT': 45000, 'ETH/USDT': 2500, 'SOL/USDT': 100, 'BONK/USDT': 0.000025, 'WIF/USDT': 2.5}[pair]
+        price = base_price * (1 + random.uniform(-0.05, 0.05))
+        change_24h = random.uniform(-15, 15)
+        
+        crypto_data.append({
+            "pair": pair,
+            "price": round(price, 6),
+            "change_24h": round(change_24h, 2),
+            "volume_24h": random.randint(1000000, 100000000),
+            "signal": "BUY" if change_24h > 5 else "SELL" if change_24h < -5 else "HOLD",
+            "confidence": round(random.uniform(0.6, 0.95), 2)
+        })
+    
+    for pair in forex_pairs:
+        base_price = {'EUR/USD': 1.0850, 'GBP/USD': 1.2650, 'USD/JPY': 149.50, 'AUD/USD': 0.6580, 'USD/CAD': 1.3720}[pair]
+        price = base_price * (1 + random.uniform(-0.01, 0.01))
+        change_24h = random.uniform(-2, 2)
+        
+        forex_data.append({
+            "pair": pair,
+            "price": round(price, 4),
+            "change_24h": round(change_24h, 2),
+            "signal": "BUY" if change_24h > 0.5 else "SELL" if change_24h < -0.5 else "HOLD",
+            "confidence": round(random.uniform(0.7, 0.9), 2)
+        })
+    
+    return {
+        "crypto_markets": crypto_data,
+        "forex_markets": forex_data,
+        "analytics": {
+            "total_opportunities": len([x for x in crypto_data + forex_data if x["signal"] != "HOLD"]),
+            "high_confidence_signals": len([x for x in crypto_data + forex_data if x["confidence"] > 0.8]),
+            "market_sentiment": "BULLISH" if sum([x["change_24h"] for x in crypto_data]) > 0 else "BEARISH"
+        },
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/metrics")
+async def get_metrics():
+    """Métriques Prometheus pour Grafana (mode professionnel)"""
+    if not PROFESSIONAL_MODE:
+        raise HTTPException(status_code=404, detail="Mode professionnel non activé")
+    
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/guide-professionnel")
+async def get_professional_guide(username: str = Depends(authenticate_user)):
+    """Guide du mode professionnel en HTML - PROTÉGÉ"""
+    try:
+        guide_path = os.path.join(os.path.dirname(__file__), "GUIDE_MODE_PROFESSIONNEL.md")
+        if os.path.exists(guide_path):
+            with open(guide_path, 'r', encoding='utf-8') as f:
+                markdown_content = f.read()
+            
+            # Conversion simple markdown vers HTML
+            html_content = markdown_content.replace('\n# ', '\n<h1>').replace('\n## ', '\n<h2>').replace('\n### ', '\n<h3>')
+            html_content = html_content.replace('```bash\n', '<pre><code class="language-bash">').replace('\n```', '</code></pre>')
+            html_content = html_content.replace('```promql\n', '<pre><code class="language-promql">').replace('\n```', '</code></pre>')
+            html_content = html_content.replace('\n- ', '\n<li>').replace('\n\n', '</li>\n\n')
+            
+            return HTMLResponse(f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Guide Mode Professionnel - Trading AI</title>
+                <meta charset="UTF-8">
+                <style>
+                    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }}
+                    h1 {{ color: #2563eb; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }}
+                    h2 {{ color: #1e293b; margin-top: 2rem; }}
+                    h3 {{ color: #64748b; }}
+                    code {{ background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: Monaco, monospace; }}
+                    pre {{ background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }}
+                </style>
+            </head>
+            <body>
+                <div>{html_content}</div>
+                <hr>
+                <p><a href="/" style="color: #2563eb;">← Retour au Dashboard</a></p>
+            </body>
+            </html>
+            """)
+        else:
+            return HTMLResponse("<h1>Guide non trouvé</h1><p>Le fichier GUIDE_MODE_PROFESSIONNEL.md n'existe pas.</p>")
+            
+    except Exception as e:
+        return HTMLResponse(f"<h1>Erreur</h1><p>Impossible de charger le guide: {e}</p>")
 
 # Interface de lancement Docker
 def main():

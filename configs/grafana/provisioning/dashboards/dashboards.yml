@@ -3,9 +3,9 @@
 apiVersion: 1
 
 providers:
-  - name: 'trading-ai-dashboards'
+  - name: 'Trading AI Dashboards'
     orgId: 1
-    folder: 'Trading AI'
+    folder: ''
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
