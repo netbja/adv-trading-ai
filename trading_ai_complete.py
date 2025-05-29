@@ -1718,28 +1718,49 @@ def get_main_dashboard(user_data: dict) -> HTMLResponse:
 async def login(request: Request):
     """Endpoint de connexion"""
     try:
+        logger.info(f"🔍 Login attempt - auth_manager: {auth_manager}")
+        logger.info(f"🔍 DATABASE_URL: {DATABASE_URL[:50]}...")
+        
         data = await request.json()
         username = data.get("username")
         password = data.get("password")
         
+        logger.info(f"🔍 Login data - username: {username}, password: {'*' * len(password) if password else 'None'}")
+        
         if not username or not password:
             raise HTTPException(status_code=400, detail="Username et password requis")
+        
+        # Vérifier que auth_manager est initialisé
+        if not auth_manager:
+            logger.error("❌ auth_manager est None!")
+            raise HTTPException(status_code=500, detail="Gestionnaire d'authentification non initialisé")
         
         # Obtenir IP et User-Agent
         client_ip = request.client.host
         user_agent = request.headers.get("user-agent", "")
         
+        logger.info(f"🔍 Client info - IP: {client_ip}, User-Agent: {user_agent[:50]}...")
+        
         # Authentifier
+        logger.info("🔍 Calling authenticate_user...")
         user_data = await auth_manager.authenticate_user(username, password, client_ip, user_agent)
+        logger.info(f"🔍 Auth result: {user_data is not None}")
         
         if not user_data:
             raise HTTPException(status_code=401, detail="Identifiants invalides")
         
+        logger.info("✅ Login successful")
         return user_data
         
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
-        logger.error(f"Erreur login: {e}")
-        raise HTTPException(status_code=500, detail="Erreur serveur")
+        logger.error(f"❌ Erreur login: {e}")
+        logger.error(f"❌ Exception type: {type(e).__name__}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
 
 @app.get("/api/dashboard")
 async def get_dashboard_data(user_data: dict = Depends(require_auth)):
