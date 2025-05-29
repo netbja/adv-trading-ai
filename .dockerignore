@@ -1,0 +1,58 @@
+# 🧠 DOCKERIGNORE - SYSTÈME AUTONOME
+# Exclure les répertoires de données et logs
+
+# Données et logs
+data/
+logs/
+backup/
+
+# Volumes Docker
+postgres_data/
+grafana_data/
+
+# Fichiers de configuration sensibles
+.env
+.env.*
+!env.autonomous.example
+
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+!Dockerfile.autonomous
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+tests/
+*_test.py
+test_*.py 
