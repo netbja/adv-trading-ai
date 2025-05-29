@@ -1,4 +1,4 @@
-# 🧠 SYSTÈME TRADING AUTONOME - DÉPENDANCES CORRIGÉES
+# 🧠 SYSTÈME TRADING AUTONOME - DÉPENDANCES COMPLÈTES
 # Core
 aiohttp==3.8.6
 aiofiles==23.2.1
@@ -24,6 +24,11 @@ python-telegram-bot==20.7
 fastapi==0.104.1
 uvicorn==0.24.0
 requests==2.31.0
+python-multipart==0.0.6
+
+# Security & Authentication
+bcrypt==4.0.1
+cryptography==41.0.7
 
 # Data & Analytics
 plotly==5.17.0
@@ -51,9 +56,6 @@ sqlalchemy==2.0.23
 
 # System monitoring  
 psutil==5.9.6
-
-# Security (version corrigée)
-cryptography==41.0.7
 
 # Development (minimal)
 pytest==7.4.3 
