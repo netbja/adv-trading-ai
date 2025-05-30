@@ -15,9 +15,10 @@ from sqlalchemy.orm import Session
 from redis import Redis
 
 from .decision_engine import DecisionEngine, TaskType, Priority, TaskRecommendation
-from ..database.connection import get_db
-from ..utils.logger import get_logger
-from ..tasks.celery_app import celery_app
+from backend.database.connection import get_db
+from backend.utils.logger import get_logger
+# Note: ces imports seront corrigés une fois les tâches créées
+# from ..tasks.celery_app import celery_app
 
 logger = get_logger(__name__)
 
@@ -218,11 +219,15 @@ class AIScheduler:
         logger.info(f"🚀 Exécution tâche: {task.id} (priorité: {task.priority.name})")
         
         try:
-            # Lancer la tâche Celery
-            celery_task = celery_app.send_task(
-                task.celery_task_name,
-                kwargs=task.parameters
-            )
+            # TODO: Lancer la tâche Celery (temporairement désactivé)
+            # celery_task = celery_app.send_task(
+            #     task.celery_task_name,
+            #     kwargs=task.parameters
+            # )
+            
+            # Simulation d'exécution pour le moment
+            logger.info(f"📋 Simulation exécution tâche: {task.celery_task_name}")
+            await asyncio.sleep(0.1)  # Simulation d'une tâche rapide
             
             # Attendre le résultat (optionnel, pour tracking)
             # result = celery_task.get(timeout=300)  # 5 minutes timeout

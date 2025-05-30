@@ -1,16 +1,15 @@
 """
-🤖 AI ORCHESTRATOR MODULE
-Orchestrateur intelligent qui remplace les crons traditionnels
+🤖 ORCHESTRATOR - ORCHESTRATEUR AI
+Module de l'orchestrateur intelligent qui remplace les crons
 """
 
 from .ai_scheduler import AIScheduler
-from .decision_engine import DecisionEngine
-from .task_manager import TaskManager
-from .market_analyzer import MarketConditionAnalyzer
+from .decision_engine import DecisionEngine, TaskType, Priority, TaskRecommendation
 
 __all__ = [
     "AIScheduler",
     "DecisionEngine", 
-    "TaskManager",
-    "MarketConditionAnalyzer"
+    "TaskType",
+    "Priority",
+    "TaskRecommendation"
 ] 
