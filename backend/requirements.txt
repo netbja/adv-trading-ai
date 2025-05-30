@@ -40,7 +40,7 @@ sentry-sdk[fastapi]==1.39.1
 # System Monitoring & Auto-Healing - VERSIONS OPTIMISÉES
 psutil==5.9.6
 asyncpg==0.29.0
-aioredis==2.0.1
+aioredis>=2.0.1
 
 # Development & Testing
 pytest==7.4.3
