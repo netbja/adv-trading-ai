@@ -115,8 +115,8 @@ check_service() {
 sleep 10
 
 # Vérifier les services un par un
-check_service "Backend API" "http://localhost:8080/health"
-check_service "Frontend" "http://localhost/health"
+check_service "Frontend" "http://localhost/"
+check_service "Backend API" "http://localhost/health"
 check_service "Prometheus" "http://localhost:9090/-/healthy"
 check_service "Grafana" "http://localhost:3001/api/health"
 
