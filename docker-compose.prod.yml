@@ -39,6 +39,8 @@ services:
     volumes:
       - redis_data_prod:/data
     restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
 
   # 🐍 Backend FastAPI
   backend:
