@@ -13,6 +13,7 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, His
 
 from app.config import settings
 from app.api.v1 import router as api_v1_router
+from app.api.orchestrator import router as orchestrator_router
 from database.session import init_db
 
 # Métriques Prometheus
@@ -40,9 +41,9 @@ async def lifespan(app: FastAPI):
 
 # Création de l'application FastAPI
 app = FastAPI(
-    title="Trading AI ETF Backend",
-    description="Backend intelligent pour le trading d'ETF avec IA",
-    version="1.0.0",
+    title="🧠 Trading AI System",
+    description="Système de trading AI avec orchestrateur intelligent",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan
@@ -59,14 +60,22 @@ app.add_middleware(
 
 # Routes principales
 app.include_router(api_v1_router, prefix="/api/v1")
+app.include_router(orchestrator_router, prefix="/api")
 
 @app.get("/")
 async def root():
     """Endpoint racine"""
     return {
-        "message": "🧠 Trading AI ETF Backend",
-        "version": "1.0.0",
+        "message": "🧠 Trading AI System",
+        "version": "2.0.0",
         "status": "operational",
+        "features": [
+            "🤖 AI Orchestrator",
+            "📊 Market Analysis",
+            "💰 Smart Trading", 
+            "🛡️ Auto-Healing",
+            "📈 Real-time Metrics"
+        ],
         "docs": "/docs"
     }
 
@@ -75,9 +84,14 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "service": "trading-ai-etf-backend",
-        "version": "1.0.0",
-        "timestamp": "2024-01-01T00:00:00Z"
+        "service": "trading-ai-system",
+        "version": "2.0.0",
+        "timestamp": "2024-01-01T00:00:00Z",
+        "components": {
+            "api": "healthy",
+            "database": "healthy",
+            "orchestrator": "ready"
+        }
     }
 
 @app.get("/metrics")
