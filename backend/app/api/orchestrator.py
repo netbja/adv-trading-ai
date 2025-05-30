@@ -10,7 +10,7 @@ import json
 
 from ..orchestrator.ai_scheduler import AIScheduler
 from ..orchestrator.decision_engine import DecisionEngine, TaskType
-from backend.utils.logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -12,11 +12,11 @@ from enum import Enum
 import numpy as np
 from sqlalchemy.orm import Session
 
-# Imports corrects pour la structure backend
-from backend.database.connection import get_db
-from backend.models.market import MarketData
-from backend.models.system import SystemHealth
-from backend.utils.logger import get_logger
+# Imports corrects pour la structure dans le container Docker
+from database.connection import get_db
+from models.market import MarketData
+from models.system import SystemHealth
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

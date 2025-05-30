@@ -54,8 +54,8 @@ def init_database():
     """Initialiser les tables de base de données"""
     try:
         # Importer tous les modèles ici pour que SQLAlchemy les connaisse
-        from backend.models.market import MarketData
-        from backend.models.system import SystemHealth
+        from models.market import MarketData
+        from models.system import SystemHealth
         
         # Créer toutes les tables
         Base.metadata.create_all(bind=engine)
