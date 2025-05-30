@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-# Installer setuptools et wheel pour Python 3.12
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+# Installer setuptools compatible Python 3.12 + wheel
+RUN pip install --no-cache-dir --upgrade pip setuptools>=68.0.0 wheel
 
 # Copier et installer les requirements Python
 COPY requirements.txt .
