@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import structlog
+import time
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Histogram
 
 from app.config import settings
@@ -135,7 +136,6 @@ async def global_exception_handler(request, exc):
 
 if __name__ == "__main__":
     import uvicorn
-    import time
     
     uvicorn.run(
         "app.main:app",
