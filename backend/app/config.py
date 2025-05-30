@@ -15,7 +15,29 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
-    LOG_LEVEL: str = "DEBUG"
+    LOG_LEVEL: str = "INFO"
+    
+    # Trading Configuration
+    DEMO_MODE: bool = True
+    INITIAL_CAPITAL: float = 200.0
+    RISK_TOLERANCE: str = "medium"
+    MAX_POSITION_SIZE: float = 0.20
+    
+    # Risk Management
+    STOP_LOSS_PERCENTAGE: float = 0.05
+    TAKE_PROFIT_PERCENTAGE: float = 0.15
+    MAX_DRAWDOWN_LIMIT: float = 0.20
+    EMERGENCY_STOP_ENABLED: bool = True
+    
+    # AI Orchestrator Settings
+    ORCHESTRATOR_ENABLED: bool = True
+    AI_OPTIMIZATION_ENABLED: bool = True
+    MARKET_ANALYSIS_INTERVAL: int = 60
+    PORTFOLIO_REBALANCE_INTERVAL: int = 3600
+    
+    # Monitoring & Performance
+    HEALTH_CHECK_INTERVAL: int = 30
+    AUTO_HEALING_ENABLED: bool = True
     
     # Database
     DATABASE_URL: str = "postgresql://trader:TradingDB2025!@postgres:5432/trading_ai"
