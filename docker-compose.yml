@@ -142,15 +142,15 @@ services:
   # 🌐 FRONTEND VUE3
   frontend:
     build:
-      context: ./frontend-vue3
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: trading_ai_frontend
     environment:
       - NODE_ENV=development
       - VITE_API_URL=http://localhost:8000
     volumes:
-      - ./frontend-vue3/src:/app/src
-      - ./frontend-vue3/public:/app/public
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     networks:
