@@ -1,0 +1,33 @@
+# 🐍 BACKEND PYTHON ETF - CELERY WORKERS
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Installer les dépendances système optimisées (sans curl pour les workers)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Installer setuptools compatible Python 3.12 + wheel
+RUN pip install --no-cache-dir --upgrade pip setuptools>=68.0.0 wheel
+
+# Installer numpy et pandas avec wheels pré-compilés AVANT les autres
+RUN pip install --no-cache-dir --only-binary=all numpy==1.26.2 pandas==2.1.4
+
+# Copier et installer les requirements Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier le code source
+COPY . .
+
+# Variables d'environnement par défaut
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Pas de health check pour les workers (ils ne servent pas HTTP)
+
+# Les workers n'ont pas besoin du script de démarrage conditionnel
+# Ils utilisent directement la commande celery dans docker-compose 
