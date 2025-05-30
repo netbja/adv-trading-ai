@@ -3,7 +3,7 @@
 # Données sensibles
 data/
 logs/
-nginx/ssl/*
+nginx/ssl/
 backup/
 *.log
 

@@ -3,11 +3,11 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copier package.json et package-lock.json
+# Copier package.json
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm ci --only=production
+# Installer TOUTES les dépendances (dev inclus car nécessaires pour build)
+RUN npm install
 
 # Copier le code source
 COPY . .
@@ -17,6 +17,9 @@ RUN npm run build
 
 # Stage de production avec nginx
 FROM nginx:alpine
+
+# Installer curl pour les health checks
+RUN apk add --no-cache curl
 
 # Copier la configuration nginx
 COPY nginx.conf /etc/nginx/nginx.conf
