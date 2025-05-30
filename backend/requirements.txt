@@ -30,7 +30,6 @@ schedule==1.2.1
 
 # HTTP & Requests (versions compatibles avec alpaca-trade-api)
 httpx==0.25.2
-# aiohttp version sera gérée automatiquement par alpaca-trade-api (3.8.2)
 requests==2.31.0
 
 # Monitoring & Logging
@@ -58,4 +57,7 @@ python-multipart==0.0.6
 # Utilities
 python-dotenv==1.0.0
 rich==13.7.0
-typer==0.9.0 
+typer==0.9.0
+
+# OVERRIDE: Force aiohttp compatible Python 3.12 (après alpaca-trade-api)
+aiohttp>=3.9.0 
