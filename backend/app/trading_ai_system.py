@@ -83,7 +83,7 @@ class TradingAISystem:
         self.config = {
             "ai_ensemble": {
                 "openai_api_key": settings.OPENAI_API_KEY,
-                "anthropic_api_key": settings.ANTHROPIC_API_KEY,
+                "groq_api_key": settings.GROQ_API_KEY,
                 "max_concurrent_analyses": 10,
                 "auto_optimization_enabled": True,
                 "learning_rate": 0.1

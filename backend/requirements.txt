@@ -17,9 +17,9 @@ pandas==2.1.3
 numpy==1.25.2
 ta==0.10.2
 
-# AI & ML - ULTRA-PERFORMANT
+# AI & ML - ULTRA-PERFORMANT (GPT + GROQ)
 openai==1.3.0
-anthropic==0.7.8
+groq==0.4.1
 scikit-learn==1.3.2
 joblib==1.3.2
 

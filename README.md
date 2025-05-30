@@ -5,7 +5,7 @@
 ## 🎯 **DESCRIPTION**
 
 Système de trading ETF ultra-avancé qui combine :
-- **🧠 IA Ensemble Multi-Modèles** (GPT-4 + Claude + ML)
+- **🧠 IA Ensemble Multi-Modèles** (GPT-4 + Groq + ML)
 - **🎭 Orchestrateur Intelligent** (remplace 100% des CRONs)
 - **🏥 Auto-Healer 24/7** (détection + guérison automatique)
 - **📊 Interface Vue3 moderne** avec Tailwind CSS
@@ -74,7 +74,7 @@ Surveillance et guérison automatique 24/7 :
 ### **🧠 IA Ensemble**
 Analyse multi-dimensionnelle de niveau institutionnel :
 - **GPT-4** : Analyse fondamentale + sentiment
-- **Claude** : Analyse technique + patterns
+- **Groq** : Analyse technique + patterns
 - **ML Custom** : Prédictions + optimisation
 - **Auto-optimisation** des poids de modèles
 

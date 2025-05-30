@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import structlog
 from openai import AsyncOpenAI
-from anthropic import AsyncAnthropic
+from groq import AsyncGroq
 
 logger = structlog.get_logger()
 
@@ -49,7 +49,7 @@ class AIEnsembleEngine:
     
     Combine multiple AI models pour des décisions optimales :
     - GPT-4 pour l'analyse fondamentale et sentiment
-    - Claude pour l'analyse technique et patterns
+    - Groq (Llama3-70B) pour l'analyse technique ultra-rapide
     - Modèles ML custom pour la prédiction
     - Auto-optimisation continue des poids
     """
@@ -57,12 +57,12 @@ class AIEnsembleEngine:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.openai_client = AsyncOpenAI(api_key=config.get("openai_api_key"))
-        self.anthropic_client = AsyncAnthropic(api_key=config.get("anthropic_api_key"))
+        self.groq_client = AsyncGroq(api_key=config.get("groq_api_key"))
         
         # Poids dynamiques des modèles (auto-optimisés)
         self.model_weights = {
             "gpt4_fundamental": 0.30,
-            "claude_technical": 0.25,
+            "groq_technical": 0.25,      # Remplace claude_technical
             "ensemble_ml": 0.20,
             "sentiment_ai": 0.15,
             "macro_ai": 0.10
@@ -99,7 +99,7 @@ class AIEnsembleEngine:
         
         # Exécution parallèle de toutes les analyses
         tasks = [
-            self._technical_analysis_claude(market_data),
+            self._technical_analysis_groq(market_data),
             self._fundamental_analysis_gpt4(market_data),
             self._sentiment_analysis_ensemble(market_data),
             self._macro_analysis_ai(market_data),
@@ -134,8 +134,8 @@ class AIEnsembleEngine:
             "timestamp": datetime.utcnow().isoformat()
         }
     
-    async def _technical_analysis_claude(self, market_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Claude excelle en analyse technique et pattern recognition"""
+    async def _technical_analysis_groq(self, market_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Groq excelle en analyse technique et pattern recognition"""
         
         prompt = f"""
         🔍 ANALYSE TECHNIQUE ULTRA-PRÉCISE
@@ -169,23 +169,24 @@ class AIEnsembleEngine:
         """
         
         try:
-            response = await self.anthropic_client.messages.create(
-                model="claude-3-sonnet-20240229",
+            response = await self.groq_client.chat.completions.create(
+                model="llama3-70b-8192",
+                messages=[{"role": "user", "content": prompt}],
                 max_tokens=2000,
-                messages=[{"role": "user", "content": prompt}]
+                temperature=0.2
             )
             
             # Parse et structure la réponse
             return {
-                "source": "claude_technical",
-                "analysis": response.content[0].text,
+                "source": "groq_technical",
+                "analysis": response.choices[0].message.content,
                 "timestamp": datetime.utcnow().isoformat(),
                 "confidence": 0.85
             }
             
         except Exception as e:
-            logger.error("Erreur analyse technique Claude", error=str(e))
-            return {"source": "claude_technical", "error": str(e), "confidence": 0.0}
+            logger.error("Erreur analyse technique Groq", error=str(e))
+            return {"source": "groq_technical", "error": str(e), "confidence": 0.0}
     
     async def _fundamental_analysis_gpt4(self, market_data: Dict[str, Any]) -> Dict[str, Any]:
         """GPT-4 excelle en analyse fondamentale et contextuelle"""
