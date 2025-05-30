@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 import subprocess
-import aioredis
+import redis.asyncio as redis
 import asyncpg
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
