@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y \
 # Installer setuptools compatible Python 3.12 + wheel
 RUN pip install --no-cache-dir --upgrade pip setuptools>=68.0.0 wheel
 
-# Installer numpy et pandas avec wheels pré-compilés AVANT les autres
-RUN pip install --no-cache-dir --only-binary=all numpy==1.26.2 pandas==2.1.4
+# Installer numpy, pandas et aiohttp avec wheels pré-compilés AVANT les autres
+RUN pip install --no-cache-dir --only-binary=all numpy==1.26.2 pandas==2.1.4 aiohttp==3.9.1
 
 # Copier et installer les requirements Python
 COPY requirements.txt .
