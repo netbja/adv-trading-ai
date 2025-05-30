@@ -1,13 +1,15 @@
-# 🐍 BACKEND PYTHON ETF - TRADING AI
-FROM python:3.11-slim
+# 🐍 BACKEND PYTHON ETF - TRADING AI ULTRA-PERFORMANT
+FROM python:3.12-slim
 
 WORKDIR /app
 
-# Installer les dépendances système
+# Installer les dépendances système optimisées
 RUN apt-get update && apt-get install -y \
     curl \
     gcc \
-    && rm -rf /var/lib/apt/lists/*
+    g++ \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copier et installer les requirements Python
 COPY requirements.txt .
