@@ -168,24 +168,187 @@ show_mode_menu() {
     echo
 }
 
-# Lancer le mode Docker
+# Lancer le mode Docker - INTÉGRÉ
 launch_docker_mode() {
     print_header "🐳 LANCEMENT MODE DOCKER"
     echo
     
-    if [ ! -f "launch_docker_ai_system.sh" ]; then
-        print_error "Script Docker non trouvé!"
-        print_info "Assure-toi que 'launch_docker_ai_system.sh' existe dans le répertoire."
+    # Vérifier Docker
+    if ! command -v docker &> /dev/null; then
+        print_error "Docker non trouvé! Installe Docker d'abord."
         exit 1
     fi
     
-    if [ ! -x "launch_docker_ai_system.sh" ]; then
-        print_info "Rendre le script Docker exécutable..."
-        chmod +x launch_docker_ai_system.sh
+    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+        print_error "Docker Compose non trouvé! Installe Docker Compose."
+        exit 1
     fi
     
-    print_info "Redirection vers le lanceur Docker..."
-    ./launch_docker_ai_system.sh "$@"
+    # Détecter la version de compose
+    if docker compose version &> /dev/null; then
+        COMPOSE_CMD="docker compose"
+    else
+        COMPOSE_CMD="docker-compose"
+    fi
+    
+    print_status "Docker et Docker Compose détectés"
+    print_info "Commande Compose: $COMPOSE_CMD"
+    
+    # Menu Docker
+    echo
+    echo -e "${BLUE}🐳 MENU DOCKER${NC}"
+    echo "==============="
+    echo "1. 🚀 Lancement complet (recommandé)"
+    echo "2. 🔧 Construction des images"
+    echo "3. ⚡ Démarrage services principaux"
+    echo "4. 🧪 Tests IA avancée"
+    echo "5. 📊 Monitoring temps réel"
+    echo "6. 🎨 Interface web (frontend)"
+    echo "7. 🛑 Arrêter les services"
+    echo "8. 🧹 Nettoyage complet"
+    echo "0. ↩️  Retour menu principal"
+    echo
+    
+    read -p "Choix Docker (0-8): " docker_choice
+    
+    case $docker_choice in
+        1)
+            print_info "🚀 Lancement complet Docker..."
+            docker_cleanup
+            docker_build
+            docker_start_services
+            docker_run_tests
+            print_status "🎉 Système Docker opérationnel!"
+            ;;
+        2)
+            print_info "🔧 Construction images Docker..."
+            docker_build
+            ;;
+        3)
+            print_info "⚡ Démarrage services Docker..."
+            docker_start_services
+            ;;
+        4)
+            print_info "🧪 Tests IA Docker..."
+            docker_run_tests
+            ;;
+        5)
+            print_info "📊 Monitoring Docker..."
+            docker_monitoring
+            ;;
+        6)
+            print_info "🎨 Interface web Docker..."
+            docker_frontend
+            ;;
+        7)
+            print_info "🛑 Arrêt services Docker..."
+            docker_stop
+            ;;
+        8)
+            print_info "🧹 Nettoyage Docker..."
+            docker_cleanup_full
+            ;;
+        0)
+            return 0
+            ;;
+        *)
+            print_error "Option Docker invalide"
+            return 1
+            ;;
+    esac
+}
+
+# Fonctions Docker intégrées
+docker_cleanup() {
+    print_step "Nettoyage conteneurs existants..."
+    $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
+    docker ps -a --filter "name=trading_" --format "{{.Names}}" | xargs docker rm -f 2>/dev/null || true
+    print_status "Nettoyage terminé"
+}
+
+docker_build() {
+    print_step "Construction des images Docker..."
+    $COMPOSE_CMD build backend ai_tests
+    print_status "Images construites"
+}
+
+docker_start_services() {
+    print_step "Démarrage des services principaux..."
+    
+    # Base de données et Redis
+    $COMPOSE_CMD up -d database redis
+    print_info "Attente base de données..."
+    sleep 10
+    
+    # Backend
+    $COMPOSE_CMD up -d backend
+    print_info "Attente API backend..."
+    sleep 15
+    
+    # Celery
+    $COMPOSE_CMD up -d celery_worker celery_beat
+    
+    print_status "Services principaux démarrés"
+    print_info "🌐 API: http://localhost:8000"
+    print_info "❤️  Health: http://localhost:8000/health"
+    print_info "📚 Docs: http://localhost:8000/docs"
+}
+
+docker_run_tests() {
+    print_step "Lancement tests IA Docker..."
+    sleep 5
+    if $COMPOSE_CMD run --rm ai_tests; then
+        print_status "Tests IA réussis! 🎉"
+    else
+        print_warning "Certains tests ont échoué"
+    fi
+}
+
+docker_monitoring() {
+    print_step "Monitoring Docker..."
+    $COMPOSE_CMD --profile monitoring up -d prometheus grafana 2>/dev/null || print_warning "Monitoring non disponible"
+    
+    while true; do
+        clear
+        echo -e "${CYAN}📊 MONITORING DOCKER${NC}"
+        echo "==================="
+        echo "⏰ $(date)"
+        echo
+        
+        $COMPOSE_CMD ps
+        echo
+        
+        if curl -s http://localhost:8000/health > /dev/null 2>&1; then
+            echo -e "${GREEN}✅ API: OPÉRATIONNEL${NC}"
+        else
+            echo -e "${RED}❌ API: HORS SERVICE${NC}"
+        fi
+        
+        echo -e "${YELLOW}Ctrl+C pour arrêter${NC}"
+        sleep 5
+    done
+}
+
+docker_frontend() {
+    print_step "Démarrage interface web..."
+    docker_start_services
+    $COMPOSE_CMD --profile frontend up -d nginx
+    print_status "Interface web démarrée"
+    print_info "🌐 Interface: http://localhost"
+}
+
+docker_stop() {
+    print_step "Arrêt services Docker..."
+    $COMPOSE_CMD down --remove-orphans
+    print_status "Services arrêtés"
+}
+
+docker_cleanup_full() {
+    print_step "Nettoyage complet Docker..."
+    $COMPOSE_CMD down --volumes --remove-orphans
+    docker images --filter "reference=*trading*" -q | xargs docker rmi -f 2>/dev/null || true
+    docker volume ls --filter "name=trading_" -q | xargs docker volume rm 2>/dev/null || true
+    print_status "Nettoyage complet terminé"
 }
 
 # Lancer le mode Bare-Metal avec venv
