@@ -26,7 +26,7 @@ import docker
 import requests
 import sys
 sys.path.append('/app/backend')
-from database.connection import get_db_session
+from database.connection import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -293,14 +293,14 @@ class SecuritySupervisor:
         """🗄️ Vérifier la santé de la base de données"""
         
         try:
-            from app.database.connection import get_db_session
+            from app.database.connection import get_db
             
             start_time = datetime.utcnow()
             
             # Test de connexion simple
-            async with get_db_session() as session:
-                result = await session.execute("SELECT 1")
-                await result.fetchone()
+            with next(get_db()) as session:
+                result = session.execute("SELECT 1")
+                result.fetchone()
             
             connection_time = (datetime.utcnow() - start_time).total_seconds() * 1000
             

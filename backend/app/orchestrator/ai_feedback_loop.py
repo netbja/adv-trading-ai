@@ -20,7 +20,7 @@ import numpy as np
 
 import sys
 sys.path.append('/app/backend')
-from database.connection import get_db_session
+from database.connection import get_db
 from app.orchestrator.decision_engine import DecisionEngine
 from app.orchestrator.performance_tracker import PerformanceTracker
 
