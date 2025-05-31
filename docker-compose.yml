@@ -131,6 +131,7 @@ services:
     environment:
       - BASE_URL=http://backend:8000/api
       - ADVANCED_AI_URL=http://backend:8000/api/advanced-ai
+      - DOCKER_ENV=true
     volumes:
       - ./test_advanced_ai_complete.py:/app/test_advanced_ai_complete.py
       - test_results:/app/results
