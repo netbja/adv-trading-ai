@@ -27,12 +27,42 @@ class Priority(Enum):
     LOW = 4
 
 class TaskType(Enum):
+    # Workflows génériques
     MARKET_ANALYSIS = "market_analysis"
-    TRADING_EXECUTION = "trading_execution"
     SYSTEM_HEALTH = "system_health"
     DATA_SYNC = "data_sync"
     AI_LEARNING = "ai_learning"
     RISK_ASSESSMENT = "risk_assessment"
+    
+    # 🪙 MEME COINS WORKFLOW
+    MEME_ANALYSIS = "meme_analysis"
+    MEME_TRADING = "meme_trading"
+    MEME_MONITORING = "meme_monitoring"
+    
+    # ₿ CRYPTO LONG TERME WORKFLOW  
+    CRYPTO_LT_ANALYSIS = "crypto_lt_analysis"
+    CRYPTO_LT_TRADING = "crypto_lt_trading"
+    CRYPTO_LT_REBALANCING = "crypto_lt_rebalancing"
+    
+    # 💱 FOREX WORKFLOW
+    FOREX_ANALYSIS = "forex_analysis"
+    FOREX_TRADING = "forex_trading"
+    FOREX_CORRELATION = "forex_correlation"
+    
+    # 📈 ETF WORKFLOW (existant, amélioré)
+    ETF_ANALYSIS = "etf_analysis"
+    ETF_TRADING = "etf_trading"
+    ETF_REBALANCING = "etf_rebalancing"
+    
+    # Workflows génériques legacy (compatibilité)
+    TRADING_EXECUTION = "trading_execution"
+
+class AssetType(Enum):
+    """Types d'assets supportés"""
+    MEME_COINS = "meme_coins"
+    CRYPTO_LT = "crypto_lt" 
+    FOREX = "forex"
+    ETF = "etf"
 
 @dataclass
 class MarketCondition:
@@ -169,10 +199,95 @@ class DecisionEngine:
                 parameters={"model_types": ["technical_analysis", "sentiment"], "epochs": 10}
             ))
 
+        # 🚀 NOUVEAUX WORKFLOWS MULTI-ASSETS
+        
+        # 🪙 MEME COINS WORKFLOW - Trading haute fréquence
+        if market_condition.volatility > 0.8:  # Memes adorent la volatilité !
+            recommendations.extend([
+                TaskRecommendation(
+                    task_type=TaskType.MEME_ANALYSIS,
+                    priority=Priority.HIGH,
+                    frequency_minutes=1,  # Très fréquent !
+                    reason=f"Volatilité extrême parfaite pour memes: {market_condition.volatility:.2f}",
+                    confidence=0.85,
+                    parameters={"scan_reddit": True, "twitter_sentiment": True, "pump_detection": True}
+                ),
+                TaskRecommendation(
+                    task_type=TaskType.MEME_TRADING,
+                    priority=Priority.HIGH,
+                    frequency_minutes=2,
+                    reason="Conditions volatiles idéales pour swing trading memes",
+                    confidence=0.8,
+                    parameters={"max_position_size": 0.05, "stop_loss": 0.15, "take_profit": 0.3}
+                )
+            ])
+        
+        # ₿ CRYPTO LONG TERME WORKFLOW - Accumulation intelligente
+        if market_condition.volatility < 0.4:  # Périodes calmes = accumulation
+            recommendations.extend([
+                TaskRecommendation(
+                    task_type=TaskType.CRYPTO_LT_ANALYSIS,
+                    priority=Priority.MEDIUM,
+                    frequency_minutes=60,  # Horizon long terme
+                    reason="Période calme idéale pour analyse long terme",
+                    confidence=0.75,
+                    parameters={"assets": ["BTC", "ETH", "SOL"], "timeframe": "1d", "dca_analysis": True}
+                ),
+                TaskRecommendation(
+                    task_type=TaskType.CRYPTO_LT_REBALANCING,
+                    priority=Priority.LOW,
+                    frequency_minutes=720,  # 12h - rebalancing lent
+                    reason="Rebalancing portefeuille crypto LT",
+                    confidence=0.7,
+                    parameters={"target_allocation": {"BTC": 0.5, "ETH": 0.3, "SOL": 0.2}}
+                )
+            ])
+
+        # 💱 FOREX WORKFLOW - Trading des paires majeures
+        if 8 <= datetime.utcnow().hour <= 17:  # Sessions de trading actives
+            recommendations.extend([
+                TaskRecommendation(
+                    task_type=TaskType.FOREX_ANALYSIS,
+                    priority=Priority.MEDIUM,
+                    frequency_minutes=15,
+                    reason="Session de trading forex active",
+                    confidence=0.8,
+                    parameters={"pairs": ["EURUSD", "GBPUSD", "USDJPY"], "correlation_analysis": True}
+                ),
+                TaskRecommendation(
+                    task_type=TaskType.FOREX_TRADING,
+                    priority=Priority.MEDIUM,
+                    frequency_minutes=30,
+                    reason="Trading forex pendant session active",
+                    confidence=0.75,
+                    parameters={"max_leverage": 30, "risk_per_trade": 0.02}
+                )
+            ])
+
+        # 📈 ETF WORKFLOW - Investissement systématique 
+        recommendations.extend([
+            TaskRecommendation(
+                task_type=TaskType.ETF_ANALYSIS,
+                priority=Priority.MEDIUM,
+                frequency_minutes=60,  # Analyse horaire
+                reason="Analyse ETF systématique pour investissement LT",
+                confidence=0.8,
+                parameters={"etfs": ["VTI", "QQQ", "VXUS", "BND"], "fundamental_analysis": True}
+            ),
+            TaskRecommendation(
+                task_type=TaskType.ETF_REBALANCING,
+                priority=Priority.LOW,
+                frequency_minutes=1440,  # Daily rebalancing
+                reason="Rebalancing quotidien portefeuille ETF",
+                confidence=0.9,
+                parameters={"rebalancing_threshold": 0.05, "auto_execute": True}
+            )
+        ])
+
         # Filtrer par confiance minimale
         recommendations = [r for r in recommendations if r.confidence >= self.min_confidence_threshold]
         
-        logger.info(f"📋 {len(recommendations)} recommandations générées")
+        logger.info(f"📋 {len(recommendations)} recommandations générées (multi-assets)")
         return recommendations
 
     async def _analyze_market_conditions(self) -> MarketCondition:

@@ -56,12 +56,35 @@ class AIScheduler:
     def _build_task_registry(self) -> Dict[TaskType, str]:
         """Mappage des types de tâches vers les tâches Celery"""
         return {
+            # Workflows génériques
             TaskType.MARKET_ANALYSIS: "app.tasks.ai_tasks.ai_market_analysis",
-            TaskType.TRADING_EXECUTION: "app.tasks.trading_tasks.execute_trading_signal", 
             TaskType.SYSTEM_HEALTH: "app.tasks.monitoring_tasks.system_health_check",
             TaskType.DATA_SYNC: "app.tasks.trading_tasks.sync_market_data",
             TaskType.AI_LEARNING: "app.tasks.ai_tasks.ai_learning_update",
-            TaskType.RISK_ASSESSMENT: "app.tasks.trading_tasks.risk_assessment"
+            TaskType.RISK_ASSESSMENT: "app.tasks.trading_tasks.risk_assessment",
+            
+            # 🪙 MEME COINS WORKFLOW
+            TaskType.MEME_ANALYSIS: "app.tasks.meme_tasks.analyze_meme_trends",
+            TaskType.MEME_TRADING: "app.tasks.meme_tasks.execute_meme_trades",
+            TaskType.MEME_MONITORING: "app.tasks.meme_tasks.monitor_meme_positions",
+            
+            # ₿ CRYPTO LONG TERME WORKFLOW
+            TaskType.CRYPTO_LT_ANALYSIS: "app.tasks.crypto_tasks.analyze_crypto_longterm",
+            TaskType.CRYPTO_LT_TRADING: "app.tasks.crypto_tasks.execute_crypto_dca",
+            TaskType.CRYPTO_LT_REBALANCING: "app.tasks.crypto_tasks.rebalance_crypto_portfolio",
+            
+            # 💱 FOREX WORKFLOW
+            TaskType.FOREX_ANALYSIS: "app.tasks.forex_tasks.analyze_forex_pairs",
+            TaskType.FOREX_TRADING: "app.tasks.forex_tasks.execute_forex_trades",
+            TaskType.FOREX_CORRELATION: "app.tasks.forex_tasks.analyze_forex_correlations",
+            
+            # 📈 ETF WORKFLOW
+            TaskType.ETF_ANALYSIS: "app.tasks.etf_tasks.analyze_etf_performance",
+            TaskType.ETF_TRADING: "app.tasks.etf_tasks.execute_etf_trades",
+            TaskType.ETF_REBALANCING: "app.tasks.etf_tasks.rebalance_etf_portfolio",
+            
+            # Legacy (compatibilité)
+            TaskType.TRADING_EXECUTION: "app.tasks.trading_tasks.execute_trading_signal"
         }
 
     async def start(self):

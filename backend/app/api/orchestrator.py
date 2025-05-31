@@ -9,7 +9,7 @@ from datetime import datetime
 import json
 
 from ..orchestrator.ai_scheduler import AIScheduler
-from ..orchestrator.decision_engine import DecisionEngine, TaskType
+from ..orchestrator.decision_engine import DecisionEngine, TaskType, AssetType
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -292,4 +292,85 @@ async def get_orchestrator_health(orchestrator: AIScheduler = Depends(get_orches
                 "status": "error",
                 "message": f"Erreur lors de la vérification: {str(e)}"
             }
-        } 
+        }
+
+@router.get("/recommendations/{asset_type}", summary="💡 Recommandations par Asset")
+async def get_recommendations_by_asset(
+    asset_type: str,
+    orchestrator: AIScheduler = Depends(get_orchestrator)
+):
+    """
+    Retourne les recommandations IA filtrées par type d'asset
+    
+    - **asset_type**: Type d'asset (meme_coins, crypto_lt, forex, etf)
+    """
+    try:
+        # Valider le type d'asset
+        try:
+            asset_enum = AssetType(asset_type)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Type d'asset invalide. Options: {[e.value for e in AssetType]}"
+            )
+        
+        decision_engine = DecisionEngine()
+        
+        # Analyser les conditions actuelles
+        market_condition, system_status = await decision_engine.analyze_current_conditions()
+        
+        # Générer toutes les recommandations
+        all_recommendations = await decision_engine.generate_recommendations(
+            market_condition, system_status
+        )
+        
+        # Filtrer par type d'asset
+        asset_task_prefixes = {
+            AssetType.MEME_COINS: ["meme_"],
+            AssetType.CRYPTO_LT: ["crypto_lt_"],
+            AssetType.FOREX: ["forex_"],
+            AssetType.ETF: ["etf_"]
+        }
+        
+        prefixes = asset_task_prefixes.get(asset_enum, [])
+        filtered_recommendations = [
+            rec for rec in all_recommendations
+            if any(rec.task_type.value.startswith(prefix) for prefix in prefixes)
+        ]
+        
+        return {
+            "success": True,
+            "timestamp": datetime.utcnow().isoformat(),
+            "asset_type": asset_type,
+            "market_conditions": {
+                "volatility": round(market_condition.volatility, 3),
+                "trend_strength": round(market_condition.trend_strength, 3),
+                "volume_ratio": round(market_condition.volume_ratio, 3),
+                "sentiment_score": round(market_condition.sentiment_score, 3),
+                "news_impact": round(market_condition.news_impact, 3)
+            },
+            "system_status": {
+                "cpu_usage": round(system_status.cpu_usage, 1),
+                "memory_usage": round(system_status.memory_usage, 1),
+                "disk_usage": round(system_status.disk_usage, 1),
+                "active_connections": system_status.active_connections,
+                "error_rate": round(system_status.error_rate, 4),
+                "response_time": round(system_status.response_time, 1)
+            },
+            "recommendations": [
+                {
+                    "task_type": rec.task_type.value,
+                    "priority": rec.priority.name,
+                    "frequency_minutes": rec.frequency_minutes,
+                    "reason": rec.reason,
+                    "confidence": round(rec.confidence, 2),
+                    "parameters": rec.parameters
+                }
+                for rec in filtered_recommendations
+            ]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Erreur recommandations asset {asset_type}: {e}")
+        raise HTTPException(status_code=500, detail=str(e)) 
