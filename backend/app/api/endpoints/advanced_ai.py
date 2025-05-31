@@ -79,19 +79,26 @@ async def submit_learning_signal(request: LearningSignalRequest, background_task
         # Créer contexte d'adaptation avec validation
         try:
             context = AdaptationContext(
+                asset_type=request.component,
                 market_conditions=request.context.get("market_conditions", {}),
                 system_state=request.context.get("system_state", {}),
-                recent_performance=request.context.get("recent_performance", {}),
-                external_factors=request.context.get("external_factors", {})
+                learning_signal=signal_type,
+                timestamp=datetime.utcnow(),
+                metadata={
+                    "recent_performance": request.context.get("recent_performance", {}),
+                    "external_factors": request.context.get("external_factors", {})
+                }
             )
         except Exception as ctx_error:
             logger.error(f"❌ Erreur création contexte: {ctx_error}")
             # Contexte par défaut
             context = AdaptationContext(
+                asset_type=request.component,
                 market_conditions={},
                 system_state={},
-                recent_performance={},
-                external_factors={}
+                learning_signal=signal_type,
+                timestamp=datetime.utcnow(),
+                metadata={}
             )
         
         # Traitement en arrière-plan

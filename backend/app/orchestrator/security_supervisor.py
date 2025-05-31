@@ -293,7 +293,10 @@ class SecuritySupervisor:
         """🗄️ Vérifier la santé de la base de données"""
         
         try:
-            from app.database.connection import get_db
+            # Import local pour éviter les erreurs circulaires
+            import sys
+            sys.path.append('/app/backend')
+            from database.connection import get_db
             
             start_time = datetime.utcnow()
             

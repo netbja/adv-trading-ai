@@ -105,7 +105,7 @@
               <div :class="['absolute inset-0 rounded-lg blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-300',
                            orchestratorRunning ? 'bg-red-400' : 'bg-sky-400']"></div>
               <span class="relative z-10">{{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}</span>
-            </button>
+          </button>
           </div>
           
           <!-- Avatar avec effet ring -->
