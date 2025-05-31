@@ -120,7 +120,7 @@ services:
       - backend
     restart: unless-stopped
     working_dir: /app
-    command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=redbeat.RedBeatScheduler
+    command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=redbeat.schedulers:RedBeatScheduler
 
   # 🧪 TESTS IA AVANCÉE - SERVICE OPTIONNEL
   ai_tests:
