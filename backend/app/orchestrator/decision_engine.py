@@ -6,14 +6,14 @@ Analyse intelligente et recommandations de tâches
 import asyncio
 import json
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple, Any
+from dataclasses import dataclass, asdict
 from enum import Enum
 import numpy as np
 from sqlalchemy.orm import Session
 
 # Imports corrects pour la structure dans le container Docker
-from database.connection import get_db
+from app.database.connection import get_db
 from models.market import MarketData
 from models.system import SystemHealth
 from utils.logger import get_logger

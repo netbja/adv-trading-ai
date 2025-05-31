@@ -24,7 +24,7 @@ import os
 import platform
 import docker
 import requests
-from database.connection import get_db_session
+from app.database.connection import get_db_session
 
 logger = logging.getLogger(__name__)
 

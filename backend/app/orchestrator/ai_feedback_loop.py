@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from enum import Enum
 import numpy as np
 
-from database.connection import get_db_session
+from app.database.connection import get_db_session
 from app.orchestrator.decision_engine import DecisionEngine
 from app.orchestrator.performance_tracker import PerformanceTracker
 
