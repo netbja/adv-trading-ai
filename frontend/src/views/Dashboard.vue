@@ -3,19 +3,17 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl">
       <div>
-        <h1 class="text-3xl font-bold text-brand-accent flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.62L16.5 21.75l-.398-1.13a3.375 3.375 0 00-2.455-2.456L12.75 18l1.13-.398a3.375 3.375 0 002.455-2.456L16.5 14.25l.398 1.13a3.375 3.375 0 002.456 2.456L20.25 18l-1.13.398a3.375 3.375 0 00-2.456 2.456z" />
-          </svg>
-          AI Trade<span class="text-slate-400">Bot</span>
-        </h1>
+        <!-- Logo AI Trade Bot (vrai logo avec couleurs) -->
+        <div class="text-3xl font-bold text-brand-accent flex items-center justify-center">
+          <img src="/src/assets/images/ai-trade-bot-logo.png" alt="AI Trade Bot" class="w-16 h-16 object-contain">
+        </div>
       </div>
 
       <nav class="space-y-2 flex-grow">
         <a href="#" @click="currentSection = 'overview'" 
            :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
                    currentSection === 'overview' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 group-hover:text-brand-accent" :class="currentSection === 'overview' ? 'text-brand-accent' : ''" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="currentSection === 'overview' ? 'text-brand-accent' : 'text-slate-400 group-hover:text-brand-accent'" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
           </svg>
           <span>Dashboard</span>
@@ -70,6 +68,7 @@
         </a>
       </nav>
 
+      <!-- Status Orchestrateur (style professionnel) -->
       <div class="mt-auto border-t border-slate-700 pt-6">
         <div class="text-sm text-slate-400">Status Orchestrateur :</div>
         <div class="text-2xl font-semibold text-slate-100">{{ orchestratorRunning ? '🟢 Actif' : '🔴 Arrêté' }}</div>
@@ -92,9 +91,10 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           </button>
+          <!-- Bouton Orchestrateur avec effet aurore professionnel -->
           <button @click="toggleOrchestrator" 
-                  :class="['px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                          orchestratorRunning ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white']">
+                  :class="['px-4 py-2 rounded-lg font-bold transition-colors text-lg shadow-lg',
+                          orchestratorRunning ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-brand-accent hover:bg-sky-500 text-white']">
             {{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}
           </button>
           <img src="https://via.placeholder.com/40/38bdf8/ffffff?text=AI" alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-brand-accent">
