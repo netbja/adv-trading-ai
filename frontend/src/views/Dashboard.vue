@@ -2,18 +2,18 @@
   <div class="bg-slate-900 text-slate-100 flex min-h-screen font-sans">
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl">
-      <!-- Header compact SANS gros logo -->
+      <!-- Header simplifié -->
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-brand-accent leading-tight">
-          AI Trade<span class="text-slate-400">Bot</span>
+          Trading<span class="text-slate-400">Pro</span>
         </h1>
-            <div class="text-sm text-slate-400 mt-1">
-              <span class="inline-flex items-center">
-                <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                Système autonome actif
-              </span>
-            </div>
-        <p class="text-slate-400 text-xs mt-1">🧠 Intelligence artificielle multi-assets</p>
+        <div class="text-sm text-slate-400 mt-1">
+          <span class="inline-flex items-center">
+            <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+            Système autonome actif
+          </span>
+        </div>
+        <p class="text-slate-400 text-xs mt-1">🚀 Trading intelligent multi-assets</p>
       </div>
 
       <nav class="space-y-2 flex-grow">
@@ -65,6 +65,27 @@
                    currentSection === 'etf' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
           <div class="w-5 h-5 rounded bg-green-500 text-white flex items-center justify-center text-xs font-bold">📈</div>
           <span>ETF</span>
+        </a>
+        
+        <a href="#" @click="currentSection = 'portfolio_global'"
+           :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
+                   currentSection === 'portfolio_global' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+          <div class="w-5 h-5 rounded bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">💼</div>
+          <span>Portfolio Global</span>
+        </a>
+        
+        <a href="#" @click="currentSection = 'analytics'"
+           :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
+                   currentSection === 'analytics' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+          <div class="w-5 h-5 rounded bg-cyan-500 text-white flex items-center justify-center text-xs font-bold">📊</div>
+          <span>Analytics</span>
+        </a>
+        
+        <a href="#" @click="currentSection = 'historique'"
+           :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
+                   currentSection === 'historique' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+          <div class="w-5 h-5 rounded bg-amber-500 text-white flex items-center justify-center text-xs font-bold">📜</div>
+          <span>Historique</span>
         </a>
         
         <a href="#" @click="currentSection = 'health'"
@@ -582,6 +603,296 @@
         </div>
       </div>
 
+      <div v-else-if="currentSection === 'portfolio_global'">
+        <!-- Portfolio Global détaillé -->
+        <div class="space-y-6">
+          <!-- Métriques principales du portfolio -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-300">Valeur Totale</h3>
+                  <p class="text-3xl font-bold text-green-400">{{ formatCurrency(systemMetrics.totalValue) }}</p>
+                  <p class="text-sm text-green-300">+{{ formatPercentage(systemMetrics.change) }} aujourd'hui</p>
+                </div>
+                <div class="text-3xl">💼</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-300">Profits Réalisés</h3>
+                  <p class="text-3xl font-bold text-blue-400">$2,847</p>
+                  <p class="text-sm text-blue-300">Ce mois</p>
+                </div>
+                <div class="text-3xl">💰</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-300">Diversification</h3>
+                  <p class="text-3xl font-bold text-purple-400">87%</p>
+                  <p class="text-sm text-purple-300">Score optimal</p>
+                </div>
+                <div class="text-3xl">🎯</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Allocation par stratégie -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">💼 Allocation par Stratégie</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="bg-slate-700 p-4 rounded-lg border border-purple-500/30">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-medium text-purple-400">🪙 Meme Coins</h4>
+                  <span class="text-sm text-slate-400">20%</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-200">$5,068</div>
+                <div class="text-sm text-purple-300">+15.2% cette semaine</div>
+              </div>
+              
+              <div class="bg-slate-700 p-4 rounded-lg border border-orange-500/30">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-medium text-orange-400">₿ Crypto LT</h4>
+                  <span class="text-sm text-slate-400">40%</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-200">$10,136</div>
+                <div class="text-sm text-orange-300">+8.7% ce mois</div>
+              </div>
+              
+              <div class="bg-slate-700 p-4 rounded-lg border border-blue-500/30">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-medium text-blue-400">💱 Forex</h4>
+                  <span class="text-sm text-slate-400">25%</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-200">$6,335</div>
+                <div class="text-sm text-blue-300">+3.1% ce mois</div>
+              </div>
+              
+              <div class="bg-slate-700 p-4 rounded-lg border border-green-500/30">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-medium text-green-400">📈 ETF</h4>
+                  <span class="text-sm text-slate-400">15%</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-200">$3,801</div>
+                <div class="text-sm text-green-300">+5.4% ce mois</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Positions principales -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">📊 Top Positions</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">₿</div>
+                  <div>
+                    <div class="font-medium text-slate-200">Bitcoin (BTC)</div>
+                    <div class="text-sm text-slate-400">0.1523 BTC</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">$6,847</div>
+                  <div class="text-sm text-green-300">+12.3%</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">E</div>
+                  <div>
+                    <div class="font-medium text-slate-200">Ethereum (ETH)</div>
+                    <div class="text-sm text-slate-400">1.247 ETH</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">$3,289</div>
+                  <div class="text-sm text-green-300">+8.1%</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">S</div>
+                  <div>
+                    <div class="font-medium text-slate-200">SPY ETF</div>
+                    <div class="text-sm text-slate-400">8 parts</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">$3,801</div>
+                  <div class="text-sm text-green-300">+5.4%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="currentSection === 'analytics'">
+        <!-- Analytics détaillées -->
+        <div class="space-y-6">
+          <!-- Métriques de performance -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Sharpe Ratio</h3>
+                  <p class="text-2xl font-bold text-green-400">2.34</p>
+                  <p class="text-xs text-green-300">Excellent</p>
+                </div>
+                <div class="text-2xl">📊</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Max Drawdown</h3>
+                  <p class="text-2xl font-bold text-yellow-400">-8.2%</p>
+                  <p class="text-xs text-yellow-300">Contrôlé</p>
+                </div>
+                <div class="text-2xl">📉</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Win Rate</h3>
+                  <p class="text-2xl font-bold text-purple-400">73%</p>
+                  <p class="text-xs text-purple-300">Élevé</p>
+                </div>
+                <div class="text-2xl">🎯</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Alpha</h3>
+                  <p class="text-2xl font-bold text-cyan-400">0.18</p>
+                  <p class="text-xs text-cyan-300">Surperformance</p>
+                </div>
+                <div class="text-2xl">🚀</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Performance par période -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">📈 Performance par Période</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-slate-700 p-4 rounded-lg">
+                <div class="text-center">
+                  <h4 class="text-sm font-medium text-slate-400 mb-2">7 Jours</h4>
+                  <div class="text-2xl font-bold text-green-400">+5.2%</div>
+                  <div class="text-sm text-green-300 mt-1">vs S&P500: +2.1%</div>
+                </div>
+              </div>
+              
+              <div class="bg-slate-700 p-4 rounded-lg">
+                <div class="text-center">
+                  <h4 class="text-sm font-medium text-slate-400 mb-2">30 Jours</h4>
+                  <div class="text-2xl font-bold text-green-400">+12.8%</div>
+                  <div class="text-sm text-green-300 mt-1">vs S&P500: +4.3%</div>
+                </div>
+              </div>
+              
+              <div class="bg-slate-700 p-4 rounded-lg">
+                <div class="text-center">
+                  <h4 class="text-sm font-medium text-slate-400 mb-2">YTD</h4>
+                  <div class="text-2xl font-bold text-green-400">+28.5%</div>
+                  <div class="text-sm text-green-300 mt-1">vs S&P500: +11.2%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Analyse des stratégies -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">🔍 Performance par Stratégie</h3>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-purple-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <div>
+                    <div class="font-medium text-purple-400">Meme Coins (Scalping)</div>
+                    <div class="text-sm text-slate-400">145 trades cette semaine</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">+15.2%</div>
+                  <div class="text-sm text-purple-300">Win Rate: 68%</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-orange-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <div>
+                    <div class="font-medium text-orange-400">Crypto Long Terme (DCA)</div>
+                    <div class="text-sm text-slate-400">12 achats automatiques</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">+8.7%</div>
+                  <div class="text-sm text-orange-300">Win Rate: 91%</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-blue-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <div>
+                    <div class="font-medium text-blue-400">Forex (Grid Trading)</div>
+                    <div class="text-sm text-slate-400">89 trades ce mois</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">+3.1%</div>
+                  <div class="text-sm text-blue-300">Win Rate: 77%</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-green-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div>
+                    <div class="font-medium text-green-400">ETF (Allocation)</div>
+                    <div class="text-sm text-slate-400">3 rééquilibrages</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-semibold text-green-400">+5.4%</div>
+                  <div class="text-sm text-green-300">Win Rate: 100%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Graphique placeholder -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">📊 Évolution Performance (YTD)</h3>
+            <div class="h-64 bg-slate-700 rounded-lg flex items-center justify-center">
+              <p class="text-slate-400">Graphique de performance avancé - À intégrer avec Chart.js</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="currentSection === 'historique'">
+        <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+          <h3 class="text-xl font-semibold text-amber-400 mb-4">📜 Historique</h3>
+          <p class="text-slate-300">Historique des transactions et des événements...</p>
+        </div>
+      </div>
+
       <div v-else-if="currentSection === 'health'">
         <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
           <h3 class="text-xl font-semibold text-red-400 mb-4">❤️ Health Monitor</h3>
@@ -679,6 +990,9 @@ const getSectionTitle = () => {
     crypto_lt: 'Crypto Long Terme', 
     forex: 'Forex Trading',
     etf: 'ETF Portfolio',
+    portfolio_global: 'Portfolio Global',
+    analytics: 'Analytics',
+    historique: 'Historique',
     health: 'Health Monitor',
     settings: 'Configuration'
   }
@@ -694,6 +1008,9 @@ const getSectionSubtitle = () => {
     crypto_lt: 'Stratégie DCA et holding long terme',
     forex: 'Trading algorithmique sur devises',
     etf: 'Allocation portfolio diversifié',
+    portfolio_global: 'Portfolio global de l\'investisseur',
+    analytics: 'Analyse des performances et des tendances',
+    historique: 'Historique des transactions et des événements',
     health: 'Monitoring système et performances',
     settings: 'Configuration des paramètres IA'
   }
