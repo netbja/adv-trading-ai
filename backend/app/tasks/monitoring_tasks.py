@@ -6,6 +6,7 @@ Tâches Celery pour le monitoring et la santé du système
 from celery import shared_task
 import structlog
 import psutil
+import time
 from datetime import datetime
 from typing import Dict, Any
 
@@ -22,19 +23,33 @@ def system_health_check(self):
         logger.info("🏥 Début vérification santé système")
         
         # Métriques système de base
-        cpu_percent = psutil.cpu_percent(interval=1)
-        memory = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
-        
+        try:
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory = psutil.virtual_memory()
+            disk = psutil.disk_usage('/')
+            processes_count = len(psutil.pids())
+            
+            # Calcul uptime sécurisé
+            try:
+                boot_time = psutil.boot_time()
+                uptime_seconds = time.time() - boot_time
+            except (OSError, AttributeError):
+                # Dans certains containers, boot_time peut échouer
+                uptime_seconds = 0
+                
+        except Exception as e:
+            logger.error("Erreur collecte métriques système", error=str(e))
+            raise
+
         # Statut des services critiques
         health_status = {
             "cpu_usage": cpu_percent,
             "memory_usage": memory.percent,
             "disk_usage": disk.percent,
-            "processes_count": len(psutil.pids()),
-            "uptime_seconds": psutil.boot_time()
+            "processes_count": processes_count,
+            "uptime_seconds": uptime_seconds
         }
-        
+   
         # Calcul score de santé global
         health_score = 100
         if cpu_percent > 80: health_score -= 20
@@ -239,4 +254,5 @@ def log_rotation_cleanup(self):
         
     except Exception as e:
         logger.error("❌ Erreur rotation logs", error=str(e))
-        self.retry(countdown=60, max_retries=2) 
+        self.retry(countdown=60, max_retries=2)
+        
