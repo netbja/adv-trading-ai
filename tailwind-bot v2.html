@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI TradeBot Pro - Multi-Assets Trading Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-accent': '#38bdf8',
+                        'brand-buy': '#22c55e',
+                        'brand-sell': '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Style personnalisé pour la scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0ea5e9;
+        }
+
+        .brand-accent {
+            color: #38bdf8;
+        }
+        /* Classe pour masquer les sections */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans"> <!-- 'flex' et 'min-h-screen' enlevés d'ici, 'min-h-screen' est sur le wrapper -->
+
+    <div class="flex min-h-screen"> <!-- NOUVEAU WRAPPER FLEX pour la sidebar et le main -->
+        <!-- SIDEBAR AVEC NAVIGATION INTÉGRÉE -->
+        <aside class="w-64 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl flex-shrink-0">
+            <!-- Logo AI Section -->
+            <div>
+                <div class="flex items-center mb-3">
+                    <!-- Logo AI neuronal personnalisé -->
+                    <div class="relative w-16 h-16 mr-4 rounded-xl border-2 border-brand-accent bg-gradient-to-br from-brand-accent to-blue-600 
+                                flex items-center justify-center text-white font-bold shadow-2xl
+                                hover:shadow-brand-accent/50 transition-all duration-300">
+                        <span class="text-2xl font-extrabold tracking-tight">AI</span>
+                        <!-- Points de connexion neuraux -->
+                        <div class="absolute top-1 right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <div class="absolute bottom-1 left-1 w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse delay-300"></div>
+                        <div class="absolute top-1 left-1 w-1 h-1 bg-purple-400 rounded-full animate-pulse delay-700"></div>
+                    </div>
+                    
+                    <!-- Texte du titre -->
+                    <div>
+                        <h1 class="text-3xl font-bold text-brand-accent leading-tight">
+                            AI Trade<span class="text-slate-400">Bot</span>
+                        </h1>
+                        <div class="text-sm text-slate-400 mt-1">
+                            <span class="inline-flex items-center">
+                                <span id="system-status" class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                                <span id="system-text">Système autonome actif</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-slate-400 text-sm">🧠 Intelligence artificielle multi-assets</p>
+            </div>
+
+            <!-- NAVIGATION MENU DANS LA SIDEBAR -->
+            <nav class="space-y-2 flex-grow">
+                <!-- Dashboard - Item actif par défaut -->
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-slate-700 text-brand-accent transition-colors group" data-section="overview">
+                    <div class="w-5 h-5 rounded bg-brand-accent text-slate-900 flex items-center justify-center text-xs font-bold">🏠</div>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="meme_coins">
+                    <div class="w-5 h-5 rounded bg-purple-500 text-white flex items-center justify-center text-xs font-bold">🪙</div>
+                    <span>Meme Coins</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="crypto_lt">
+                    <div class="w-5 h-5 rounded bg-orange-500 text-white flex items-center justify-center text-xs font-bold">₿</div>
+                    <span>Crypto Long Terme</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="forex">
+                    <div class="w-5 h-5 rounded bg-blue-500 text-white flex items-center justify-center text-xs font-bold">💱</div>
+                    <span>Forex</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="etf">
+                    <div class="w-5 h-5 rounded bg-green-500 text-white flex items-center justify-center text-xs font-bold">📈</div>
+                    <span>ETF</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="ai_insights">
+                    <div class="w-5 h-5 rounded bg-purple-600 text-white flex items-center justify-center text-xs font-bold">🧠</div>
+                    <span>AI Insights</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="health">
+                    <div class="w-5 h-5 rounded bg-red-500 text-white flex items-center justify-center text-xs font-bold">❤️</div>
+                    <span>Health Monitor</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-brand-accent transition-colors group" data-section="settings">
+                    <div class="w-5 h-5 rounded bg-slate-600 text-white flex items-center justify-center text-xs font-bold">⚙️</div>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Status Orchestrateur en bas de sidebar -->
+            <div class="mt-auto border-t border-slate-700 pt-6">
+                <div class="text-sm text-slate-400">Status Orchestrateur :</div>
+                <div id="orchestrator-status-text" class="text-2xl font-semibold text-slate-100">🟢 Actif</div>
+                <div id="orchestrator-success-rate" class="text-sm font-medium text-green-400">94.7% succès</div>
+                <button id="toggle-orchestrator" class="w-full mt-4 px-6 py-3 rounded-xl font-bold transition-all duration-300 bg-red-600 hover:bg-red-700 text-white">
+                    ARRÊTER
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENU PRINCIPAL À DROITE -->
+        <main class="flex-1 p-8 space-y-8 overflow-y-auto">
+            <!-- Header simple -->
+            <header class="flex justify-between items-center">
+                <div>
+                    <h2 id="section-title" class="text-3xl font-semibold text-slate-100">Dashboard Multi-Assets</h2>
+                    <p id="section-subtitle" class="text-slate-400">Supervision intelligente de tous vos workflows de trading</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Status marché -->
+                    <div class="flex items-center space-x-2 bg-slate-800/50 rounded-xl px-4 py-2">
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-green-400 font-medium">Marchés Ouverts</span>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <button class="relative p-3 rounded-xl hover:bg-slate-700 transition-colors group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400 group-hover:text-brand-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                            <span class="text-xs font-bold text-white">3</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Avatar IA compact -->
+                    <div class="relative w-12 h-12 rounded-xl border-2 border-brand-accent bg-gradient-to-br from-brand-accent to-blue-600 flex items-center justify-center text-white font-bold cursor-pointer">
+                        <span class="text-lg font-extrabold">AI</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Contenu dynamique -->
+            <div id="main-content-area">
+                <!-- Section Overview (Dashboard) -->
+                <div id="overview-content" class="section-content space-y-8">
+                    <!-- Vue d'ensemble du marché -->
+                    <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-semibold text-slate-100">📊 Vue d'ensemble du marché</h3>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                <span class="text-sm text-slate-400">Données en temps réel</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            <div class="text-center p-3 bg-slate-700/50 rounded-lg">
+                                <div class="text-xs text-slate-400">BTC/USD</div>
+                                <div class="text-lg font-bold text-slate-100">€63,847.92</div>
+                                <div class="text-xs text-green-400">+2.47%</div>
+                            </div>
+                            <div class="text-center p-3 bg-slate-700/50 rounded-lg">
+                                <div class="text-xs text-slate-400">ETH/USD</div>
+                                <div class="text-lg font-bold text-slate-100">€3,234.67</div>
+                                <div class="text-xs text-red-400">-1.23%</div>
+                            </div>
+                            <div class="text-center p-3 bg-slate-700/50 rounded-lg">
+                                <div class="text-xs text-slate-400">SOL/USD</div>
+                                <div class="text-lg font-bold text-slate-100">€142.85</div>
+                                <div class="text-xs text-green-400">+5.67%</div>
+                            </div>
+                            <div class="text-center p-3 bg-slate-700/50 rounded-lg">
+                                <div class="text-xs text-slate-400">Fear & Greed</div>
+                                <div class="text-lg font-bold text-blue-400">78</div>
+                                <div class="text-xs text-blue-400">Extrême Cupidité</div>
+                            </div>
+                            <div class="text-center p-3 bg-slate-700/50 rounded-lg">
+                                <div class="text-xs text-slate-400">VIX</div>
+                                <div class="text-lg font-bold text-slate-100">16.92</div>
+                                <div class="text-xs text-slate-400">Faible Vol.</div>
+                            </div>
+                            <div class="text-center p-3 bg-slate-700/50 rounded-lg">
+                                <div class="text-xs text-slate-400">DXY</div>
+                                <div class="text-lg font-bold text-slate-100">103.45</div>
+                                <div class="text-xs text-red-400">-0.32%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights Section -->
+                    <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
+                        <div class="flex items-center mb-6">
+                            <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white text-sm font-bold">🧠</span>
+                            </div>
+                            <h3 class="text-xl font-semibold text-slate-100">Perspectives IA Multi-Modèles</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-green-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <div class="text-sm font-semibold text-green-400">STRONG BUY</div>
+                                        <div class="text-lg font-bold">DOGE/USD</div>
+                                        <div class="text-xs text-slate-400">Target: $0.085 (+12.3%)</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm text-green-500 font-semibold">96%</div>
+                                        <div class="text-xs text-slate-400">Confiance</div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-slate-300">Consensus GPT-4 + Groq: Momentum haussier détecté</div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-blue-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <div class="text-sm font-semibold text-blue-400">HOLD DCA</div>
+                                        <div class="text-lg font-bold">BTC/USD</div>
+                                        <div class="text-xs text-slate-400">Accumulation continue</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm text-blue-500 font-semibold">89%</div>
+                                        <div class="text-xs text-slate-400">Confiance</div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-slate-300">Stratégie long terme: Zone d'accumulation optimale</div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-orange-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <div class="text-sm font-semibold text-orange-400">FOREX ALERT</div>
+                                        <div class="text-lg font-bold">EUR/USD</div>
+                                        <div class="text-xs text-slate-400">Breakout imminent</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm text-orange-500 font-semibold">82%</div>
+                                        <div class="text-xs text-slate-400">Confiance</div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-slate-300">Pattern triangle: Sortie attendue sous 48h</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Performance -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Positions Actives -->
+                        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
+                            <h3 class="text-xl font-semibold text-slate-100 mb-4">📍 Positions Actives</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">🪙</div>
+                                        <div>
+                                            <div class="font-semibold">SHIB/USD</div>
+                                            <div class="text-sm text-slate-400">Long • 0.5 BTC</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-green-400 font-semibold">+€3,247.82</div>
+                                        <div class="text-sm text-green-400">+18.7%</div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold">₿</div>
+                                        <div>
+                                            <div class="font-semibold">BTC/USD</div>
+                                            <div class="text-sm text-slate-400">DCA • 2.3 BTC</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-green-400 font-semibold">+€12,847.45</div>
+                                        <div class="text-sm text-green-400">+8.2%</div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">💱</div>
+                                        <div>
+                                            <div class="font-semibold">EUR/USD</div>
+                                            <div class="text-sm text-slate-400">Short • 50k EUR</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-red-400 font-semibold">-€847.23</div>
+                                        <div class="text-sm text-red-400">-1.7%</div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">📈</div>
+                                        <div>
+                                            <div class="font-semibold">SPY ETF</div>
+                                            <div class="text-sm text-slate-400">Long • 100 parts</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-green-400 font-semibold">+€2,143.67</div>
+                                        <div class="text-sm text-green-400">+4.8%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Métriques de Performance -->
+                        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
+                            <h3 class="text-xl font-semibold text-slate-100 mb-4">⚡ Métriques de Performance</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">P&L Total (24h)</span>
+                                    <span class="text-green-400 font-bold text-lg">+€24,847.92</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">Taux de réussite</span>
+                                    <span class="text-green-400 font-semibold">94.7%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">Trades actifs</span>
+                                    <span class="text-slate-100 font-semibold">17</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">Sharpe Ratio</span>
+                                    <span class="text-blue-400 font-semibold">2.84</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">Max Drawdown</span>
+                                    <span class="text-yellow-400 font-semibold">-3.2%</span>
+                                </div>
+
+                                <!-- Barres de progression -->
+                                <div class="space-y-3 pt-4 border-t border-slate-700">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-slate-400">Allocation Crypto</span>
+                                            <span class="text-slate-300">68%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-700 rounded-full h-2">
+                                            <div class="bg-gradient-to-r from-orange-500 to-orange-400 h-2 rounded-full" style="width: 68%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-slate-400">Allocation Forex</span>
+                                            <span class="text-slate-300">22%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-700 rounded-full h-2">
+                                            <div class="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full" style="width: 22%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-slate-400">Allocation ETF</span>
+                                            <span class="text-slate-300">10%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-700 rounded-full h-2">
+                                            <div class="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full" style="width: 10%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status des Workflows -->
+                    <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-6">🔄 Status des Workflows de Trading</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-purple-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-purple-400">Meme Coins Bot</h4>
+                                        <p class="text-sm text-slate-400">Trading haute fréquence</p>
+                                    </div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="text-sm text-slate-300">
+                                    • 23 trades aujourd'hui<br>
+                                    • P&L: +€8,347.82<br>
+                                    • Prochaine analyse: 2min
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-orange-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-orange-400">Crypto DCA Bot</h4>
+                                        <p class="text-sm text-slate-400">Accumulation long terme</p>
+                                    </div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="text-sm text-slate-300">
+                                    • Achat programmé: 4h<br>
+                                    • Stack: 2.3 BTC total<br>
+                                    • Prix moyen: €58,442
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-blue-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-blue-400">Forex Scanner</h4>
+                                        <p class="text-sm text-slate-400">Analyse multi-paires</p>
+                                    </div>
+                                    <div class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="text-sm text-slate-300">
+                                    • 8 paires surveillées<br>
+                                    • 2 signaux en attente<br>
+                                    • Volatilité: Modérée
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-green-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-green-400">ETF Rebalancer</h4>
+                                        <p class="text-sm text-slate-400">Allocation automatique</p>
+                                    </div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="text-sm text-slate-300">
+                                    • Portfolio équilibré<br>
+                                    • Prochain rebalance: 7j<br>
+                                    • Performance: +4.8%
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-purple-600">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-purple-400">AI Risk Manager</h4>
+                                        <p class="text-sm text-slate-400">Gestion des risques</p>
+                                    </div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="text-sm text-slate-300">
+                                    • Exposition: 68% capital<br>
+                                    • Corrélations surveillées<br>
+                                    • Alertes: 0 critiques
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-700/50 p-4 rounded-lg border-l-4 border-red-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-red-400">System Health Monitor</h4>
+                                        <p class="text-sm text-slate-400">Surveillance globale</p>
+                                    </div>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="text-sm text-slate-300">
+                                    • CPU: 35%, RAM: 60%<br>
+                                    • API Latency: 45ms<br>
+                                    • No errors reported
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Meme Coins -->
+                <div id="meme_coins-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">🪙 Meme Coins</h3>
+                    <p class="text-slate-400">Gestion et stratégies pour les Meme Coins. Graphiques et analyses spécifiques à venir.</p>
+                    <!-- Contenu spécifique pour Meme Coins ici -->
+                </div>
+
+                <!-- Section Crypto Long Terme -->
+                <div id="crypto_lt-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">₿ Crypto Long Terme</h3>
+                    <p class="text-slate-400">Suivi de portefeuille long terme, stratégies DCA, et analyses fondamentales. Contenu à venir.</p>
+                    <!-- Contenu spécifique pour Crypto LT ici -->
+                </div>
+
+                <!-- Section Forex -->
+                <div id="forex-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">💱 Forex</h3>
+                    <p class="text-slate-400">Analyses des paires de devises, signaux de trading Forex, et gestion des positions. Contenu à venir.</p>
+                    <!-- Contenu spécifique pour Forex ici -->
+                </div>
+
+                <!-- Section ETF -->
+                <div id="etf-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">📈 ETF</h3>
+                    <p class="text-slate-400">Suivi des ETF, stratégies d'allocation et de rebalancement. Contenu à venir.</p>
+                    <!-- Contenu spécifique pour ETF ici -->
+                </div>
+
+                <!-- Section AI Insights -->
+                <div id="ai_insights-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">🧠 AI Insights Détaillés</h3>
+                    <p class="text-slate-400">Rapports approfondis de l'IA, analyses prédictives et backtesting des modèles. Contenu à venir.</p>
+                    <!-- Contenu spécifique pour AI Insights ici -->
+                </div>
+
+                <!-- Section Health Monitor -->
+                <div id="health-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">❤️ Health Monitor</h3>
+                    <p class="text-slate-400">Statistiques détaillées sur la santé du système, performance des API, et logs. Contenu à venir.</p>
+                    <!-- Contenu spécifique pour Health Monitor ici -->
+                </div>
+
+                <!-- Section Settings -->
+                <div id="settings-content" class="section-content hidden bg-slate-800 p-6 rounded-xl shadow-2xl">
+                    <h3 class="text-2xl font-semibold text-slate-100 mb-4">⚙️ Settings</h3>
+                    <p class="text-slate-400">Configuration des bots, gestion des clés API, préférences utilisateur et notifications. Contenu à venir.</p>
+                    <!-- Contenu spécifique pour Settings ici -->
+                </div>
+            </div>
+        </main>
+    </div> <!-- FIN DU WRAPPER FLEX -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sectionTitleEl = document.getElementById('section-title');
+            const sectionSubtitleEl = document.getElementById('section-subtitle');
+            const mainContentArea = document.getElementById('main-content-area');
+            const allSectionContents = mainContentArea.querySelectorAll('.section-content');
+
+            const sectionDetails = {
+                'overview': { title: "Dashboard Multi-Assets", subtitle: "Supervision intelligente de tous vos workflows de trading" },
+                'meme_coins': { title: "Meme Coins", subtitle: "Stratégies et analyses pour les Meme Coins" },
+                'crypto_lt': { title: "Crypto Long Terme", subtitle: "Gestion de portefeuille et investissements stratégiques" },
+                'forex': { title: "Forex", subtitle: "Trading sur le marché des changes et analyses" },
+                'etf': { title: "ETF", subtitle: "Suivi et stratégies d'investissement en ETF" },
+                'ai_insights': { title: "AI Insights", subtitle: "Perspectives et analyses générées par l'IA" },
+                'health': { title: "Health Monitor", subtitle: "Surveillance de l'état du système et des performances" },
+                'settings': { title: "Settings", subtitle: "Configuration et préférences de la plateforme" }
+            };
+
+            function showSection(sectionId) {
+                allSectionContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+
+                const targetSectionContent = document.getElementById(`${sectionId}-content`);
+                if (targetSectionContent) {
+                    targetSectionContent.classList.remove('hidden');
+                } else {
+                    console.warn(`Content for section "${sectionId}" not found.`);
+                    document.getElementById('overview-content').classList.remove('hidden');
+                    sectionId = 'overview'; 
+                }
+
+                navItems.forEach(item => {
+                    item.classList.remove('bg-slate-700', 'text-brand-accent');
+                    item.classList.add('text-slate-300', 'hover:bg-slate-700', 'hover:text-brand-accent');
+                    
+                    const iconDiv = item.querySelector('div:first-child');
+                    if (iconDiv) {
+                        if (!item.dataset.originalIconBg) { 
+                            item.dataset.originalIconBg = Array.from(iconDiv.classList).find(cls => cls.startsWith('bg-') && cls !== 'bg-brand-accent');
+                            item.dataset.originalIconText = Array.from(iconDiv.classList).find(cls => cls.startsWith('text-') && cls !== 'text-slate-900');
+                        }
+                        // Remove all potentially conflicting bg/text classes before re-adding originals
+                        iconDiv.className = iconDiv.className.replace(/bg-\S+/g, '').replace(/text-\S+/g, '');
+                        iconDiv.classList.add(item.dataset.originalIconBg || 'bg-slate-600');
+                        iconDiv.classList.add(item.dataset.originalIconText || 'text-white');
+                        // Ensure base classes are preserved
+                        iconDiv.classList.add('w-5', 'h-5', 'rounded', 'flex', 'items-center', 'justify-center', 'text-xs', 'font-bold');
+                    }
+
+                    if (item.dataset.section === sectionId) {
+                        item.classList.add('bg-slate-700', 'text-brand-accent');
+                        item.classList.remove('text-slate-300');
+                        if (iconDiv) {
+                             // Remove original/default and add active styling
+                            iconDiv.classList.remove(item.dataset.originalIconBg || 'bg-slate-600');
+                            iconDiv.classList.remove(item.dataset.originalIconText || 'text-white');
+                            iconDiv.classList.add('bg-brand-accent', 'text-slate-900');
+                        }
+                    }
+                });
+
+                const details = sectionDetails[sectionId];
+                if (details) {
+                    sectionTitleEl.textContent = details.title;
+                    sectionSubtitleEl.textContent = details.subtitle;
+                } else {
+                    const formattedId = sectionId.charAt(0).toUpperCase() + sectionId.slice(1).replace(/_/g, ' ');
+                    sectionTitleEl.textContent = formattedId;
+                    sectionSubtitleEl.textContent = `Informations pour ${formattedId}`;
+                }
+            }
+
+            navItems.forEach(item => {
+                const iconDiv = item.querySelector('div:first-child');
+                if (iconDiv) {
+                    item.dataset.originalIconBg = Array.from(iconDiv.classList).find(cls => cls.startsWith('bg-') && cls !== 'bg-brand-accent');
+                    item.dataset.originalIconText = Array.from(iconDiv.classList).find(cls => cls.startsWith('text-') && cls !== 'text-slate-900');
+                }
+
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = item.dataset.section;
+                    showSection(sectionId);
+                });
+            });
+
+            showSection('overview');
+
+            const toggleOrchestratorBtn = document.getElementById('toggle-orchestrator');
+            const orchestratorStatusText = document.getElementById('orchestrator-status-text');
+            const orchestratorSuccessRate = document.getElementById('orchestrator-success-rate');
+            let orchestratorActive = true;
+
+            toggleOrchestratorBtn.addEventListener('click', () => {
+                orchestratorActive = !orchestratorActive;
+                if (orchestratorActive) {
+                    orchestratorStatusText.textContent = '🟢 Actif';
+                    orchestratorStatusText.classList.remove('text-red-400');
+                    orchestratorStatusText.classList.add('text-slate-100'); 
+                    orchestratorSuccessRate.classList.remove('hidden');
+                    toggleOrchestratorBtn.textContent = 'ARRÊTER';
+                    toggleOrchestratorBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    toggleOrchestratorBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                } else {
+                    orchestratorStatusText.textContent = '🔴 Arrêté';
+                    orchestratorStatusText.classList.remove('text-slate-100');
+                    orchestratorStatusText.classList.add('text-red-400');
+                    orchestratorSuccessRate.classList.add('hidden');
+                    toggleOrchestratorBtn.textContent = 'DÉMARRER';
+                    toggleOrchestratorBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    toggleOrchestratorBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
