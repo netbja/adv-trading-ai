@@ -1,0 +1,1 @@
+# Intégrations externes (APIs de trading, données de marché) 

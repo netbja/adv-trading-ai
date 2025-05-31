@@ -10,12 +10,15 @@ from contextlib import asynccontextmanager
 import structlog
 import time
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Histogram
+import logging
 
 from app.config import settings
 from app.api.v1 import router as api_v1_router
 from app.api.orchestrator import router as orchestrator_router
 from app.api.endpoints.advanced_ai import router as advanced_ai_router
 from database.session import init_db
+from app.api.endpoints import health, trading
+from app.orchestrator.orchestrator import orchestrator
 
 # Métriques Prometheus
 REQUEST_COUNT = Counter('http_requests_total', 'Total HTTP requests', ['method', 'endpoint'])
@@ -63,6 +66,8 @@ app.add_middleware(
 app.include_router(api_v1_router, prefix="/api/v1")
 app.include_router(orchestrator_router, prefix="/api")
 app.include_router(advanced_ai_router, prefix="/api")
+app.include_router(health.router)
+app.include_router(trading.router)
 
 @app.get("/")
 async def root():
