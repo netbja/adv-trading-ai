@@ -15,7 +15,10 @@ from sqlalchemy.orm import Session
 from redis import Redis
 
 from .decision_engine import DecisionEngine, TaskType, Priority, TaskRecommendation
-from app.database.connection import get_db
+
+import sys
+sys.path.append('/app/backend')
+from database.connection import get_db
 from utils.logger import get_logger
 # Note: ces imports seront corrigés une fois les tâches créées
 # from ..tasks.celery_app import celery_app

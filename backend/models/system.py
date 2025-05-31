@@ -5,7 +5,10 @@ Surveillance et métriques système
 
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Boolean
 from sqlalchemy.sql import func
-from app.database.connection import Base
+
+import sys
+sys.path.append('/app/backend')
+from database.connection import Base
 
 class SystemHealth(Base):
     """

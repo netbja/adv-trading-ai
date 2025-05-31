@@ -13,7 +13,12 @@ import numpy as np
 from sqlalchemy.orm import Session
 
 # Imports corrects pour la structure dans le container Docker
-from app.database.connection import get_db
+import sys
+import os
+sys.path.append('/app')
+sys.path.append('/app/backend')
+
+from database.connection import get_db
 from models.market import MarketData
 from models.system import SystemHealth
 from utils.logger import get_logger
