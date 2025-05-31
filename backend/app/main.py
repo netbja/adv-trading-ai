@@ -18,7 +18,6 @@ from app.api.orchestrator import router as orchestrator_router
 from app.api.endpoints.advanced_ai import router as advanced_ai_router
 from database.session import init_db
 from app.api.endpoints import health, trading
-from app.orchestrator.orchestrator import orchestrator
 
 # Métriques Prometheus
 REQUEST_COUNT = Counter('http_requests_total', 'Total HTTP requests', ['method', 'endpoint'])

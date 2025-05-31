@@ -7,12 +7,12 @@
         <h1 class="text-2xl font-bold text-brand-accent leading-tight">
           AI Trade<span class="text-slate-400">Bot</span>
         </h1>
-        <div class="text-sm text-slate-400 mt-1">
-          <span class="inline-flex items-center">
-            <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-            Système autonome actif
-          </span>
-        </div>
+            <div class="text-sm text-slate-400 mt-1">
+              <span class="inline-flex items-center">
+                <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                Système autonome actif
+              </span>
+            </div>
         <p class="text-slate-400 text-xs mt-1">🧠 Intelligence artificielle multi-assets</p>
       </div>
 
@@ -101,9 +101,9 @@
         </div>
         <div class="flex items-center space-x-4">
           <!-- Bouton DÉMARRER/ARRÊTER -->
-          <button @click="toggleOrchestrator" 
+            <button @click="toggleOrchestrator" 
                   :class="['px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg',
-                          orchestratorRunning 
+                            orchestratorRunning 
                             ? 'bg-red-600 hover:bg-red-700 text-white' 
                             : 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white']">
             {{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}

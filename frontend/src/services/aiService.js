@@ -231,7 +231,7 @@ class AIService {
       try {
         const result = await endpoint.method()
         results[endpoint.name] = { status: 'success', data: result }
-      } catch (error) {
+    } catch (error) {
         results[endpoint.name] = { status: 'error', error: error.message }
       }
     }
