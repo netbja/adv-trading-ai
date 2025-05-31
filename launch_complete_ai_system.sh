@@ -332,9 +332,10 @@ docker_monitoring() {
 docker_frontend() {
     print_step "Démarrage interface web..."
     docker_start_services
-    $COMPOSE_CMD --profile frontend up -d nginx
+    $COMPOSE_CMD up -d frontend
     print_status "Interface web démarrée"
     print_info "🌐 Interface: http://localhost"
+    print_info "🔧 API Backend: http://localhost:8000"
 }
 
 docker_stop() {

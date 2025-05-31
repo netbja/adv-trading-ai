@@ -1,0 +1,328 @@
+# 🚀 DOCKER COMPOSE PRO - TRADING AI ENTERPRISE
+# Backend + Frontend + Monitoring Avancé + ELK Stack + Tests Automatisés
+version: '3.8'
+
+services:
+  # 🗄️ BASE DE DONNÉES POSTGRESQL
+  database:
+    image: postgres:15-alpine
+    container_name: trading_db_pro
+    environment:
+      POSTGRES_DB: trading_orchestrator
+      POSTGRES_USER: trading_user
+      POSTGRES_PASSWORD: trading_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+      - ./backend/sql:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - trading_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trading_user -d trading_orchestrator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 🔴 REDIS POUR CACHE ET CELERY
+  redis:
+    image: redis:7-alpine
+    container_name: trading_redis_pro
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - trading_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # 🚀 BACKEND FASTAPI - IA TRADING ORCHESTRATOR
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trading_backend_pro
+    environment:
+      - DATABASE_URL=postgresql://trading_user:trading_pass@database:5432/trading_orchestrator
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=false
+      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+      - MONITORING_ENABLED=true
+    volumes:
+      - ./backend:/app
+      - backend_logs:/app/logs
+    ports:
+      - "8000:8000"
+    networks:
+      - trading_network
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  # 👷 CELERY WORKER - TÂCHES ASYNCHRONES
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trading_celery_worker_pro
+    environment:
+      - DATABASE_URL=postgresql://trading_user:trading_pass@database:5432/trading_orchestrator
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=false
+      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+    volumes:
+      - ./backend:/app
+      - celery_logs:/app/logs
+    networks:
+      - trading_network
+    depends_on:
+      - database
+      - redis
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=8
+
+  # ⏰ CELERY BEAT - SCHEDULER
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trading_celery_beat_pro
+    environment:
+      - DATABASE_URL=postgresql://trading_user:trading_pass@database:5432/trading_orchestrator
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=false
+      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+    volumes:
+      - ./backend:/app
+      - celery_logs:/app/logs
+    networks:
+      - trading_network
+    depends_on:
+      - database
+      - redis
+      - backend
+    restart: unless-stopped
+    working_dir: /app
+    healthcheck:
+      test: ["CMD", "python", "healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=redbeat.schedulers:RedBeatScheduler
+
+  # 🌐 FRONTEND VUE3 - INTERFACE UTILISATEUR
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: trading_frontend_pro
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - frontend_ssl:/etc/nginx/ssl
+      - frontend_logs:/var/log/nginx
+    networks:
+      - trading_network
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - NODE_ENV=production
+
+  # 🧪 TESTS IA AVANCÉE - SERVICE AUTOMATISÉ
+  ai_tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    container_name: trading_ai_tests_pro
+    environment:
+      - BASE_URL=http://backend:8000/api
+      - ADVANCED_AI_URL=http://backend:8000/api/advanced-ai
+      - DOCKER_ENV=true
+      - TEST_MODE=continuous
+    volumes:
+      - ./test_advanced_ai_complete.py:/app/test_advanced_ai_complete.py
+      - test_results:/app/results
+    networks:
+      - trading_network
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    command: python test_advanced_ai_complete.py
+
+  # 📊 MONITORING - PROMETHEUS
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trading_prometheus_pro
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - trading_network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+  # 📈 GRAFANA - DASHBOARDS INTELLIGENTS
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trading_grafana_pro
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-worldmap-panel,grafana-clock-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    networks:
+      - trading_network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  # 🔍 ELASTICSEARCH - LOGS AVANCÉS
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: trading_elasticsearch_pro
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - cluster.name=trading-cluster
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - trading_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # 📝 KIBANA - INTERFACE LOGS
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: trading_kibana_pro
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=trading-kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - trading_network
+    restart: unless-stopped
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # 📡 LOGSTASH - PIPELINE DE LOGS
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: trading_logstash_pro
+    environment:
+      - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
+    volumes:
+      - ./monitoring/logstash/config:/usr/share/logstash/config
+      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline
+      - backend_logs:/logs/backend
+      - celery_logs:/logs/celery
+      - frontend_logs:/logs/frontend
+    networks:
+      - trading_network
+    restart: unless-stopped
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # 🛡️ SECURITY SCANNER - CVE ET VULNÉRABILITÉS
+  security_scanner:
+    image: aquasec/trivy:latest
+    container_name: trading_security_pro
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - security_reports:/reports
+    networks:
+      - trading_network
+    restart: unless-stopped
+    command: |
+      sh -c "
+        while true; do
+          trivy image --format json --output /reports/backend_scan.json trading_backend_pro || true
+          trivy image --format json --output /reports/frontend_scan.json trading_frontend_pro || true
+          sleep 3600
+        done
+      "
+
+# 🌐 RÉSEAUX
+networks:
+  trading_network:
+    driver: bridge
+    name: trading_ai_network_pro
+
+# 💾 VOLUMES PERSISTANTS ENTERPRISE - AVEC BACKUP
+volumes:
+  postgres_data:
+    name: trading_postgres_data_pro
+  postgres_backups:
+    name: trading_postgres_backups_pro
+  redis_data:
+    name: trading_redis_data_pro
+  backend_logs:
+    name: trading_backend_logs_pro
+  celery_logs:
+    name: trading_celery_logs_pro
+  frontend_ssl:
+    name: trading_frontend_ssl_pro
+  frontend_logs:
+    name: trading_frontend_logs_pro
+  test_results:
+    name: trading_test_results_pro
+  prometheus_data:
+    name: trading_prometheus_data_pro
+  grafana_data:
+    name: trading_grafana_data_pro
+  elasticsearch_data:
+    name: trading_elasticsearch_data_pro
+  security_reports:
+    name: trading_security_reports_pro 

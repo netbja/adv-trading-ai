@@ -20,10 +20,10 @@
           </div>
           
           <!-- Texte du titre -->
-          <div>
+      <div>
             <h1 class="text-3xl font-bold text-brand-accent leading-tight">
-              AI Trade<span class="text-slate-400">Bot</span>
-            </h1>
+          AI Trade<span class="text-slate-400">Bot</span>
+        </h1>
             <div class="text-sm text-slate-400 mt-1">
               <span class="inline-flex items-center">
                 <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
@@ -120,7 +120,7 @@
                               ? 'bg-red-600 hover:bg-red-700 text-white ring-4 ring-red-300/50 hover:ring-red-300 hover:shadow-red-400/50' 
                               : 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white ring-4 ring-sky-300/50 hover:ring-sky-300 hover:shadow-sky-400/50']">
               <span class="relative z-10">{{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}</span>
-            </button>
+          </button>
           </div>
           
           <!-- Avatar IA ENCORE plus gros -->

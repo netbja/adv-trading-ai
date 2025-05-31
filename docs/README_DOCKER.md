@@ -1,289 +1,313 @@
-# 🐳 TRADING AI PROFESSIONNEL - DOCKER
+# 🐳 AI Trading Orchestrator - Docker Edition
 
-## 🎯 Vue d'ensemble
+## 🚀 Déploiement Complet avec Docker
 
-Interface de trading AI professionnelle avec authentification sécurisée et workflows temps réel, optimisée pour un déploiement Docker.
+Ce guide te permet de déployer l'ensemble du système AI Trading Orchestrator avec tous ses modules avancés en utilisant Docker.
 
-## 🚀 Démarrage rapide en Docker
+## 📋 Prérequis
 
-### Prérequis
-```bash
-# Docker et Docker Compose installés
-docker --version
-docker-compose --version
-
-# Si pas installés sur Ubuntu/Debian :
-sudo apt update
-sudo apt install docker.io docker-compose
-sudo usermod -aG docker $USER
-# Redémarrer la session ou faire : newgrp docker
-```
-
-### 🎯 Démarrage simple (Recommandé)
-```bash
-# Cloner et accéder au répertoire
-cd adv-trading-ai
-
-# Démarrage simple (Interface + PostgreSQL)
-./start_docker_trading_ai.sh
-
-# Ou en mode professionnel (+ Grafana + Prometheus)
-./start_docker_trading_ai.sh professional
-
-# Avec suivi des logs
-./start_docker_trading_ai.sh simple logs
-```
-
-### 🌐 Accès à l'interface
-- **Interface principale**: http://localhost:8000
-- **Connexion**: `admin / TradingAI2025!`
-- **Mode professionnel**: Grafana sur http://localhost:3000
+- **Docker** >= 20.10
+- **Docker Compose** >= 2.0
+- **4 GB RAM** minimum
+- **2 CPU cores** recommandé
+- **10 GB espace disque** libre
 
 ## 🏗️ Architecture Docker
 
-### Services disponibles
-
-#### 🧠 Interface Trading AI (`autonomous_trading`)
-- Port: `8000`
-- Interface web professionnelle complète
-- Workflows crypto, meme et forex temps réel
-- Authentification DB sécurisée
-
-#### 🗃️ PostgreSQL (`postgres`)
-- Port: `5432` 
-- Base de données pour utilisateurs et sessions
-- Healthcheck intégré
-- Backup automatique
-
-#### 📊 Grafana (`grafana`) - Mode professionnel
-- Port: `3000`
-- Dashboards de monitoring
-- Métriques système et trading
-
-#### 📈 Prometheus (`prometheus`) - Mode professionnel
-- Port: `9090`
-- Collecte de métriques
-- Alerting intégré
-
-## ⚙️ Configuration
-
-### Variables d'environnement (.env)
-```bash
-# Le fichier .env est créé automatiquement depuis env.autonomous.example
-# Personnalisez selon vos besoins :
-
-# Ports (si conflits)
-AUTONOMOUS_PORT=8000
-GRAFANA_PORT=3000
-POSTGRES_PORT=5432
-
-# Mots de passe
-POSTGRES_PASSWORD=TradingDB2025!
-GF_ADMIN_PASSWORD=TradingAI2025!
-
-# Mode et configuration
-DEMO_MODE=true
-INITIAL_CAPITAL=200
-LOG_LEVEL=INFO
+```
+┌─────────────────────────────────────────────────────────┐
+│                   AI TRADING ORCHESTRATOR               │
+├─────────────────────────────────────────────────────────┤
+│  🐳 CONTAINERS                                          │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐      │
+│  │   Backend   │ │   Database  │ │    Redis    │      │
+│  │  FastAPI    │ │ PostgreSQL  │ │   Cache     │      │
+│  └─────────────┘ └─────────────┘ └─────────────┘      │
+│                                                         │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐      │
+│  │   Celery    │ │ Celery Beat │ │  AI Tests   │      │
+│  │   Worker    │ │  Scheduler  │ │   Suite     │      │
+│  └─────────────┘ └─────────────┘ └─────────────┘      │
+├─────────────────────────────────────────────────────────┤
+│  🧠 MODULES IA AVANCÉE                                 │
+│  • AI Feedback Loop - Apprentissage continu            │
+│  • Predictive System - Prédictions multi-horizon       │
+│  • Security Supervisor - Surveillance complète         │
+│  • Portfolio Optimizer - Optimisation intelligente     │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Configuration avancée
-```bash
-# Éditer la configuration
-nano .env
+## 🚀 Lancement Rapide
 
-# Redémarrer pour appliquer
-./start_docker_trading_ai.sh
+### Option 1: Lancement Automatique (Recommandé)
+
+```bash
+# Lancement complet automatique
+./launch_docker_ai_system.sh --auto
 ```
 
-## 📋 Commandes utiles
+### Option 2: Menu Interactif
 
-### Gestion des containers
 ```bash
-# Voir les services actifs
-docker-compose -f docker-compose.autonomous.yml ps
+# Menu avec options avancées
+./launch_docker_ai_system.sh
+```
+
+### Option 3: Commandes Docker Manuelles
+
+```bash
+# Construction et démarrage
+docker compose build
+docker compose up -d
+
+# Tests IA avancée
+docker compose run --rm ai_tests
+```
+
+## 📊 Services et Ports
+
+| Service | Port | Description | Health Check |
+|---------|------|-------------|--------------|
+| Backend API | 8000 | FastAPI + IA Modules | http://localhost:8000/health |
+| PostgreSQL | 5432 | Base de données | Interne |
+| Redis | 6379 | Cache et queues | Interne |
+| Prometheus | 9090 | Monitoring (optionnel) | http://localhost:9090 |
+| Grafana | 3000 | Dashboards (optionnel) | http://localhost:3000 |
+
+## 🧪 Tests et Validation
+
+### Tests IA Complets
+
+```bash
+# Lancer tous les tests IA
+docker compose run --rm ai_tests
+
+# Logs des tests
+docker compose logs ai_tests
+```
+
+### Monitoring en Temps Réel
+
+```bash
+# Monitoring avec le script
+./launch_docker_ai_system.sh monitoring
+
+# Status des containers
+docker compose ps
 
 # Logs en temps réel
-docker-compose -f docker-compose.autonomous.yml logs -f
-
-# Logs d'un service spécifique
-docker-compose -f docker-compose.autonomous.yml logs -f autonomous_trading
-
-# Arrêter tous les services
-docker-compose -f docker-compose.autonomous.yml down
-
-# Arrêter et supprimer les volumes
-docker-compose -f docker-compose.autonomous.yml down -v
+docker compose logs -f
 ```
 
-### Debug et maintenance
+## 🔧 Configuration Avancée
+
+### Variables d'Environnement
+
 ```bash
-# Accéder au container Trading AI
-docker exec -it trading_ai_autonomous bash
+# Database
+DATABASE_URL=postgresql://trading_user:trading_pass@database:5432/trading_orchestrator
 
-# Accéder à PostgreSQL
-docker exec -it trading_ai_postgres_autonomous psql -U trader -d trading_ai
+# Redis
+REDIS_URL=redis://redis:6379/0
 
-# Reconstruire l'image
-docker-compose -f docker-compose.autonomous.yml build --no-cache autonomous_trading
+# Application
+DEBUG=true
+ENVIRONMENT=docker
+PYTHONPATH=/app
+```
 
-# Voir l'utilisation des ressources
+### Profiles Docker Compose
+
+```bash
+# Avec monitoring
+docker compose --profile monitoring up -d
+
+# Avec logging avancé
+docker compose --profile logging up -d
+
+# Tests seulement
+docker compose --profile testing run ai_tests
+```
+
+## 📈 Monitoring et Logs
+
+### Accès aux Logs
+
+```bash
+# Logs backend
+docker compose logs -f backend
+
+# Logs Celery
+docker compose logs -f celery_worker celery_beat
+
+# Logs base de données
+docker compose logs -f database
+
+# Tous les logs
+docker compose logs -f
+```
+
+### Métriques de Performance
+
+```bash
+# Status des containers
 docker stats
+
+# Utilisation des volumes
+docker system df
+
+# Health checks
+docker compose exec backend curl localhost:8000/health
 ```
 
-### Sauvegarde et restauration
+## 🔍 Dépannage
+
+### Problèmes Courants
+
+1. **Port déjà utilisé**
+   ```bash
+   # Vérifier les ports
+   netstat -tlnp | grep :8000
+   
+   # Changer le port dans docker-compose.yml
+   ports:
+     - "8001:8000"  # Utiliser 8001 au lieu de 8000
+   ```
+
+2. **Manque de mémoire**
+   ```bash
+   # Vérifier la mémoire
+   docker system df
+   docker system prune
+   
+   # Ajuster les ressources dans docker-compose.yml
+   deploy:
+     resources:
+       limits:
+         memory: 512M
+   ```
+
+3. **Base de données non prête**
+   ```bash
+   # Attendre que la DB soit prête
+   docker compose exec database pg_isready -U trading_user
+   
+   # Reinitialiser si nécessaire
+   docker compose down -v
+   docker compose up -d database
+   ```
+
+### Commandes de Dépannage
+
 ```bash
-# Sauvegarder la base de données
-docker exec trading_ai_postgres_autonomous pg_dump -U trader trading_ai > backup_$(date +%Y%m%d).sql
+# Redémarrage complet
+docker compose down --remove-orphans
+docker compose up -d
 
-# Restaurer une sauvegarde
-docker exec -i trading_ai_postgres_autonomous psql -U trader trading_ai < backup_20241225.sql
+# Reconstruction des images
+docker compose build --no-cache
+
+# Nettoyage complet
+./launch_docker_ai_system.sh cleanup
 ```
 
-## 🔍 Monitoring et logs
+## 🔐 Sécurité
 
-### Localisation des logs
+### Configuration Sécurisée
+
 ```bash
-logs/
-├── autonomous/        # Logs de l'interface Trading AI
-├── postgres/         # Logs PostgreSQL
-└── grafana/          # Logs Grafana (mode pro)
+# Créer un réseau isolé
+docker network create trading_secure
+
+# Utiliser des secrets Docker
+echo "trading_pass" | docker secret create db_password -
 ```
 
-### Monitoring en temps réel
+### Scanner les Vulnérabilités
+
 ```bash
-# Voir tous les logs
-./start_docker_trading_ai.sh simple logs
+# Scanner les images
+docker scout cves trading_backend
 
-# Filtrer par service
-docker-compose -f docker-compose.autonomous.yml logs -f autonomous_trading | grep ERROR
-
-# Métriques système (mode professionnel)
-# Grafana: http://localhost:3000
-# Prometheus: http://localhost:9090
+# Mettre à jour les images
+docker compose pull
+docker compose up -d
 ```
 
-## 🔧 Résolution de problèmes
+## 📊 API et Endpoints
 
-### Problèmes courants
+### Endpoints Principaux
 
-**Port 8000 déjà utilisé**
+- **Health Check**: `GET /health`
+- **API Docs**: `GET /docs` 
+- **AI Feedback**: `POST /api/advanced-ai/feedback/learn`
+- **Predictions**: `POST /api/advanced-ai/prediction/forecast`
+- **Security**: `POST /api/advanced-ai/security/health-check`
+- **Portfolio**: `POST /api/advanced-ai/portfolio/optimize`
+
+### Tests d'API
+
 ```bash
-# Changer le port dans .env
-echo "AUTONOMOUS_PORT=8001" >> .env
-./start_docker_trading_ai.sh
+# Test de base
+curl http://localhost:8000/health
+
+# Test complet
+curl -X POST http://localhost:8000/api/advanced-ai/feedback/learn \
+  -H "Content-Type: application/json" \
+  -d '{"signal_type":"SUCCESS","component":"test"}'
 ```
 
-**PostgreSQL ne démarre pas**
+## 🚀 Production
+
+### Optimisations Production
+
 ```bash
-# Vérifier les logs
-docker-compose -f docker-compose.autonomous.yml logs postgres
+# Variables d'environnement production
+export DEBUG=false
+export ENVIRONMENT=production
+export LOG_LEVEL=WARNING
 
-# Nettoyer les volumes corrompus
-docker-compose -f docker-compose.autonomous.yml down -v
-./start_docker_trading_ai.sh
+# Déploiement avec ressources limitées
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
-**Interface ne répond pas**
+### Sauvegarde et Restauration
+
 ```bash
-# Vérifier le healthcheck
-docker ps
+# Sauvegarde de la DB
+docker compose exec database pg_dump -U trading_user trading_orchestrator > backup.sql
 
-# Redémarrer le service
-docker-compose -f docker-compose.autonomous.yml restart autonomous_trading
-
-# Vérifier les logs
-docker-compose -f docker-compose.autonomous.yml logs autonomous_trading
+# Restauration
+docker compose exec -T database psql -U trading_user trading_orchestrator < backup.sql
 ```
 
-**Mémoire insuffisante**
-```bash
-# Augmenter les limites dans docker-compose.autonomous.yml
-# mem_limit: 2g  # au lieu de 1g
+## 🎯 Résultats Attendus
 
-# Ou désactiver les limites temporairement
-# Commenter les lignes mem_limit dans le fichier
+Après un déploiement réussi, tu devrais voir :
+
+```
+🏆 SYSTÈME 100% AUTONOME EN DOCKER!
+   ✅ Tous les containers fonctionnent parfaitement
+   ✅ Communication inter-services opérationnelle
+   ✅ Scalabilité Docker validée
+   ✅ Isolation et sécurité containers confirmées
+   ✅ Orchestration microservices réussie
+
+🚀 LE SYSTÈME DOCKER EST PRÊT POUR LA PRODUCTION!
+   🐳 Déploiement conteneurisé validé
+   📊 Monitoring intégré fonctionnel
+   🔄 Auto-scaling prêt
 ```
 
-### Debug avancé
-```bash
-# Mode debug détaillé
-echo "LOG_LEVEL=DEBUG" >> .env
-./start_docker_trading_ai.sh
+## 📞 Support
 
-# Analyser l'utilisation mémoire/CPU
-docker stats trading_ai_autonomous
+En cas de problème :
 
-# Inspecter la configuration
-docker inspect trading_ai_autonomous
-```
-
-## 🔒 Sécurité Docker
-
-### Bonnes pratiques appliquées
-- ✅ Utilisateur non-root dans les containers
-- ✅ Variables d'environnement pour secrets
-- ✅ Réseaux Docker isolés
-- ✅ Healthchecks pour tous les services
-- ✅ Limites mémoire définies
-
-### Renforcement (optionnel)
-```bash
-# Utiliser secrets Docker (production)
-# Ajouter dans docker-compose.yml :
-secrets:
-  postgres_password:
-    file: ./secrets/postgres_password.txt
-
-# Scanner les vulnérabilités
-docker scout cves trading_ai_autonomous
-
-# Mettre à jour les images de base
-docker-compose -f docker-compose.autonomous.yml pull
-./start_docker_trading_ai.sh
-```
-
-## 🚀 Déploiement production
-
-### Checklist pré-production
-- [ ] Changer tous les mots de passe par défaut
-- [ ] Configurer les vraies APIs (pas demo)
-- [ ] Activer HTTPS (Nginx avec certificats)
-- [ ] Configurer les sauvegardes automatiques
-- [ ] Mettre en place le monitoring externe
-- [ ] Tester la haute disponibilité
-
-### Variables production
-```bash
-# .env de production
-DEMO_MODE=false
-POSTGRES_PASSWORD=VotreMotDePasseFort!
-GF_ADMIN_PASSWORD=VotreMotDePasseGrafana!
-
-# APIs réelles
-OPENAI_API_KEY=votre_clé_openai
-GROQ_API_KEY=votre_clé_groq
-TELEGRAM_BOT_TOKEN=votre_token_telegram
-```
-
-## 📚 Référence rapide
-
-### Scripts disponibles
-- `./start_docker_trading_ai.sh` - Démarrage simple
-- `./start_docker_trading_ai.sh professional` - Mode professionnel
-- `./start_docker_trading_ai.sh simple logs` - Avec logs
-
-### URLs importantes
-- Interface Trading AI: http://localhost:8000
-- Grafana (mode pro): http://localhost:3000  
-- Prometheus (mode pro): http://localhost:9090
-- PostgreSQL: localhost:5432
-
-### Comptes par défaut
-- **Trading AI**: admin / TradingAI2025!
-- **Grafana**: admin / TradingAI2025!
-- **PostgreSQL**: trader / TradingDB2025!
+1. Vérifier les logs : `docker compose logs`
+2. Consulter le monitoring : `./launch_docker_ai_system.sh monitoring`
+3. Redémarrer : `docker compose restart`
+4. Nettoyage complet : `./launch_docker_ai_system.sh cleanup`
 
 ---
 
-**🐳 Déployé avec Docker pour une facilité maximale !** 
+**🎉 Bon trading avec l'IA ! 🤖💰** 

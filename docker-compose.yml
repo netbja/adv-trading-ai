@@ -1,5 +1,5 @@
-# 🚀 DOCKER COMPOSE - TRADING AI ETF SYSTEM
-# Version Vue3 + Backend Python FastAPI + ETF Intelligence
+# 🚀 DOCKER COMPOSE - TRADING AI STANDARD
+# Backend FastAPI + Frontend Vue3 + Database + Redis + Celery
 version: '3.8'
 
 services:
@@ -134,113 +134,23 @@ services:
       start_period: 30s
     command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=redbeat.schedulers:RedBeatScheduler
 
-  # 🧪 TESTS IA AVANCÉE - SERVICE OPTIONNEL
-  ai_tests:
+  # 🌐 FRONTEND VUE3 - INTERFACE UTILISATEUR
+  frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.tests
-    container_name: trading_ai_tests
-    environment:
-      - BASE_URL=http://backend:8000/api
-      - ADVANCED_AI_URL=http://backend:8000/api/advanced-ai
-      - DOCKER_ENV=true
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: trading_frontend
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./test_advanced_ai_complete.py:/app/test_advanced_ai_complete.py
-      - test_results:/app/results
+      - frontend_ssl:/etc/nginx/ssl
     networks:
       - trading_network
     depends_on:
       backend:
         condition: service_healthy
-    profiles:
-      - testing
-    command: python test_advanced_ai_complete.py
-
-  # 📊 MONITORING - PROMETHEUS (OPTIONNEL)
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: trading_prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    networks:
-      - trading_network
-    profiles:
-      - monitoring
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-
-  # 📈 GRAFANA - DASHBOARDS (OPTIONNEL)
-  grafana:
-    image: grafana/grafana:latest
-    container_name: trading_grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana:/etc/grafana/provisioning
-    networks:
-      - trading_network
-    profiles:
-      - monitoring
-    depends_on:
-      - prometheus
-
-  # 🔍 ELASTICSEARCH - LOGS AVANCÉS (OPTIONNEL)
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: trading_elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    networks:
-      - trading_network
-    profiles:
-      - logging
-
-  # 📝 KIBANA - INTERFACE LOGS (OPTIONNEL)
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.11.0
-    container_name: trading_kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-    networks:
-      - trading_network
-    profiles:
-      - logging
-    depends_on:
-      - elasticsearch
-
-  # 🌐 NGINX - FRONTEND VUE3 ET REVERSE PROXY
-  nginx:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
-    container_name: trading_nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - trading_network
-    depends_on:
-      - backend
     restart: unless-stopped
-    profiles:
-      - frontend
     environment:
       - VITE_API_URL=http://localhost:8000
 
@@ -250,7 +160,7 @@ networks:
     driver: bridge
     name: trading_ai_network
 
-# 💾 VOLUMES PERSISTANTS
+# 💾 VOLUMES PERSISTANTS - SÉCURISÉS POUR BACKUP
 volumes:
   postgres_data:
     name: trading_postgres_data
@@ -260,13 +170,5 @@ volumes:
     name: trading_backend_logs
   celery_logs:
     name: trading_celery_logs
-  celery_beat_data:
-    name: trading_celery_beat_data
-  test_results:
-    name: trading_test_results
-  prometheus_data:
-    name: trading_prometheus_data
-  grafana_data:
-    name: trading_grafana_data
-  elasticsearch_data:
-    name: trading_elasticsearch_data
+  frontend_ssl:
+    name: trading_frontend_ssl
