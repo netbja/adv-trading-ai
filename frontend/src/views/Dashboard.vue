@@ -4,8 +4,8 @@
     <aside class="w-64 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl">
       <div>
         <!-- Logo AI Trade Bot (vrai logo avec couleurs) -->
-        <div class="text-3xl font-bold text-brand-accent flex items-center justify-center py-4">
-          <img src="/src/assets/images/ai-trade-bot-logo.png" alt="AI Trade Bot" class="w-24 h-24 object-contain">
+        <div class="text-3xl font-bold text-brand-accent flex items-center justify-center py-6">
+          <img src="/src/assets/images/ai-trade-bot-logo.png" alt="AI Trade Bot" class="w-32 h-32 object-contain">
         </div>
       </div>
 
@@ -86,18 +86,32 @@
           <p class="text-slate-400">{{ getSectionSubtitle() }}</p>
         </div>
         <div class="flex items-center space-x-4">
-          <button @click="refreshData" class="p-2 rounded-full hover:bg-slate-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <!-- Bouton Refresh avec effet halo -->
+          <button @click="refreshData" 
+                  class="p-3 rounded-full hover:bg-slate-700 transition-all duration-300 ring-2 ring-slate-600 hover:ring-4 hover:ring-sky-400/50 shadow-lg hover:shadow-sky-400/30 group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400 group-hover:text-sky-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           </button>
+          
           <!-- Bouton Orchestrateur avec effet aurore professionnel -->
-          <button @click="toggleOrchestrator" 
-                  :class="['px-4 py-2 rounded-lg font-bold transition-colors text-lg shadow-lg',
-                          orchestratorRunning ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-brand-accent hover:bg-sky-500 text-white']">
-            {{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}
-          </button>
-          <img src="https://via.placeholder.com/40/38bdf8/ffffff?text=AI" alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-brand-accent">
+          <div class="relative">
+            <button @click="toggleOrchestrator" 
+                    :class="['px-6 py-3 rounded-lg font-bold transition-all duration-300 text-lg shadow-xl relative overflow-hidden group',
+                            orchestratorRunning 
+                              ? 'bg-red-600 hover:bg-red-700 text-white ring-4 ring-red-300/50 hover:ring-red-300 hover:shadow-red-400/50' 
+                              : 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white ring-4 ring-sky-300/50 hover:ring-sky-300 hover:shadow-sky-400/50']">
+              <!-- Effet glow en arrière-plan -->
+              <div :class="['absolute inset-0 rounded-lg blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-300',
+                           orchestratorRunning ? 'bg-red-400' : 'bg-sky-400']"></div>
+              <span class="relative z-10">{{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}</span>
+            </button>
+          </div>
+          
+          <!-- Avatar avec effet ring -->
+          <img src="https://via.placeholder.com/40/38bdf8/ffffff?text=AI" 
+               alt="User Avatar" 
+               class="w-10 h-10 rounded-full border-2 border-brand-accent ring-2 ring-brand-accent/30 hover:ring-4 hover:ring-brand-accent/50 transition-all duration-300 shadow-lg hover:shadow-brand-accent/30">
         </div>
       </header>
 
