@@ -4,8 +4,8 @@
     <aside class="w-64 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl">
       <div>
         <!-- Logo AI Trade Bot (vrai logo avec couleurs) -->
-        <div class="text-3xl font-bold text-brand-accent flex items-center justify-center">
-          <img src="/src/assets/images/ai-trade-bot-logo.png" alt="AI Trade Bot" class="w-16 h-16 object-contain">
+        <div class="text-3xl font-bold text-brand-accent flex items-center justify-center py-4">
+          <img src="/src/assets/images/ai-trade-bot-logo.png" alt="AI Trade Bot" class="w-24 h-24 object-contain">
         </div>
       </div>
 
