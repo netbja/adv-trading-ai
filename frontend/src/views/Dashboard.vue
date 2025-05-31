@@ -109,14 +109,11 @@
             {{ orchestratorRunning ? 'ARRÊTER' : 'DÉMARRER' }}
           </button>
           
-          <!-- Status IA compact -->
+          <!-- Status IA compact (sans gros logo) -->
           <div class="flex items-center space-x-2 bg-slate-800 px-4 py-2 rounded-lg">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-accent to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-              AI
-            </div>
             <div class="text-sm">
-              <div class="text-slate-300 font-medium">4/4 Modules</div>
-              <div class="text-green-400 text-xs">Actifs</div>
+              <div class="text-slate-300 font-medium">4/4 Modules IA</div>
+              <div class="text-green-400 text-xs">✅ Tous Actifs</div>
             </div>
           </div>
         </div>

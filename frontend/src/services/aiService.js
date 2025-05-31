@@ -36,7 +36,7 @@ class AIService {
   async post(endpoint, data = {}) {
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, {
-        method: 'POST',
+      method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -76,7 +76,7 @@ class AIService {
   // Analyser les performances
   async analyzePerformance(performanceData) {
     return this.post('/feedback/analyze-performance', performanceData)
-  }
+    }
 
   // ================================================================================
   // 🔮 PREDICTIVE SYSTEM ENDPOINTS
