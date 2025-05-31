@@ -63,8 +63,15 @@ async def submit_learning_signal(request: LearningSignalRequest, background_task
     try:
         feedback_loop = get_ai_feedback_loop()
         
-        # Convertir string en enum
-        signal_type = LearningSignal[request.signal_type.upper()]
+        # Convertir string en enum (mapping correct)
+        signal_mapping = {
+            "SUCCESS": LearningSignal.SUCCESS,
+            "FAILURE": LearningSignal.FAILURE,
+            "OPTIMIZATION": LearningSignal.OPTIMIZATION,
+            "ADAPTATION": LearningSignal.ADAPTATION
+        }
+        
+        signal_type = signal_mapping.get(request.signal_type.upper(), LearningSignal.SUCCESS)
         
         # Créer contexte d'adaptation
         context = AdaptationContext(
@@ -166,8 +173,15 @@ async def generate_prediction(request: PredictionRequest):
     try:
         predictive_system = get_predictive_system()
         
-        # Convertir horizon string en enum
-        horizon = PredictionHorizon[request.horizon.upper().replace("MIN", "_MINUTES").replace("HOUR", "_HOUR")]
+        # Convertir horizon string en enum (mapping correct)
+        horizon_mapping = {
+            "5min": PredictionHorizon.SHORT_TERM,
+            "1hour": PredictionHorizon.MEDIUM_TERM,
+            "4hour": PredictionHorizon.LONG_TERM,
+            "24hour": PredictionHorizon.STRATEGIC
+        }
+        
+        horizon = horizon_mapping.get(request.horizon, PredictionHorizon.MEDIUM_TERM)
         
         prediction = await predictive_system.generate_market_prediction(
             asset_type=request.asset_type,
@@ -187,6 +201,13 @@ async def generate_prediction(request: PredictionRequest):
                 "probability": prediction.probability,
                 "key_factors": prediction.key_factors,
                 "risk_factors": prediction.risk_factors,
+                "predicted_volatility": prediction.predicted_volatility,
+                "predicted_trend": prediction.predicted_trend,
+                "predicted_regime": prediction.predicted_regime.value,
+                "key_levels": prediction.key_levels,
+                "opportunities": prediction.opportunities,
+                "risks": prediction.risks,
+                "optimal_strategies": prediction.optimal_strategies,
                 "generated_at": prediction.generated_at.isoformat()
             }
         }
@@ -208,12 +229,10 @@ async def detect_market_regime():
             "status": "success",
             "regime": {
                 "trend": regime.trend.value,
-                "volatility": regime.volatility.value,
-                "market_phase": regime.market_phase.value,
+                "volatility": regime.volatility,
+                "market_phase": regime.market_phase,
                 "confidence": regime.confidence,
                 "regime_strength": regime.regime_strength,
-                "duration_days": regime.duration_days,
-                "characteristics": regime.characteristics,
                 "detected_at": regime.detected_at.isoformat()
             }
         }
@@ -236,19 +255,20 @@ async def get_predictive_alerts():
             "alerts": [
                 {
                     "alert_id": alert.alert_id,
-                    "alert_type": alert.alert_type.value,
+                    "alert_type": alert.alert_type,
                     "asset_type": alert.asset_type,
-                    "message": alert.message,
-                    "urgency": alert.urgency.value,
+                    "severity": alert.severity,
+                    "predicted_event": alert.predicted_event,
+                    "probability": alert.probability,
+                    "time_to_event": str(alert.time_to_event),
+                    "recommended_actions": alert.recommended_actions,
                     "confidence": alert.confidence,
-                    "recommended_action": alert.recommended_action,
-                    "impact_assessment": alert.impact_assessment,
-                    "generated_at": alert.generated_at.isoformat()
+                    "created_at": alert.created_at.isoformat()
                 }
                 for alert in alerts
             ],
             "total_alerts": len(alerts),
-            "high_priority": len([a for a in alerts if a.urgency.value == "high"])
+            "high_priority": len([a for a in alerts if a.severity == "high"])
         }
         
     except Exception as e:
