@@ -7,12 +7,12 @@ const routes = [
   {
     path: '/',
     name: 'Dashboard',
-    component: DashboardPro
+    component: Dashboard
   },
   {
-    path: '/dashboard-old',
-    name: 'DashboardOld',
-    component: Dashboard
+    path: '/dashboard-pro',
+    name: 'DashboardPro',
+    component: DashboardPro
   },
   {
     path: '/login',

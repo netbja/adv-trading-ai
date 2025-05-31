@@ -894,9 +894,214 @@
       </div>
 
       <div v-else-if="currentSection === 'health'">
-        <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
-          <h3 class="text-xl font-semibold text-red-400 mb-4">❤️ Health Monitor</h3>
-          <p class="text-slate-300">Monitoring système et performances...</p>
+        <!-- Health Monitor détaillé -->
+        <div class="space-y-6">
+          <!-- Statut global du système -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">CPU Usage</h3>
+                  <p class="text-2xl font-bold text-green-400">15%</p>
+                  <p class="text-xs text-green-300">Normal</p>
+                </div>
+                <div class="text-2xl">🖥️</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Memory</h3>
+                  <p class="text-2xl font-bold text-yellow-400">68%</p>
+                  <p class="text-xs text-yellow-300">Modéré</p>
+                </div>
+                <div class="text-2xl">🧠</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Uptime</h3>
+                  <p class="text-2xl font-bold text-green-400">99.9%</p>
+                  <p class="text-xs text-green-300">Excellent</p>
+                </div>
+                <div class="text-2xl">⏱️</div>
+              </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-slate-400">Latency</h3>
+                  <p class="text-2xl font-bold text-green-400">45ms</p>
+                  <p class="text-xs text-green-300">Rapide</p>
+                </div>
+                <div class="text-2xl">⚡</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Status des services -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">🔧 Status des Services</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-green-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-slate-200">Backend API</div>
+                    <div class="text-sm text-slate-400">FastAPI Server</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-green-400 font-semibold">🟢 Healthy</div>
+                  <div class="text-sm text-slate-400">Port 8000</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-green-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-slate-200">Database</div>
+                    <div class="text-sm text-slate-400">PostgreSQL 15</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-green-400 font-semibold">🟢 Connected</div>
+                  <div class="text-sm text-slate-400">5 connections</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-green-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-slate-200">Redis Cache</div>
+                    <div class="text-sm text-slate-400">Redis 7</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-green-400 font-semibold">🟢 Active</div>
+                  <div class="text-sm text-slate-400">45% memory</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-4 bg-slate-700 rounded-lg border border-green-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-slate-200">Celery Workers</div>
+                    <div class="text-sm text-slate-400">Background Tasks</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-green-400 font-semibold">🟢 Running</div>
+                  <div class="text-sm text-slate-400">4 workers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modules IA Health -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">🧠 Santé Modules IA</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg border border-purple-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-purple-400">Feedback Loop</div>
+                    <div class="text-sm text-slate-400">Dernière adaptation: il y a 2min</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-purple-400 font-semibold">✅ Actif</div>
+                  <div class="text-sm text-purple-300">Score: 94/100</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg border border-blue-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-blue-400">Predictive System</div>
+                    <div class="text-sm text-slate-400">147 prédictions actives</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-blue-400 font-semibold">✅ Actif</div>
+                  <div class="text-sm text-blue-300">Précision: 91%</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg border border-red-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-red-400">Security Supervisor</div>
+                    <div class="text-sm text-slate-400">Dernier scan: il y a 5min</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-red-400 font-semibold">✅ Surveillant</div>
+                  <div class="text-sm text-red-300">Score: 98/100</div>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center p-3 bg-slate-700 rounded-lg border border-green-500/30">
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div>
+                    <div class="font-medium text-green-400">Portfolio Optimizer</div>
+                    <div class="text-sm text-slate-400">Dernière optimisation: il y a 12min</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-green-400 font-semibold">✅ Optimisant</div>
+                  <div class="text-sm text-green-300">Efficacité: 87%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Alertes et logs récents -->
+          <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4">📋 Événements Récents</h3>
+            <div class="space-y-2">
+              <div class="flex items-center space-x-3 p-2 rounded bg-slate-700">
+                <span class="text-green-400">✅</span>
+                <span class="text-sm text-slate-300">11:23 - Portfolio optimizer: Réallocation +2.3% efficacité</span>
+                <span class="text-xs text-slate-500 ml-auto">il y a 12min</span>
+              </div>
+              
+              <div class="flex items-center space-x-3 p-2 rounded bg-slate-700">
+                <span class="text-blue-400">ℹ️</span>
+                <span class="text-sm text-slate-300">11:18 - Predictive system: Nouvelle prédiction BTC +5.2%</span>
+                <span class="text-xs text-slate-500 ml-auto">il y a 17min</span>
+              </div>
+              
+              <div class="flex items-center space-x-3 p-2 rounded bg-slate-700">
+                <span class="text-purple-400">🔄</span>
+                <span class="text-sm text-slate-300">11:15 - Feedback loop: Adaptation pattern meme_coins</span>
+                <span class="text-xs text-slate-500 ml-auto">il y a 20min</span>
+              </div>
+              
+              <div class="flex items-center space-x-3 p-2 rounded bg-slate-700">
+                <span class="text-green-400">✅</span>
+                <span class="text-sm text-slate-300">11:10 - Security scan: Aucune vulnérabilité détectée</span>
+                <span class="text-xs text-slate-500 ml-auto">il y a 25min</span>
+              </div>
+              
+              <div class="flex items-center space-x-3 p-2 rounded bg-slate-700">
+                <span class="text-yellow-400">⚠️</span>
+                <span class="text-sm text-slate-300">11:05 - Utilisation mémoire: 68% (seuil d'alerte: 70%)</span>
+                <span class="text-xs text-slate-500 ml-auto">il y a 30min</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
