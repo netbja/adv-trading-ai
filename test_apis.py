@@ -300,6 +300,104 @@ def test_groq():
         print(f"❌ Groq: {e}")
         return False
 
+def test_gmgn():
+    """Test GMGN.AI API (meme coins intelligence) - GRATUIT"""
+    print("🎪 Test GMGN.AI...")
+    try:
+        # Pas de clé API nécessaire pour gmgn.ai !
+        base_url = os.getenv('GMGN_BASE_URL', 'https://gmgn.ai/defi/quotation/v1')
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://gmgn.ai/",
+            "Origin": "https://gmgn.ai"
+        }
+        
+        # Test trending tokens Solana
+        url = f"{base_url}/rank/sol/swaps/6h"
+        params = {
+            "orderby": "volume",
+            "direction": "desc"
+        }
+        
+        response = requests.get(url, headers=headers, params=params, timeout=15)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("code") == 0 and "data" in data:
+                rank_data = data["data"].get("rank", [])
+                if rank_data:
+                    top_token = rank_data[0]
+                    symbol = top_token.get("symbol", "UNKNOWN")
+                    volume = float(top_token.get("volume", 0))
+                    print("✅ GMGN.AI: Connecté (GRATUIT)")
+                    print(f"   🔥 Top trending: {symbol} (Vol: ${volume:,.0f})")
+                    return True
+            
+            print("⚠️ GMGN.AI: Données vides")
+            return False
+        else:
+            print(f"❌ GMGN.AI: HTTP {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ GMGN.AI: {e}")
+        return False
+
+def test_coincap():
+    """Test CoinCap API (crypto market data)"""
+    print("💰 Test CoinCap...")
+    try:
+        api_key = os.getenv('COINCAP_API_KEY')
+        base_url = os.getenv('COINCAP_BASE_URL', 'https://api.coincap.io/v2')
+        
+        headers = {
+            "Accept": "application/json",
+            "User-Agent": "TradingAI-Orchestrator/1.0"
+        }
+        
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        
+        # Test assets endpoint
+        url = f"{base_url}/assets"
+        params = {"limit": 5}
+        
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if "data" in data and data["data"]:
+                btc = data["data"][0]  # Bitcoin devrait être #1
+                symbol = btc.get("symbol", "")
+                price = float(btc.get("priceUsd", 0))
+                change = float(btc.get("changePercent24Hr", 0))
+                
+                print("✅ CoinCap: Connecté")
+                print(f"   📊 {symbol}: ${price:,.2f} ({change:+.2f}%)")
+                
+                # Test historique si clé API disponible
+                if api_key:
+                    hist_url = f"{base_url}/assets/bitcoin/history"
+                    hist_params = {"interval": "d1", "start": int((datetime.now().timestamp() - 86400) * 1000)}
+                    hist_response = requests.get(hist_url, headers=headers, params=hist_params, timeout=10)
+                    if hist_response.status_code == 200:
+                        print("   📈 Historique: ✅")
+                
+                return True
+            else:
+                print("⚠️ CoinCap: Pas de données")
+                return False
+        else:
+            print(f"❌ CoinCap: HTTP {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ CoinCap: {e}")
+        return False
+
 def main():
     """Fonction principale de test"""
     print("🧪 TEST DE CONNECTIVITÉ APIs - TRADING AI BOT")
@@ -315,7 +413,9 @@ def main():
         ("Reddit (Sentiment)", test_reddit),
         ("Twitter (Trends)", test_twitter),
         ("Alpaca (Trading)", test_alpaca),
-        ("Groq (AI)", test_groq)
+        ("Groq (AI)", test_groq),
+        ("GMGN.AI (Meme Coins Intelligence)", test_gmgn),
+        ("CoinCap (Crypto Market Data)", test_coincap)
     ]
     
     # Exécuter tous les tests
