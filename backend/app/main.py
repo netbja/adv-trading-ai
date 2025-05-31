@@ -14,6 +14,7 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, His
 from app.config import settings
 from app.api.v1 import router as api_v1_router
 from app.api.orchestrator import router as orchestrator_router
+from app.api.endpoints.advanced_ai import router as advanced_ai_router
 from database.session import init_db
 
 # Métriques Prometheus
@@ -61,6 +62,7 @@ app.add_middleware(
 # Routes principales
 app.include_router(api_v1_router, prefix="/api/v1")
 app.include_router(orchestrator_router, prefix="/api")
+app.include_router(advanced_ai_router, prefix="/api")
 
 @app.get("/")
 async def root():
@@ -74,9 +76,14 @@ async def root():
             "📊 Market Analysis",
             "💰 Smart Trading", 
             "🛡️ Auto-Healing",
-            "📈 Real-time Metrics"
+            "📈 Real-time Metrics",
+            "🧠 AI Feedback Loop",
+            "🔮 Predictive System",
+            "🛡️ Security Supervisor",
+            "💼 Portfolio Optimizer"
         ],
-        "docs": "/docs"
+        "docs": "/docs",
+        "advanced_ai": "/api/advanced-ai/*"
     }
 
 @app.get("/health")

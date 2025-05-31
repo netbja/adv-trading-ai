@@ -255,36 +255,67 @@ full_cleanup() {
     print_status "Nettoyage complet terminé"
 }
 
-# Menu principal
-show_menu() {
+# Menu principal avec navigation améliorée
+show_main_menu() {
+    echo -e "${BLUE}🎯 MENU PRINCIPAL - SYSTÈME IA DOCKER${NC}"
+    echo "=================================="
     echo
-    echo -e "${BLUE}🎯 MENU DOCKER AI TRADING${NC}"
-    echo "========================="
-    echo "1. 🚀 Lancement complet (recommandé)"
-    echo "2. 🔧 Construction des images seulement"
-    echo "3. ⚡ Démarrage services principaux"
-    echo "4. 🧪 Tests IA avancée seulement"
-    echo "5. 📊 Monitoring en temps réel"
-    echo "6. 📝 Afficher les logs"
-    echo "7. 🛑 Arrêter tous les services"
-    echo "8. 🧹 Nettoyage complet"
-    echo "9. ❌ Quitter"
+    echo "1. 🚀 Déploiement complet"
+    echo "2. 🔧 Gestion des services"
+    echo "3. 📊 Monitoring et statuts"
+    echo "4. 🧪 Tests et validation"
+    echo "5. 🗃️  Gestion des données"
+    echo "6. 🔍 Logs et diagnostics"
+    echo "7. 🛠️  Configuration avancée"
+    echo "8. 📚 Documentation"
+    echo "9. 🧹 Nettoyage du système"
     echo
-    read -p "Choix (1-9): " choice
+    echo "🌐 Options Frontend:"
+    echo "f. 🎨 Démarrer avec interface web (port 80)"
+    echo "m. 📈 Démarrer avec monitoring (port 3000/9090)"
+    echo
+    echo "0. ❌ Quitter"
+    echo -e "${YELLOW}💡 Astuce: Appuyez sur 'q' ou ESC pour quitter rapidement${NC}"
+    echo
 }
 
-# Démarrage avec services optionnels
-start_with_monitoring() {
-    print_step "Démarrage avec monitoring..."
+# Fonction pour lire l'input avec gestion ESC
+read_user_input() {
+    local prompt="$1"
+    local input
     
-    start_core_services
-    
-    print_info "Démarrage des services de monitoring..."
-    $COMPOSE_CMD --profile monitoring up -d prometheus grafana
-    
-    print_status "Services de monitoring démarrés"
-    print_info "Prometheus: http://localhost:9090"
-    print_info "Grafana: http://localhost:3000 (admin/admin123)"
+    # Configuration pour capturer les touches spéciales
+    while true; do
+        printf "$prompt"
+        
+        # Lecture caractère par caractère pour capturer ESC
+        read -n1 -s input
+        
+        case "$input" in
+            $'\e') # ESC
+                echo
+                print_info "Au revoir! 👋"
+                exit 0
+                ;;
+            'q'|'Q') # Touche q pour quitter
+                echo
+                print_info "Au revoir! 👋"
+                exit 0
+                ;;
+            [0-9]) # Chiffres valides
+                echo "$input"
+                return 0
+                ;;
+            '') # Entrée
+                echo
+                return 0
+                ;;
+            *) # Autres touches, afficher et continuer
+                echo "$input"
+                return 0
+                ;;
+        esac
+    done
 }
 
 # Menu logs
@@ -306,13 +337,30 @@ show_logs_menu() {
     esac
 }
 
+# Démarrage avec frontend
+start_with_frontend() {
+    print_step "Démarrage avec interface web..."
+    
+    start_core_services
+    
+    print_info "Démarrage de l'interface web..."
+    $COMPOSE_CMD --profile frontend up -d nginx
+    
+    print_status "Interface web démarrée"
+    print_info "🌐 Interface: http://localhost"
+    print_info "📚 API Docs: http://localhost/docs"
+    print_info "🔍 Health: http://localhost/health"
+}
+
 # Fonction principale
 main() {
     print_banner
     check_docker
     
     while true; do
-        show_menu
+        show_main_menu
+        
+        choice=$(read_user_input "Choix (0-9): ")
         
         case $choice in
             1)
@@ -351,6 +399,13 @@ main() {
             9)
                 print_info "Au revoir! 👋"
                 exit 0
+                ;;
+            f)
+                start_with_frontend
+                ;;
+            m)
+                start_with_monitoring
+                monitor_services
                 ;;
             *)
                 print_error "Option invalide"

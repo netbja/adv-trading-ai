@@ -95,7 +95,7 @@ services:
       - redis
       - backend
     restart: unless-stopped
-    command: celery -A app.core.celery worker --loglevel=info --concurrency=4
+    command: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=4
 
   # ⏰ CELERY BEAT - SCHEDULER
   celery_beat:
@@ -120,7 +120,7 @@ services:
       - redis
       - backend
     restart: unless-stopped
-    command: celery -A app.core.celery beat --loglevel=info
+    command: celery -A app.tasks.celery_app beat --loglevel=info
 
   # 🧪 TESTS IA AVANCÉE - SERVICE OPTIONNEL
   ai_tests:
@@ -212,6 +212,25 @@ services:
       - logging
     depends_on:
       - elasticsearch
+
+  # 🌐 NGINX - FRONTEND VUE3 ET REVERSE PROXY
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: trading_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - trading_network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    profiles:
+      - frontend
+    environment:
+      - VITE_API_URL=http://localhost:8000
 
 # 🌐 RÉSEAUX
 networks:
