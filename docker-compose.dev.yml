@@ -84,7 +84,7 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=celery.beat:PersistentScheduler
+    command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=celery.beat:PersistentScheduler --schedule=/app/data/celerybeat-schedule
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/${POSTGRES_DB:-trading_ai}
       - REDIS_URL=redis://redis:6379
@@ -95,7 +95,7 @@ services:
       - backend
     volumes:
       - ./backend:/app
-      - celery_beat_dev:/app/celerybeat-schedule
+      - celery_beat_dev:/app/data
     restart: unless-stopped
 
   # 🎨 Frontend Vue3
