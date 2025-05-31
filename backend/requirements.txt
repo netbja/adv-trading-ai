@@ -33,15 +33,22 @@ schedule==1.2.1
 # HTTP & Requests (versions compatibles avec alpaca-py)
 httpx==0.25.2
 requests==2.31.0
+aiohttp==3.9.1
+aiofiles==23.2.1
+
+# System & Docker Integration - MODULES IA AVANCÉE
+docker==6.1.3
+psutil==5.9.6
+asyncpg==0.29.0
+
+# CVE & Security Scanning
+safety==2.3.5
+bandit==1.7.5
 
 # Monitoring & Logging
 prometheus-client==0.19.0
 structlog==23.2.0
 sentry-sdk[fastapi]==1.39.1
-
-# System Monitoring & Auto-Healing - VERSIONS OPTIMISÉES
-psutil==5.9.6
-asyncpg==0.29.0
 
 # Development & Testing
 pytest==7.4.3
