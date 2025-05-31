@@ -52,7 +52,8 @@ docker-compose*.yml
 *.md
 !README.md
 
-# Tests
+# Tests locaux (garder les tests Docker)
 tests/
 *_test.py
-test_*.py 
+# Autoriser test_advanced_ai_complete.py pour les tests Docker
+!test_advanced_ai_complete.py 
