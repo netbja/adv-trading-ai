@@ -25,6 +25,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY start.sh .
 RUN chmod +x start.sh
 
+# Copier le script de health check pour Celery
+COPY healthcheck.py .
+
 # Copier le code source
 COPY . .
 
