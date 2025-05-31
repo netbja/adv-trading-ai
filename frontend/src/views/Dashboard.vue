@@ -1,52 +1,103 @@
 <template>
   <div class="bg-slate-900 text-slate-100 flex min-h-screen font-sans">
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl">
+    <aside class="w-72 bg-slate-800 p-6 space-y-8 flex flex-col shadow-2xl">
       <div>
         <h1 class="text-3xl font-bold text-brand-accent flex items-center">
           <SparklesIcon class="w-8 h-8 mr-2" />
-          AI Trade<span class="text-slate-400">Bot</span>
+          AI Trade<span class="text-slate-400">Hub</span>
         </h1>
+        <p class="text-sm text-slate-400 mt-1">Orchestrateur Multi-Assets</p>
       </div>
 
+      <!-- Orchestrator Controls -->
+      <div class="bg-slate-700/50 p-4 rounded-xl">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-semibold text-slate-200">🧠 Orchestrateur AI</h3>
+          <div :class="['w-3 h-3 rounded-full', orchestratorRunning ? 'bg-green-400 animate-pulse' : 'bg-red-400']"></div>
+        </div>
+        <div class="space-y-2">
+          <button 
+            @click="toggleOrchestrator" 
+            :class="['w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    orchestratorRunning ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white']">
+            {{ orchestratorRunning ? '⏹️ ARRÊTER' : '▶️ DÉMARRER' }}
+          </button>
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-300">
+            <div>Tâches: {{ orchestratorStats.total_tasks || 0 }}</div>
+            <div>Succès: {{ (orchestratorStats.success_rate || 0) }}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Navigation -->
       <nav class="space-y-2 flex-grow">
-        <a href="#" @click="currentSection = 'dashboard'" 
+        <div class="text-xs text-slate-400 uppercase tracking-wide mb-4">🌐 Multi-Assets</div>
+        
+        <a href="#" @click="currentAsset = 'overview'" 
            :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
-                   currentSection === 'dashboard' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+                   currentAsset === 'overview' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
           <HomeIcon class="h-5 w-5" />
-          <span>Dashboard</span>
+          <span>📊 Vue d'ensemble</span>
         </a>
-        <a href="#" @click="currentSection = 'trading'"
+
+        <a href="#" @click="currentAsset = 'meme_coins'"
            :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
-                   currentSection === 'trading' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+                   currentAsset === 'meme_coins' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+          <CurrencyDollarIcon class="h-5 w-5" />
+          <span>🪙 Meme Coins</span>
+          <span v-if="assetStats.meme_coins?.active" class="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        </a>
+
+        <a href="#" @click="currentAsset = 'crypto_lt'"
+           :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
+                   currentAsset === 'crypto_lt' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
           <ChartBarIcon class="h-5 w-5" />
-          <span>Trade Station</span>
+          <span>₿ Crypto Long Terme</span>
+          <span v-if="assetStats.crypto_lt?.active" class="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
         </a>
-        <a href="#" @click="currentSection = 'portfolio'"
+
+        <a href="#" @click="currentAsset = 'forex'"
            :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
-                   currentSection === 'portfolio' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+                   currentAsset === 'forex' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+          <GlobeEuropeAfricaIcon class="h-5 w-5" />
+          <span>💱 Forex</span>
+          <span v-if="assetStats.forex?.active" class="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        </a>
+
+        <a href="#" @click="currentAsset = 'etf'"
+           :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
+                   currentAsset === 'etf' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
           <WalletIcon class="h-5 w-5" />
-          <span>Portefeuille ETF</span>
+          <span>📈 ETF</span>
+          <span v-if="assetStats.etf?.active" class="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
         </a>
-        <a href="#" @click="currentSection = 'ai'"
+
+        <div class="text-xs text-slate-400 uppercase tracking-wide mt-6 mb-4">⚙️ Système</div>
+        
+        <a href="#" @click="currentAsset = 'ai_insights'"
            :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
-                   currentSection === 'ai' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+                   currentAsset === 'ai_insights' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
           <CpuChipIcon class="h-5 w-5" />
-          <span>AI Insights</span>
+          <span>🧠 Insights IA</span>
         </a>
-        <a href="#" @click="currentSection = 'settings'"
+
+        <a href="#" @click="currentAsset = 'settings'"
            :class="['flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group',
-                   currentSection === 'settings' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
+                   currentAsset === 'settings' ? 'bg-slate-700 text-brand-accent' : 'text-slate-300 hover:bg-slate-700 hover:text-brand-accent']">
           <Cog6ToothIcon class="h-5 w-5" />
-          <span>Paramètres</span>
+          <span>⚙️ Paramètres</span>
         </a>
       </nav>
 
+      <!-- Market Conditions Footer -->
       <div class="mt-auto border-t border-slate-700 pt-6">
-        <div class="text-sm text-slate-400">Capital Total ETF :</div>
-        <div class="text-2xl font-semibold text-slate-100">${{ portfolioValue.toLocaleString() }}</div>
-        <div :class="['text-sm font-medium', dailyChange >= 0 ? 'text-green-400' : 'text-red-400']">
-          {{ dailyChange >= 0 ? '+' : '' }}{{ dailyChange.toFixed(2) }}% aujourd'hui
+        <div class="text-sm text-slate-400">Conditions Marché :</div>
+        <div class="grid grid-cols-2 gap-2 text-xs mt-2">
+          <div class="text-slate-300">Volatilité: {{ (marketConditions.volatility || 0).toFixed(3) }}</div>
+          <div class="text-slate-300">Tendance: {{ (marketConditions.trend_strength || 0).toFixed(3) }}</div>
+          <div class="text-slate-300">CPU: {{ (systemStatus.cpu_usage || 0) }}%</div>
+          <div class="text-slate-300">RAM: {{ (systemStatus.memory_usage || 0).toFixed(1) }}%</div>
         </div>
       </div>
     </aside>
@@ -55,8 +106,8 @@
     <main class="flex-1 p-8 space-y-8 overflow-y-auto">
       <header class="flex justify-between items-center">
         <div>
-          <h2 class="text-3xl font-semibold text-slate-100">{{ getSectionTitle() }}</h2>
-          <p class="text-slate-400">{{ getSectionSubtitle() }}</p>
+          <h2 class="text-3xl font-semibold text-slate-100">{{ getAssetTitle() }}</h2>
+          <p class="text-slate-400">{{ getAssetSubtitle() }}</p>
         </div>
         <div class="flex items-center space-x-4">
           <button @click="refreshData" class="p-2 rounded-full hover:bg-slate-700 transition-colors pulse-glow">
@@ -71,126 +122,164 @@
         </div>
       </header>
 
-      <!-- Dashboard Section -->
-      <div v-if="currentSection === 'dashboard'" class="space-y-8">
-        <!-- Stats Grid -->
+      <!-- Overview Section -->
+      <div v-if="currentAsset === 'overview'" class="space-y-8">
+        <!-- Global Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-brand-accent">
-            <h3 class="text-sm text-slate-400 uppercase tracking-wide">Capital ETF</h3>
-            <p class="text-2xl font-bold text-slate-100 mt-2">${{ portfolioValue.toLocaleString() }}</p>
-            <span :class="['text-sm font-medium', dailyChange >= 0 ? 'text-green-400' : 'text-red-400']">
-              {{ dailyChange >= 0 ? '+' : '' }}{{ dailyChange.toFixed(2) }}%
+          <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-purple-500">
+            <h3 class="text-sm text-slate-400 uppercase tracking-wide">🪙 Meme Coins</h3>
+            <p class="text-2xl font-bold text-slate-100 mt-2">{{ assetStats.meme_coins?.recommendations || 0 }}</p>
+            <span :class="['text-sm font-medium', assetStats.meme_coins?.active ? 'text-green-400' : 'text-slate-400']">
+              {{ assetStats.meme_coins?.active ? '🔥 Actif' : '😴 Inactif' }}
+            </span>
+          </div>
+
+          <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-orange-500">
+            <h3 class="text-sm text-slate-400 uppercase tracking-wide">₿ Crypto LT</h3>
+            <p class="text-2xl font-bold text-slate-100 mt-2">{{ assetStats.crypto_lt?.recommendations || 0 }}</p>
+            <span :class="['text-sm font-medium', assetStats.crypto_lt?.active ? 'text-green-400' : 'text-slate-400']">
+              {{ assetStats.crypto_lt?.active ? '📈 Optimisation' : '💤 Attente' }}
+            </span>
+          </div>
+
+          <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-blue-500">
+            <h3 class="text-sm text-slate-400 uppercase tracking-wide">💱 Forex</h3>
+            <p class="text-2xl font-bold text-slate-100 mt-2">{{ assetStats.forex?.recommendations || 0 }}</p>
+            <span :class="['text-sm font-medium', assetStats.forex?.active ? 'text-green-400' : 'text-slate-400']">
+              {{ assetStats.forex?.active ? '🌐 Session Active' : '🌙 Hors Session' }}
             </span>
           </div>
 
           <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-green-500">
-            <h3 class="text-sm text-slate-400 uppercase tracking-wide">ETF Actifs</h3>
-            <p class="text-2xl font-bold text-slate-100 mt-2">{{ activeETFs }}</p>
-            <span class="text-sm font-medium text-green-400">Diversifié</span>
-          </div>
-
-          <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-blue-500">
-            <h3 class="text-sm text-slate-400 uppercase tracking-wide">Signaux IA</h3>
-            <p class="text-2xl font-bold text-slate-100 mt-2">{{ aiSignals }}</p>
-            <span class="text-sm font-medium text-slate-300">Aujourd'hui</span>
-          </div>
-
-          <div class="bg-slate-800 p-6 rounded-xl shadow-2xl border-l-4 border-yellow-500">
-            <h3 class="text-sm text-slate-400 uppercase tracking-wide">Système IA</h3>
-            <p class="text-2xl font-bold text-slate-100 mt-2">{{ systemHealth }}%</p>
-            <span class="text-sm font-medium text-green-400">Opérationnel</span>
+            <h3 class="text-sm text-slate-400 uppercase tracking-wide">📈 ETF</h3>
+            <p class="text-2xl font-bold text-slate-100 mt-2">{{ assetStats.etf?.recommendations || 0 }}</p>
+            <span :class="['text-sm font-medium', assetStats.etf?.active ? 'text-green-400' : 'text-slate-400']">
+              {{ assetStats.etf?.active ? '🚀 Toujours Actif' : '⏸️ Pause' }}
+            </span>
           </div>
         </div>
 
-        <!-- AI Insights Section -->
+        <!-- AI Decision Engine Status -->
         <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
           <div class="flex items-center mb-4">
             <CpuChipIcon class="w-8 h-8 mr-3 text-brand-accent" />
-            <h3 class="text-xl font-semibold text-slate-100">Perspectives IA ETF</h3>
+            <h3 class="text-xl font-semibold text-slate-100">🧠 Decision Engine - État Temps Réel</h3>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="insight in aiInsights" :key="insight.id" class="bg-slate-700/70 p-4 rounded-lg">
-              <h4 :class="['font-semibold', getInsightColor(insight.type)]">{{ insight.title }}</h4>
-              <p class="text-sm text-slate-300 mt-1">{{ insight.description }}</p>
-              <div class="mt-2 flex items-center text-xs text-slate-400">
-                <ClockIcon class="w-4 h-4 mr-1" />
-                {{ insight.timestamp }}
-              </div>
+            <div class="bg-slate-700/70 p-4 rounded-lg">
+              <h4 class="font-semibold text-blue-400">📊 Analyse Marché</h4>
+              <p class="text-sm text-slate-300 mt-1">Volatilité: {{ (marketConditions.volatility || 0).toFixed(3) }}</p>
+              <p class="text-sm text-slate-300">Tendance: {{ (marketConditions.trend_strength || 0).toFixed(3) }}</p>
+            </div>
+            <div class="bg-slate-700/70 p-4 rounded-lg">
+              <h4 class="font-semibold text-green-400">💻 Performance Système</h4>
+              <p class="text-sm text-slate-300 mt-1">CPU: {{ systemStatus.cpu_usage || 0 }}%</p>
+              <p class="text-sm text-slate-300">RAM: {{ (systemStatus.memory_usage || 0).toFixed(1) }}%</p>
+            </div>
+            <div class="bg-slate-700/70 p-4 rounded-lg">
+              <h4 class="font-semibold text-purple-400">🎯 Orchestrateur</h4>
+              <p class="text-sm text-slate-300 mt-1">Tâches: {{ orchestratorStats.total_tasks || 0 }}</p>
+              <p class="text-sm text-slate-300">Succès: {{ orchestratorStats.success_rate || 0 }}%</p>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Portfolio Allocation -->
+      <!-- Meme Coins Section -->
+      <div v-if="currentAsset === 'meme_coins'" class="space-y-8">
+        <AssetDashboard 
+          :asset-type="'meme_coins'"
+          :asset-name="'🪙 Meme Coins'"
+          :recommendations="recommendations.meme_coins"
+          :color="'purple'"
+          :description="'Trading haute fréquence sur meme coins (volatilité > 0.8 requise)'"
+        />
+      </div>
+
+      <!-- Crypto Long Term Section -->
+      <div v-if="currentAsset === 'crypto_lt'" class="space-y-8">
+        <AssetDashboard 
+          :asset-type="'crypto_lt'"
+          :asset-name="'₿ Crypto Long Terme'"
+          :recommendations="recommendations.crypto_lt"
+          :color="'orange'"
+          :description="'Accumulation et rebalancing crypto long terme (optimal en période calme < 0.4)'"
+        />
+      </div>
+
+      <!-- Forex Section -->
+      <div v-if="currentAsset === 'forex'" class="space-y-8">
+        <AssetDashboard 
+          :asset-type="'forex'"
+          :asset-name="'💱 Forex'"
+          :recommendations="recommendations.forex"
+          :color="'blue'"
+          :description="'Trading paires Forex pendant sessions actives (8h-17h UTC)'"
+        />
+      </div>
+
+      <!-- ETF Section -->
+      <div v-if="currentAsset === 'etf'" class="space-y-8">
+        <AssetDashboard 
+          :asset-type="'etf'"
+          :asset-name="'📈 ETF'"
+          :recommendations="recommendations.etf"
+          :color="'green'"
+          :description="'Investissement systématique ETF (toujours actif)'"
+        />
+      </div>
+
+      <!-- AI Insights Section -->
+      <div v-if="currentAsset === 'ai_insights'" class="space-y-8">
         <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
-          <h3 class="text-xl font-semibold text-slate-100 mb-4">Allocation ETF Intelligente</h3>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <h3 class="text-xl font-semibold text-slate-100 mb-4">🧠 Insights IA Multi-Assets</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="space-y-4">
-              <div v-for="allocation in portfolioAllocations" :key="allocation.symbol" 
-                   class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                <div class="flex items-center space-x-3">
-                  <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: allocation.color }"></div>
+              <h4 class="font-semibold text-slate-200">📊 Recommandations Intelligentes</h4>
+              <div v-for="rec in globalRecommendations" :key="`${rec.asset_type}-${rec.task_type}`" 
+                   class="bg-slate-700/50 p-3 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-200">{{ getAssetEmoji(rec.asset_type) }} {{ rec.task_type }}</span>
+                  <span :class="['px-2 py-1 text-xs rounded', getPriorityClass(rec.priority)]">{{ rec.priority }}</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">{{ rec.reason }}</p>
+                <p class="text-xs text-slate-500">Fréquence: {{ rec.frequency_minutes }}min</p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <h4 class="font-semibold text-slate-200">🎯 Métriques Performance</h4>
+              <div class="bg-slate-700/50 p-4 rounded-lg">
+                <div class="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div class="font-medium text-slate-100">{{ allocation.name }}</div>
-                    <div class="text-sm text-slate-400">{{ allocation.symbol }}</div>
+                    <div class="text-slate-400">Tâches Totales</div>
+                    <div class="text-lg font-semibold text-slate-100">{{ orchestratorStats.total_tasks || 0 }}</div>
+                  </div>
+                  <div>
+                    <div class="text-slate-400">Taux de Succès</div>
+                    <div class="text-lg font-semibold text-green-400">{{ orchestratorStats.success_rate || 0 }}%</div>
+                  </div>
+                  <div>
+                    <div class="text-slate-400">Temps Moyen</div>
+                    <div class="text-lg font-semibold text-slate-100">{{ (orchestratorStats.average_execution_time || 0).toFixed(1) }}s</div>
+                  </div>
+                  <div>
+                    <div class="text-slate-400">Statut</div>
+                    <div :class="['text-lg font-semibold', orchestratorRunning ? 'text-green-400' : 'text-red-400']">
+                      {{ orchestratorRunning ? '🟢 Actif' : '🔴 Arrêté' }}
+                    </div>
                   </div>
                 </div>
-                <div class="text-right">
-                  <div class="font-semibold text-slate-100">{{ allocation.percentage }}%</div>
-                  <div :class="['text-sm', allocation.change >= 0 ? 'text-green-400' : 'text-red-400']">
-                    {{ allocation.change >= 0 ? '+' : '' }}{{ allocation.change.toFixed(2) }}%
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center justify-center">
-              <div class="text-slate-400">
-                [Graphique en anneau allocation ETF]
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Trading Section -->
-      <div v-if="currentSection === 'trading'" class="space-y-8">
+      <!-- Settings Section -->
+      <div v-if="currentAsset === 'settings'" class="space-y-8">
         <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
-          <h3 class="text-xl font-semibold text-slate-100 mb-4">Station de Trading ETF</h3>
-          <p class="text-slate-400">Les ordres ETF sont gérés automatiquement par l'IA. Interface de monitoring uniquement.</p>
-        </div>
-      </div>
-
-      <!-- Portfolio Section -->
-      <div v-if="currentSection === 'portfolio'" class="space-y-8">
-        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl">
-          <h3 class="text-xl font-semibold text-slate-100 mb-4">Portefeuille ETF Détaillé</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-slate-300">
-              <thead class="text-xs text-slate-400 uppercase bg-slate-700/50">
-                <tr>
-                  <th class="px-6 py-3">ETF</th>
-                  <th class="px-6 py-3">Allocation</th>
-                  <th class="px-6 py-3">Valeur</th>
-                  <th class="px-6 py-3">Performance</th>
-                  <th class="px-6 py-3">Statut IA</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-700">
-                <tr v-for="etf in detailedPortfolio" :key="etf.symbol" class="hover:bg-slate-700/30">
-                  <td class="px-6 py-4 font-medium text-slate-100">{{ etf.name }}</td>
-                  <td class="px-6 py-4">{{ etf.allocation }}%</td>
-                  <td class="px-6 py-4">${{ etf.value.toLocaleString() }}</td>
-                  <td :class="['px-6 py-4', etf.performance >= 0 ? 'text-green-400' : 'text-red-400']">
-                    {{ etf.performance >= 0 ? '+' : '' }}{{ etf.performance.toFixed(2) }}%
-                  </td>
-                  <td class="px-6 py-4">
-                    <span :class="['px-2 py-1 text-xs rounded-full', getStatusClass(etf.aiStatus)]">
-                      {{ etf.aiStatus }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <h3 class="text-xl font-semibold text-slate-100 mb-4">⚙️ Configuration Multi-Assets</h3>
+          <p class="text-slate-400">Configuration avancée des workflows disponible prochainement...</p>
         </div>
       </div>
     </main>
@@ -198,203 +287,161 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { 
-  SparklesIcon, 
-  HomeIcon, 
-  ChartBarIcon, 
-  WalletIcon, 
-  CpuChipIcon,
-  Cog6ToothIcon,
-  ArrowPathIcon,
-  PowerIcon,
-  ClockIcon
+  SparklesIcon, HomeIcon, CurrencyDollarIcon, ChartBarIcon, 
+  GlobeEuropeAfricaIcon, WalletIcon, CpuChipIcon, Cog6ToothIcon,
+  ArrowPathIcon, PowerIcon, ClockIcon
 } from '@heroicons/vue/24/outline'
+import AssetDashboard from '../components/AssetDashboard.vue'
 
-// État réactif
-const currentSection = ref('dashboard')
-const portfolioValue = ref(125430.50)
-const dailyChange = ref(2.45)
-const activeETFs = ref(8)
-const aiSignals = ref(12)
-const systemHealth = ref(98)
+// Reactive data
+const currentAsset = ref('overview')
+const orchestratorRunning = ref(false)
+const orchestratorStats = ref({})
+const marketConditions = ref({})
+const systemStatus = ref({})
+const assetStats = ref({})
+const recommendations = ref({})
+const globalRecommendations = ref([])
+const refreshInterval = ref(null)
 
-// Données mock pour démonstration
-const aiInsights = ref([
-  {
-    id: 1,
-    type: 'buy',
-    title: 'Signal d\'Achat Fort : VTI',
-    description: 'L\'IA détecte une opportunité d\'accumulation sur l\'ETF Vanguard Total Stock Market avec une probabilité de succès de 82%.',
-    timestamp: 'Il y a 15 min'
-  },
-  {
-    id: 2,
-    type: 'neutral',
-    title: 'Analyse Sectorielle : Tech Stable',
-    description: 'Le secteur technologique (QQQ) montre des signaux neutres. Maintien de l\'allocation recommandé.',
-    timestamp: 'Il y a 1h'
-  },
-  {
-    id: 3,
-    type: 'warning',
-    title: 'Alerte Rebalancing : VXUS',
-    description: 'L\'ETF international dépasse l\'allocation cible de 2%. Rebalancing automatique programmé.',
-    timestamp: 'Il y a 2h'
-  }
-])
-
-const portfolioAllocations = ref([
-  { symbol: 'VTI', name: 'Vanguard Total Stock Market', percentage: 35, change: 1.2, color: '#22c55e' },
-  { symbol: 'VTIAX', name: 'Vanguard Total International', percentage: 25, change: -0.5, color: '#3b82f6' },
-  { symbol: 'QQQ', name: 'Invesco QQQ Trust', percentage: 20, change: 2.1, color: '#8b5cf6' },
-  { symbol: 'BND', name: 'Vanguard Total Bond Market', percentage: 15, change: 0.1, color: '#f59e0b' },
-  { symbol: 'VNQ', name: 'Vanguard Real Estate', percentage: 5, change: -1.2, color: '#ef4444' }
-])
-
-const detailedPortfolio = ref([
-  { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', allocation: 35, value: 43900, performance: 1.2, aiStatus: 'HOLD' },
-  { symbol: 'VTIAX', name: 'Vanguard Total International', allocation: 25, value: 31350, performance: -0.5, aiStatus: 'ACCUMULATE' },
-  { symbol: 'QQQ', name: 'Invesco QQQ Trust', allocation: 20, value: 25086, performance: 2.1, aiStatus: 'HOLD' },
-  { symbol: 'BND', name: 'Vanguard Total Bond Market', allocation: 15, value: 18814, performance: 0.1, aiStatus: 'REDUCE' },
-  { symbol: 'VNQ', name: 'Vanguard Real Estate ETF', allocation: 5, value: 6270, performance: -1.2, aiStatus: 'HOLD' }
-])
-
-// Méthodes
-const getSectionTitle = () => {
+// Methods
+const getAssetTitle = () => {
   const titles = {
-    dashboard: 'Dashboard ETF IA',
-    trading: 'Station de Trading',
-    portfolio: 'Portefeuille ETF',
-    ai: 'Intelligence Artificielle',
-    settings: 'Paramètres'
+    overview: '📊 Vue d\'Ensemble Multi-Assets',
+    meme_coins: '🪙 Meme Coins - Trading Haute Fréquence',
+    crypto_lt: '₿ Crypto Long Terme - Accumulation DCA',
+    forex: '💱 Forex - Trading Devises',
+    etf: '📈 ETF - Investissement Systématique',
+    ai_insights: '🧠 Insights IA - Analyse Prédictive',
+    settings: '⚙️ Paramètres - Configuration Workflows'
   }
-  return titles[currentSection.value] || 'Dashboard'
+  return titles[currentAsset.value] || 'Dashboard'
 }
 
-const getSectionSubtitle = () => {
+const getAssetSubtitle = () => {
   const subtitles = {
-    dashboard: 'Vue d\'ensemble de votre portefeuille ETF intelligent',
-    trading: 'Monitoring des ordres automatiques IA',
-    portfolio: 'Analyse détaillée de vos investissements ETF',
-    ai: 'Insights et recommandations de l\'IA',
-    settings: 'Configuration du système de trading'
+    overview: 'Supervision intelligente de tous les workflows de trading',
+    meme_coins: 'Actif uniquement si volatilité > 0.8 (conditions extrêmes)',
+    crypto_lt: 'Optimal pendant périodes calmes < 0.4 (accumulation sûre)',
+    forex: 'Trading pendant sessions 8h-17h UTC uniquement',
+    etf: 'Stratégie always-on pour investissement long terme',
+    ai_insights: 'Analyses prédictives et recommandations temps réel',
+    settings: 'Personnalisation avancée des stratégies de trading'
   }
-  return subtitles[currentSection.value] || 'Tableau de bord'
+  return subtitles[currentAsset.value] || 'AI Trading Hub'
 }
 
-const getInsightColor = (type) => {
-  const colors = {
-    buy: 'text-brand-buy',
-    sell: 'text-brand-sell',
-    neutral: 'text-slate-200',
-    warning: 'text-yellow-400'
+const getAssetEmoji = (assetType) => {
+  const emojis = {
+    meme_coins: '🪙',
+    crypto_lt: '₿',
+    forex: '💱',
+    etf: '📈'
   }
-  return colors[type] || 'text-slate-200'
+  return emojis[assetType] || '📊'
 }
 
-const getStatusClass = (status) => {
+const getPriorityClass = (priority) => {
   const classes = {
-    'HOLD': 'bg-blue-900 text-blue-300',
-    'ACCUMULATE': 'bg-green-900 text-green-300',
-    'REDUCE': 'bg-red-900 text-red-300'
+    HIGH: 'bg-red-600 text-white',
+    MEDIUM: 'bg-yellow-600 text-white', 
+    LOW: 'bg-green-600 text-white'
   }
-  return classes[status] || 'bg-slate-900 text-slate-300'
+  return classes[priority] || 'bg-slate-600 text-white'
 }
 
-const refreshData = () => {
-  console.log('🔄 Actualisation des données ETF...')
-  // Simulation d'actualisation
-  portfolioValue.value = portfolioValue.value + (Math.random() - 0.5) * 1000
-  dailyChange.value = dailyChange.value + (Math.random() - 0.5) * 0.5
+const toggleOrchestrator = async () => {
+  try {
+    const action = orchestratorRunning.value ? 'stop' : 'start'
+    const response = await fetch(`/api/orchestrator/${action}`, { method: 'POST' })
+    const data = await response.json()
+    
+    if (data.success) {
+      orchestratorRunning.value = !orchestratorRunning.value
+      await refreshData()
+    }
+  } catch (error) {
+    console.error('Erreur toggle orchestrateur:', error)
+  }
 }
+
+const fetchOrchestratorStatus = async () => {
+  try {
+    const response = await fetch('/api/orchestrator/status')
+    const data = await response.json()
+    
+    orchestratorRunning.value = data.orchestrator?.running || false
+    orchestratorStats.value = data.orchestrator || {}
+    marketConditions.value = data.market_conditions || {}
+    systemStatus.value = data.system_status || {}
+  } catch (error) {
+    console.error('Erreur status orchestrateur:', error)
+  }
+}
+
+const fetchAssetRecommendations = async () => {
+  try {
+    const assetTypes = ['meme_coins', 'crypto_lt', 'forex', 'etf']
+    
+    for (const assetType of assetTypes) {
+      const response = await fetch(`/api/orchestrator/recommendations/${assetType}`)
+      const data = await response.json()
+      
+      recommendations.value[assetType] = data.recommendations || []
+      assetStats.value[assetType] = {
+        recommendations: (data.recommendations || []).length,
+        active: (data.recommendations || []).length > 0
+      }
+    }
+    
+    // Global recommendations
+    const globalResponse = await fetch('/api/orchestrator/recommendations')
+    const globalData = await globalResponse.json()
+    globalRecommendations.value = globalData.all_recommendations || []
+  } catch (error) {
+    console.error('Erreur recommandations assets:', error)
+  }
+}
+
+const refreshData = async () => {
+  await Promise.all([
+    fetchOrchestratorStatus(),
+    fetchAssetRecommendations()
+  ])
+}
+
+// Lifecycle
+onMounted(async () => {
+  await refreshData()
+  
+  // Auto-refresh every 5 seconds
+  refreshInterval.value = setInterval(refreshData, 5000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
+})
 </script>
 
 <style scoped>
-.dashboard {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
 }
 
-h1 {
-  color: #2c3e50;
-  margin-bottom: 2rem;
-  text-align: center;
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  }
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #3498db;
-}
-
-.stat-card h3 {
-  margin: 0 0 0.5rem 0;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 0.5rem 0;
-  color: #2c3e50;
-}
-
-.stat-change.positive {
-  color: #27ae60;
-}
-
-.stat-change.neutral {
-  color: #7f8c8d;
-}
-
-.stat-status.active {
-  color: #27ae60;
-  font-weight: bold;
-}
-
-.actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.btn-primary, .btn-secondary {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-primary {
-  background: #3498db;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #2980b9;
-}
-
-.btn-secondary {
-  background: #95a5a6;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #7f8c8d;
+.brand-accent {
+  color: #3B82F6;
 }
 </style> 
