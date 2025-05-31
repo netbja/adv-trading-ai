@@ -95,6 +95,12 @@ services:
       - redis
       - backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.tasks.celery_app inspect ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     command: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=4
 
   # ⏰ CELERY BEAT - SCHEDULER
@@ -120,6 +126,12 @@ services:
       - backend
     restart: unless-stopped
     working_dir: /app
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.tasks.celery_app inspect active || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     command: celery -A app.tasks.celery_app beat --loglevel=info --scheduler=redbeat.schedulers:RedBeatScheduler
 
   # 🧪 TESTS IA AVANCÉE - SERVICE OPTIONNEL
