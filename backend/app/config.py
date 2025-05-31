@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     AUTO_HEALING_ENABLED: bool = True
     
     # Database
-    DATABASE_URL: str = "postgresql://trader:TradingDB2025!@postgres:5432/trading_ai"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/trading_ai")
     
     # Redis
     REDIS_URL: str = "redis://redis:6379/0"
