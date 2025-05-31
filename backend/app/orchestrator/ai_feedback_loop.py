@@ -58,6 +58,16 @@ class LearningPattern:
     usage_count: int
     last_updated: datetime
 
+@dataclass
+class AdaptationContext:
+    """Contexte d'adaptation pour l'apprentissage"""
+    asset_type: str
+    market_conditions: Dict
+    system_state: Dict
+    learning_signal: LearningSignal
+    timestamp: datetime
+    metadata: Optional[Dict] = None
+
 class AIFeedbackLoop:
     """
     🧠 BOUCLE DE RÉTROACTION IA POSITIVE
