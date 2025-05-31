@@ -32,7 +32,7 @@ class LearningSignalRequest(BaseModel):
     signal_type: str  # SUCCESS, FAILURE, OPTIMIZATION, ADAPTATION
     component: str
     context: Dict[str, Any]
-    performance_metrics: Dict[str, float]
+    performance_metrics: Dict[str, Any]
     timestamp: Optional[datetime] = None
 
 class PredictionRequest(BaseModel):

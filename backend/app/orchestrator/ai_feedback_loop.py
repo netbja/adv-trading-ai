@@ -577,7 +577,7 @@ class AIFeedbackLoop:
             logger.error(f"❌ Erreur cycle d'apprentissage: {e}")
             return {"success": False, "error": str(e)}
 
-    async def process_learning_signal(self, signal_type: LearningSignal, component: str, context: 'AdaptationContext', performance_metrics: Dict[str, float]) -> Dict:
+    async def process_learning_signal(self, signal_type: LearningSignal, component: str, context: 'AdaptationContext', performance_metrics: Dict[str, Any]) -> Dict:
         """
         🎯 Traiter un signal d'apprentissage direct
         
@@ -585,12 +585,26 @@ class AIFeedbackLoop:
             signal_type: Type de signal (SUCCESS, FAILURE, etc.)
             component: Composant source du signal
             context: Contexte d'adaptation
-            performance_metrics: Métriques de performance
+            performance_metrics: Métriques de performance (types mixtes)
             
         Returns:
             Dict avec les résultats du traitement
         """
         try:
+            # Convertir les métriques en float quand possible
+            converted_metrics = {}
+            for key, value in performance_metrics.items():
+                try:
+                    if isinstance(value, (int, float)):
+                        converted_metrics[key] = float(value)
+                    elif isinstance(value, str) and value.replace('.', '').replace('-', '').isdigit():
+                        converted_metrics[key] = float(value)
+                    else:
+                        # Garder la valeur originale si conversion impossible
+                        converted_metrics[key] = value
+                except (ValueError, TypeError):
+                    converted_metrics[key] = value
+            
             # Créer un feedback à partir du signal
             feedback = FeedbackData(
                 timestamp=datetime.utcnow(),
@@ -599,9 +613,9 @@ class AIFeedbackLoop:
                 market_conditions=context.market_conditions,
                 system_conditions=context.system_state,
                 action_taken=f"signal_processing_{signal_type.value}",
-                result_metrics=performance_metrics,
+                result_metrics=converted_metrics,
                 learning_signal=signal_type,
-                confidence_score=performance_metrics.get('accuracy', 0.8)
+                confidence_score=converted_metrics.get('accuracy', 0.8) if isinstance(converted_metrics.get('accuracy'), (int, float)) else 0.8
             )
             
             # Traiter le feedback
