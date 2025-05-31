@@ -21,6 +21,10 @@ RUN pip install --no-cache-dir --only-binary=all numpy==1.26.2 pandas==2.1.4
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copier le script de démarrage et donner permissions AVANT de copier le reste
+COPY start.sh .
+RUN chmod +x start.sh
+
 # Copier le code source
 COPY . .
 
@@ -36,10 +40,6 @@ EXPOSE 8000
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
-
-# Script de démarrage conditionnel
-COPY start.sh .
-RUN chmod +x start.sh
 
 # Commande par défaut
 CMD ["./start.sh"] 
